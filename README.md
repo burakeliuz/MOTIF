@@ -101,3 +101,7 @@ reports/            feasibility.md (curated report; currently not_evaluated)
 docs/               evidence contract, Qloo access notes, deferred design, synthetic example output
 tests/              unittest suite (+ a fake harness used only by tests)
 ```
+
+## License
+
+MIT. See [`LICENSE`](LICENSE).
