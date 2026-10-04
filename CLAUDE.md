@@ -4,6 +4,12 @@ Current phase: **Qloo feasibility spike** (roadmap stage 1 done offline; stage 2
 Read `MOTIF_QLOO_FEASIBILITY.md` (rev 0.2) before changing anything. Then read
 `README.md`, `docs/QLOO_ACCESS_NOTES.md`, and `reports/feasibility.md`.
 
+## Communication with the project owner
+
+- The owner follows progress live on a phone. Write every user-facing message in Turkish, including the short progress notes between steps and tool-call descriptions.
+- Use plain language for a non-technical reader; longer is fine. The first time a technical term appears (for example harness, API, JSON, commit), explain it in one short sentence.
+- Code, code comments, and repository documents stay in English (the hackathon submission is in English).
+
 ## Commands
 
 - `python3 -m unittest`: run before every commit.
