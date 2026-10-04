@@ -1,0 +1,16 @@
+# Local run outputs. Live runs contain Qloo response data; keep them out of
+# source control unless the event's data terms allow sharing (see data/README.md).
+data/raw/*
+data/normalized/*
+!data/raw/.gitkeep
+!data/normalized/.gitkeep
+
+# Credentials never belong in this folder. Use `qloo setup --qloo` instead.
+.env
+.env.*
+*.key
+
+# Python / Node
+__pycache__/
+*.pyc
+node_modules/

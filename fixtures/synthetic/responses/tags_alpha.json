@@ -1,0 +1,25 @@
+{
+  "_synthetic_fixture": "Invented workflow envelope. It mirrors the field names of the harness 0.1.26 result envelope; it is not Qloo output.",
+  "schema_version": "synthetic",
+  "operation": "entity_tags",
+  "status": "ok",
+  "interpretation": {
+    "entities": [
+      {"input": "SYNTHETIC-ENT-A001", "entityId": "SYNTHETIC-ENT-A001", "name": "Synthetic Seed Alpha", "type": "urn:entity:brand", "match": "identifier"}
+    ]
+  },
+  "results": [
+    {"id": "synthetic:tag:style:fx_st1", "name": "Fixture Style ST1", "type": "synthetic:tag:style", "popularity": 0.5, "affinity": 0.97},
+    {"id": "synthetic:tag:keyword:media:fx_k1", "name": "Fixture Keyword K1", "type": "synthetic:tag:keyword:media", "popularity": 0.8, "affinity": 0.9},
+    {"id": "synthetic:tag:genre:music:fx_quiet", "name": "Fixture Quiet", "type": "synthetic:tag:genre:music", "popularity": 0.3, "affinity": 0.85},
+    {"id": "synthetic:tag:keyword:brand:fx_b1", "name": "Fixture Brand Keyword B1", "type": "synthetic:tag:keyword:brand"}
+  ],
+  "result_count": 4,
+  "execution": {"transport": "direct", "transport_name": "synthetic-fixture", "correlation_id": "synthetic-0001", "duration_ms": 0},
+  "provenance": {
+    "source": "SYNTHETIC FIXTURE (not Qloo)",
+    "endpoint": "/v2/insights",
+    "documentation": "n/a",
+    "requests": [{"filter.type": "urn:tag", "signal.interests.entities": ["SYNTHETIC-ENT-A001"], "take": 5}]
+  }
+}

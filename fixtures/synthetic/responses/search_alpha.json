@@ -1,0 +1,20 @@
+[
+  {
+    "_synthetic_fixture": true,
+    "entity_id": "SYNTHETIC-ENT-A001",
+    "name": "Synthetic Seed Alpha",
+    "types": ["urn:entity:brand"],
+    "popularity": 0.61,
+    "properties": {"short_description": "Invented fixture brand; not a real entity"},
+    "tags": [
+      {"id": "synthetic:tag:style:fx_st1", "name": "Fixture Style ST1", "type": "synthetic:tag:style"}
+    ]
+  },
+  {
+    "_synthetic_fixture": true,
+    "entity_id": "SYNTHETIC-ENT-A002",
+    "name": "Synthetic Seed Alpha Outlet",
+    "types": ["urn:entity:brand"],
+    "popularity": 0.2
+  }
+]

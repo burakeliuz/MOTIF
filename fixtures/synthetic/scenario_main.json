@@ -1,0 +1,61 @@
+{
+  "_synthetic_fixture": "SYNTHETIC SCENARIO. Invented seeds, entities, tags, scores, and IDs used only to test the evidence contract. Not Qloo data and not a claim about Qloo's wire format.",
+  "scenario_id": "contract-check-main-v1",
+  "exercises": [
+    "alpha: unique name match; seed detail; three domains; duplicate entity in a result list; item without tags/properties; explainability present on some items; a domain without explainability; HTTP 429 then success; tag insights with one missing score",
+    "beta: same-name candidates narrowed by expected type (accent/case folding); entity lookup not found; overlap with alpha; empty result; rejected request (400); persistent retryable workflow failure",
+    "gamma: two same-name candidates of the expected type -> ambiguous, nothing selected",
+    "delta: only a near match -> unresolved, nothing selected"
+  ],
+  "manifest": {
+    "manifest_version": "synthetic-1",
+    "seeds": [
+      {"key": "alpha", "input_name": "Synthetic Seed Alpha", "expected_types": ["urn:entity:brand"]},
+      {"key": "beta", "input_name": "Synthetic Seed Beta", "expected_types": ["urn:entity:brand"]},
+      {"key": "gamma", "input_name": "Synthetic Seed Gamma", "expected_types": ["urn:entity:brand"]},
+      {"key": "delta", "input_name": "Synthetic Seed Delta", "expected_types": ["urn:entity:brand"]}
+    ],
+    "domains": [
+      {"key": "movie", "label": "movies", "entity_type": "urn:entity:movie"},
+      {"key": "artist", "label": "music artists", "entity_type": "urn:entity:artist"},
+      {"key": "book", "label": "books", "entity_type": "urn:entity:book"}
+    ],
+    "defaults": {
+      "search_take": 5, "related_take": 5, "explainability": true, "seed_detail": true, "seed_tags_limit": 5,
+      "max_retries": 2, "retry_backoff_s": [0, 0], "timeout_s": 5
+    },
+    "plans": {
+      "synthetic": {"seeds": ["alpha", "beta", "gamma", "delta"], "domains": ["movie", "artist", "book"], "max_requests": 40}
+    }
+  },
+  "responses": [
+    {"match": {"command": ["api", "search"], "flags": {"--query": "Synthetic Seed Alpha"}}, "sequence": [{"stdout_file": "responses/search_alpha.json"}]},
+    {"match": {"command": ["api", "search"], "flags": {"--query": "Synthetic Seed Beta"}}, "sequence": [{"stdout_file": "responses/search_beta.json"}]},
+    {"match": {"command": ["api", "search"], "flags": {"--query": "Synthetic Seed Gamma"}}, "sequence": [{"stdout_file": "responses/search_gamma.json"}]},
+    {"match": {"command": ["api", "search"], "flags": {"--query": "Synthetic Seed Delta"}}, "sequence": [{"stdout_file": "responses/search_delta.json"}]},
+
+    {"match": {"command": ["api", "entity"], "flags": {"--id": "SYNTHETIC-ENT-A001"}}, "sequence": [{"stdout_file": "responses/entity_alpha.json"}]},
+    {"match": {"command": ["api", "entity"], "flags": {"--id": "SYNTHETIC-ENT-B001"}},
+     "sequence": [{"exit_code": 4, "stdout": {"error": true, "code": "NOT_FOUND", "message": "Entity not found. (synthetic fixture)"}}]},
+
+    {"match": {"command": ["api", "insights"], "flags": {"--type": "urn:entity:movie", "--signal-entities": "SYNTHETIC-ENT-A001"}},
+     "sequence": [{"stdout_file": "responses/insights_alpha_movie.json"}]},
+    {"match": {"command": ["api", "insights"], "flags": {"--type": "urn:entity:artist", "--signal-entities": "SYNTHETIC-ENT-A001"}},
+     "sequence": [{"stdout_file": "responses/insights_alpha_artist.json"}]},
+    {"match": {"command": ["api", "insights"], "flags": {"--type": "urn:entity:book", "--signal-entities": "SYNTHETIC-ENT-A001"}},
+     "sequence": [
+       {"exit_code": 5, "stdout": {"error": true, "code": "API_ERROR", "message": "API request failed: 429 Too Many Requests (synthetic fixture)"}},
+       {"stdout_file": "responses/insights_alpha_book.json"}
+     ]},
+    {"match": {"command": ["api", "insights"], "flags": {"--type": "urn:entity:movie", "--signal-entities": "SYNTHETIC-ENT-B001"}},
+     "sequence": [{"stdout_file": "responses/insights_beta_movie.json"}]},
+    {"match": {"command": ["api", "insights"], "flags": {"--type": "urn:entity:artist", "--signal-entities": "SYNTHETIC-ENT-B001"}},
+     "sequence": [{"stdout_text": "[]"}]},
+    {"match": {"command": ["api", "insights"], "flags": {"--type": "urn:entity:book", "--signal-entities": "SYNTHETIC-ENT-B001"}},
+     "sequence": [{"exit_code": 5, "stdout": {"error": true, "code": "API_ERROR", "message": "API request failed: 400 Bad Request (synthetic fixture)"}}]},
+
+    {"match": {"command": ["exec", "entity_tags"], "input": {"entities": ["SYNTHETIC-ENT-A001"]}}, "sequence": [{"stdout_file": "responses/tags_alpha.json"}]},
+    {"match": {"command": ["exec", "entity_tags"], "input": {"entities": ["SYNTHETIC-ENT-B001"]}},
+     "sequence": [{"exit_code": 1, "stdout": {"error": {"code": "QLOO_UPSTREAM", "layer": "qloo", "retryable": true, "recovery": "Retry later. (synthetic fixture)"}, "operation": "entity_tags", "correlation_id": "synthetic-0002"}}]}
+  ]
+}

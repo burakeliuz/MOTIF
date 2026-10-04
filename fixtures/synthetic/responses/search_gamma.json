@@ -1,0 +1,7 @@
+{
+  "_synthetic_fixture": "Object-with-entities shape, used to exercise the parser's shape detection.",
+  "entities": [
+    {"_synthetic_fixture": true, "entity_id": "SYNTHETIC-ENT-G001", "name": "Synthetic Seed Gamma", "types": ["urn:entity:brand"], "popularity": 0.3},
+    {"_synthetic_fixture": true, "entity_id": "SYNTHETIC-ENT-G002", "name": "Synthetic Seed Gamma", "types": ["urn:entity:brand"], "popularity": 0.25}
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "_synthetic_fixture": "SYNTHETIC SCENARIO. The first request fails with a credential error; the run must stop without trying another credential, endpoint, or fixture.",
+  "scenario_id": "contract-check-auth-error-v1",
+  "manifest": {
+    "manifest_version": "synthetic-1",
+    "seeds": [
+      {"key": "alpha", "input_name": "Synthetic Seed Alpha", "expected_types": ["urn:entity:brand"]},
+      {"key": "beta", "input_name": "Synthetic Seed Beta", "expected_types": ["urn:entity:brand"]}
+    ],
+    "domains": [
+      {"key": "movie", "label": "movies", "entity_type": "urn:entity:movie"}
+    ],
+    "defaults": {
+      "search_take": 5, "related_take": 5, "explainability": true, "seed_detail": true, "seed_tags_limit": 5,
+      "max_retries": 2, "retry_backoff_s": [0, 0], "timeout_s": 5
+    },
+    "plans": {
+      "synthetic": {"seeds": ["alpha", "beta"], "domains": ["movie"], "max_requests": 10}
+    }
+  },
+  "responses": [
+    {"match": {"command": ["api", "search"], "flags": {"--query": "Synthetic Seed Alpha"}},
+     "sequence": [{"exit_code": 3, "stdout": {"error": true, "code": "AUTH_FAILED", "message": "No API key found. (synthetic fixture)"}}]},
+    {"match": {"command": ["api", "search"], "flags": {"--query": "Synthetic Seed Beta"}}, "sequence": [{"stdout_file": "responses/search_beta.json"}]}
+  ]
+}

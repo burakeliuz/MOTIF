@@ -1,0 +1,75 @@
+{
+  "manifest_version": "0.1.0",
+  "description": "Live request manifest for the MOTIF Qloo feasibility spike (MOTIF_QLOO_FEASIBILITY.md rev 0.2, section 8). Seeds are inputs, not Qloo IDs. Entity types are the harness 0.1.26 type list; their availability under the event credential is not verified until a live run.",
+  "seeds": [
+    {
+      "key": "a24",
+      "input_name": "A24",
+      "expected_types": ["urn:entity:brand"],
+      "search_type": null,
+      "note": "Film studio/distributor. Its Qloo type is unknown; the expected type only breaks ties between same-name candidates."
+    },
+    {
+      "key": "muji",
+      "input_name": "MUJI",
+      "expected_types": ["urn:entity:brand"],
+      "search_type": null,
+      "note": "Retail brand."
+    },
+    {
+      "key": "cdg",
+      "input_name": "Comme des Garçons",
+      "expected_types": ["urn:entity:brand"],
+      "search_type": null,
+      "note": "Fashion label. Name comparison folds case and accents (ç = c); nothing fuzzier."
+    },
+    {
+      "key": "nike",
+      "input_name": "Nike",
+      "expected_types": ["urn:entity:brand"],
+      "search_type": null,
+      "note": "Brand name shared with non-brand entities is possible; ambiguity is reported, not guessed."
+    },
+    {
+      "key": "ralph_lauren",
+      "input_name": "Ralph Lauren",
+      "expected_types": ["urn:entity:brand"],
+      "search_type": null,
+      "note": "Brand and person share the name; the expected type narrows only exact-name candidates."
+    }
+  ],
+  "resolution_overrides": {},
+  "resolution_overrides_help": "Only after reviewing an ambiguous search: {\"<seed key>\": {\"qloo_id\": \"<an ID the search actually returned>\", \"reason\": \"...\"}}. An ID that was not returned is rejected.",
+  "domains": [
+    {"key": "brand", "label": "brands", "entity_type": "urn:entity:brand"},
+    {"key": "movie", "label": "movies", "entity_type": "urn:entity:movie"},
+    {"key": "artist", "label": "music artists", "entity_type": "urn:entity:artist"},
+    {"key": "book", "label": "books", "entity_type": "urn:entity:book"},
+    {"key": "person", "label": "people", "entity_type": "urn:entity:person"},
+    {"key": "place", "label": "places", "entity_type": "urn:entity:place"}
+  ],
+  "defaults": {
+    "search_take": 10,
+    "related_take": 10,
+    "explainability": true,
+    "seed_detail": true,
+    "seed_tags_limit": 20,
+    "max_retries": 2,
+    "retry_backoff_s": [3, 10],
+    "timeout_s": 90
+  },
+  "plans": {
+    "pilot": {
+      "description": "Two contrasting seeds, three domains. Inspect output before expanding.",
+      "seeds": ["a24", "muji"],
+      "domains": ["movie", "artist", "brand"],
+      "max_requests": 20
+    },
+    "full": {
+      "description": "All five seeds and all six candidate domains. Identical successful pilot requests are reused, not re-sent.",
+      "seeds": ["a24", "muji", "cdg", "nike", "ralph_lauren"],
+      "domains": ["brand", "movie", "artist", "book", "person", "place"],
+      "max_requests": 60
+    }
+  }
+}

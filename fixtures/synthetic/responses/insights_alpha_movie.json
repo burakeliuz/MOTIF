@@ -1,0 +1,67 @@
+[
+  {
+    "_synthetic_fixture": true,
+    "entity_id": "SYNTHETIC-ENT-M101",
+    "name": "Fixture Film 101",
+    "type": "urn:entity",
+    "subtype": "urn:entity:movie",
+    "properties": {"description": "Invented film description (fixture).", "release_year": 2001},
+    "popularity": 0.9,
+    "query": {"affinity": 0.95, "explainability": {"signal.interests.entities": [{"entity_id": "SYNTHETIC-ENT-A001", "score": 1.0}]}},
+    "tags": [
+      {"id": "synthetic:tag:keyword:media:fx_k1", "name": "Fixture Keyword K1", "type": "synthetic:tag:keyword:media"},
+      {"id": "synthetic:tag:genre:media:fx_g1", "name": "Fixture Genre G1", "type": "synthetic:tag:genre:media"},
+      {"id": "synthetic:tag:streaming_service:media:fx_s1", "name": "Fixture Streaming S1", "type": "synthetic:tag:streaming_service:media"},
+      {"id": "synthetic:tag:keyword:media:fx_quiet", "name": "Fixture Quiet", "type": "synthetic:tag:keyword:media"}
+    ]
+  },
+  {
+    "_synthetic_fixture": true,
+    "entity_id": "SYNTHETIC-ENT-M102",
+    "name": "Fixture Film 102",
+    "type": "urn:entity",
+    "subtype": "urn:entity:movie",
+    "properties": {"release_year": 2010},
+    "popularity": 0.7,
+    "query": {"affinity": 0.91},
+    "tags": [
+      {"id": "synthetic:tag:keyword:media:fx_k2", "name": "Fixture Keyword K2", "type": "synthetic:tag:keyword:media"},
+      {"id": "synthetic:tag:genre:media:fx_g1", "name": "Fixture Genre G1", "type": "synthetic:tag:genre:media"}
+    ]
+  },
+  {
+    "_synthetic_fixture": true,
+    "entity_id": "SYNTHETIC-ENT-M103",
+    "name": "Fixture Film 103",
+    "type": "urn:entity",
+    "subtype": "urn:entity:movie",
+    "properties": {"description": "Another invented film description (fixture)."},
+    "popularity": 0.5,
+    "query": {"affinity": 0.88, "explainability": {"signal.interests.entities": [{"entity_id": "SYNTHETIC-ENT-A001", "score": 1.0}]}},
+    "tags": [
+      {"id": "synthetic:tag:keyword:media:fx_k1", "name": "Fixture Keyword K1", "type": "synthetic:tag:keyword:media"},
+      {"id": "synthetic:tag:streaming_service:media:fx_s1", "name": "Fixture Streaming S1", "type": "synthetic:tag:streaming_service:media"}
+    ]
+  },
+  {
+    "_synthetic_fixture": true,
+    "entity_id": "SYNTHETIC-ENT-M102",
+    "name": "Fixture Film 102",
+    "type": "urn:entity",
+    "subtype": "urn:entity:movie",
+    "properties": {"release_year": 2010},
+    "popularity": 0.7,
+    "query": {"affinity": 0.86},
+    "tags": [
+      {"id": "synthetic:tag:keyword:media:fx_k2", "name": "Fixture Keyword K2", "type": "synthetic:tag:keyword:media"}
+    ]
+  },
+  {
+    "_synthetic_fixture": true,
+    "entity_id": "SYNTHETIC-ENT-M105",
+    "name": "Fixture Film 105",
+    "type": "urn:entity",
+    "subtype": "urn:entity:movie",
+    "query": {"affinity": 0.8}
+  }
+]

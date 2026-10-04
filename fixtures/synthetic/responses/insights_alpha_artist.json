@@ -1,0 +1,50 @@
+[
+  {
+    "_synthetic_fixture": true,
+    "entity_id": "SYNTHETIC-ENT-R101",
+    "name": "Fixture Artist 101",
+    "type": "urn:entity",
+    "subtype": "urn:entity:artist",
+    "popularity": 0.7,
+    "query": {"affinity": 0.92},
+    "tags": [
+      {"id": "synthetic:tag:genre:music:fx_m1", "name": "Fixture Music Genre M1", "type": "synthetic:tag:genre:music"},
+      {"id": "synthetic:tag:keyword:media:fx_k1", "name": "Fixture Keyword K1", "type": "synthetic:tag:keyword:media"},
+      {"id": "synthetic:tag:genre:music:fx_quiet", "name": "Fixture Quiet", "type": "synthetic:tag:genre:music"}
+    ]
+  },
+  {
+    "_synthetic_fixture": true,
+    "entity_id": "SYNTHETIC-ENT-R102",
+    "name": "Fixture Artist 102",
+    "type": "urn:entity",
+    "subtype": "urn:entity:artist",
+    "popularity": 0.6,
+    "query": {"affinity": 0.89},
+    "tags": [
+      {"id": "synthetic:tag:genre:music:fx_m1", "name": "Fixture Music Genre M1", "type": "synthetic:tag:genre:music"}
+    ]
+  },
+  {
+    "_synthetic_fixture": true,
+    "entity_id": "SYNTHETIC-ENT-R103",
+    "name": "Fixture Artist 103",
+    "type": "urn:entity",
+    "subtype": "urn:entity:artist",
+    "popularity": 0.4,
+    "query": {"affinity": 0.84},
+    "tags": []
+  },
+  {
+    "_synthetic_fixture": true,
+    "entity_id": "SYNTHETIC-ENT-R104",
+    "name": "Fixture Artist 104",
+    "type": "urn:entity",
+    "subtype": "urn:entity:artist",
+    "popularity": 0.35,
+    "query": {"affinity": 0.81},
+    "tags": [
+      {"id": "synthetic:tag:genre:music:fx_m2", "name": "Fixture Music Genre M2", "type": "synthetic:tag:genre:music"}
+    ]
+  }
+]

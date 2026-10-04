@@ -1,0 +1,15 @@
+{
+  "_synthetic_fixture": true,
+  "entity_id": "SYNTHETIC-ENT-A001",
+  "name": "Synthetic Seed Alpha",
+  "types": ["urn:entity:brand"],
+  "popularity": 0.61,
+  "properties": {
+    "description": "Invented fixture description for contract tests. Not a real entity.",
+    "short_description": "Invented fixture brand"
+  },
+  "tags": [
+    {"id": "synthetic:tag:style:fx_st1", "name": "Fixture Style ST1", "type": "synthetic:tag:style"},
+    {"id": "synthetic:tag:keyword:brand:fx_b1", "name": "Fixture Brand Keyword B1", "type": "synthetic:tag:keyword:brand"}
+  ]
+}

@@ -1,0 +1,64 @@
+[
+  {
+    "_synthetic_fixture": true,
+    "entity_id": "SYNTHETIC-ENT-M101",
+    "name": "Fixture Film 101",
+    "type": "urn:entity",
+    "subtype": "urn:entity:movie",
+    "properties": {"description": "Invented film description (fixture).", "release_year": 2001},
+    "popularity": 0.9,
+    "query": {"affinity": 0.93, "explainability": {"signal.interests.entities": [{"entity_id": "SYNTHETIC-ENT-B001", "score": 1.0}]}},
+    "tags": [
+      {"id": "synthetic:tag:keyword:media:fx_k1", "name": "Fixture Keyword K1", "type": "synthetic:tag:keyword:media"},
+      {"id": "synthetic:tag:genre:media:fx_g1", "name": "Fixture Genre G1", "type": "synthetic:tag:genre:media"}
+    ]
+  },
+  {
+    "_synthetic_fixture": true,
+    "entity_id": "SYNTHETIC-ENT-M103",
+    "name": "Fixture Film 103",
+    "type": "urn:entity",
+    "subtype": "urn:entity:movie",
+    "popularity": 0.5,
+    "query": {"affinity": 0.9},
+    "tags": [
+      {"id": "synthetic:tag:keyword:media:fx_k1", "name": "Fixture Keyword K1", "type": "synthetic:tag:keyword:media"}
+    ]
+  },
+  {
+    "_synthetic_fixture": true,
+    "entity_id": "SYNTHETIC-ENT-M201",
+    "name": "Fixture Film 201",
+    "type": "urn:entity",
+    "subtype": "urn:entity:movie",
+    "popularity": 0.3,
+    "query": {"affinity": 0.87},
+    "tags": [
+      {"id": "synthetic:tag:keyword:media:fx_k2", "name": "Fixture Keyword K2", "type": "synthetic:tag:keyword:media"}
+    ]
+  },
+  {
+    "_synthetic_fixture": true,
+    "entity_id": "SYNTHETIC-ENT-M202",
+    "name": "Fixture Film 202",
+    "type": "urn:entity",
+    "subtype": "urn:entity:movie",
+    "popularity": 0.2,
+    "query": {"affinity": 0.85},
+    "tags": [
+      {"id": "synthetic:tag:genre:media:fx_g2", "name": "Fixture Genre G2", "type": "synthetic:tag:genre:media"}
+    ]
+  },
+  {
+    "_synthetic_fixture": true,
+    "entity_id": "SYNTHETIC-ENT-M203",
+    "name": "Fixture Film 203",
+    "type": "urn:entity",
+    "subtype": "urn:entity:movie",
+    "popularity": 0.25,
+    "query": {"affinity": 0.83},
+    "tags": [
+      {"id": "synthetic:tag:genre:media:fx_g2", "name": "Fixture Genre G2", "type": "synthetic:tag:genre:media"}
+    ]
+  }
+]

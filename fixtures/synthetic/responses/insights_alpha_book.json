@@ -1,0 +1,40 @@
+[
+  {
+    "_synthetic_fixture": true,
+    "entity_id": "SYNTHETIC-ENT-K101",
+    "name": "Fixture Book 101",
+    "type": "urn:entity",
+    "subtype": "urn:entity:book",
+    "properties": {"description": "Invented book description (fixture)."},
+    "popularity": 0.45,
+    "query": {"affinity": 0.9, "explainability": {"signal.interests.entities": [{"entity_id": "SYNTHETIC-ENT-A001", "score": 1.0}]}},
+    "tags": [
+      {"id": "synthetic:tag:keyword:media:fx_k1", "name": "Fixture Keyword K1", "type": "synthetic:tag:keyword:media"},
+      {"id": "synthetic:tag:genre:book:fx_bk1", "name": "Fixture Book Genre BK1", "type": "synthetic:tag:genre:book"}
+    ]
+  },
+  {
+    "_synthetic_fixture": true,
+    "entity_id": "SYNTHETIC-ENT-K102",
+    "name": "Fixture Book 102",
+    "type": "urn:entity",
+    "subtype": "urn:entity:book",
+    "popularity": 0.3,
+    "query": {"affinity": 0.86},
+    "tags": [
+      {"id": "synthetic:tag:genre:book:fx_bk1", "name": "Fixture Book Genre BK1", "type": "synthetic:tag:genre:book"}
+    ]
+  },
+  {
+    "_synthetic_fixture": true,
+    "entity_id": "SYNTHETIC-ENT-K103",
+    "name": "Fixture Book 103",
+    "type": "urn:entity",
+    "subtype": "urn:entity:book",
+    "popularity": 0.28,
+    "query": {"affinity": 0.82},
+    "tags": [
+      {"id": "synthetic:tag:genre:book:fx_bk2", "name": "Fixture Book Genre BK2", "type": "synthetic:tag:genre:book"}
+    ]
+  }
+]

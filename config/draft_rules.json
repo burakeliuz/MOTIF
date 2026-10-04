@@ -1,0 +1,82 @@
+{
+  "registry_version": "draft-0.2",
+  "status": "inactive_draft",
+  "source": "MOTIF_QLOO_FEASIBILITY.md rev 0.2, sections 4-6",
+  "notice": "Creative design hypotheses, not empirical findings or calibrated mappings. The feasibility spike does not apply them; it only stamps this version on run records. Changing axes or rules is a product decision, not a code fix.",
+  "axes": [
+    {"key": "warm_cool", "first_pole": "warm", "second_pole": "cool", "interpretation": "Perceived olfactory warmth/coolness"},
+    {"key": "light_dense", "first_pole": "light", "second_pole": "dense", "interpretation": "Perceived weight or density"},
+    {"key": "raw_polished", "first_pole": "raw", "second_pole": "polished", "interpretation": "Perceived texture/refinement"},
+    {"key": "natural_synthetic", "first_pole": "natural", "second_pole": "synthetic", "interpretation": "Perceived aesthetic impression, not ingredient origin"},
+    {"key": "intimate_projecting", "first_pole": "intimate", "second_pole": "projecting", "interpretation": "Intended spatial presence, not measured formula performance"},
+    {"key": "sweet_dry", "first_pole": "sweet", "second_pole": "dry", "interpretation": "Intended sweetness/dryness impression"}
+  ],
+  "unknown_axis_value": null,
+  "unknown_axis_rule": "An unsupported axis stays null: never zero, a midpoint, or an invented neutral score. Numerical mappings and calibration are not established.",
+  "motifs": [
+    {"id": "restrained", "label_tr": "ölçülü"},
+    {"id": "experimental", "label_tr": null},
+    {"id": "intimate", "label_tr": "mahrem"},
+    {"id": "industrial", "label_tr": null},
+    {"id": "romantic", "label_tr": null},
+    {"id": "heritage", "label_tr": null},
+    {"id": "playful", "label_tr": null},
+    {"id": "provocative", "label_tr": null},
+    {"id": "natural", "label_tr": "doğal"},
+    {"id": "precise", "label_tr": "hassas"},
+    {"id": "opulent", "label_tr": "gösterişli"},
+    {"id": "melancholic", "label_tr": null}
+  ],
+  "rules": [
+    {"rule_id": "R1", "motif": "restrained", "axis": "light_dense", "toward": "light",
+     "rationale": "Translate restraint as reduced perceived weight",
+     "no_automatic_inference": ["projection", "sweetness", "temperature"]},
+    {"rule_id": "R2", "motif": "intimate", "axis": "intimate_projecting", "toward": "intimate",
+     "rationale": "Translate closeness as a close-to-skin design target",
+     "no_automatic_inference": ["lightness", "longevity"]},
+    {"rule_id": "R3", "motif": "precise", "axis": "raw_polished", "toward": "polished",
+     "rationale": "Translate controlled detail as a refined texture target",
+     "no_automatic_inference": ["natural/synthetic", "temperature"]},
+    {"rule_id": "R4", "motif": "opulent", "axis": "light_dense", "toward": "dense",
+     "rationale": "Translate richness as greater perceived density",
+     "no_automatic_inference": ["sweetness", "projection"]},
+    {"rule_id": "R5", "motif": "natural", "axis": "natural_synthetic", "toward": "natural",
+     "rationale": "Translate evidenced natural imagery/materiality as an aesthetic target",
+     "no_automatic_inference": ["ingredient origin", "safety", "sourcing"]}
+  ],
+  "unmapped_motifs": ["experimental", "industrial", "romantic", "heritage", "playful", "provocative", "melancholic"],
+  "unmapped_rule": "Keep evidence-backed annotations for review, but these motifs must not influence axes or material ranking until a justified rule exists. Do not assume playful=sweet, melancholic=cool, romantic=floral, heritage=warm, or industrial=synthetic.",
+  "removed_rules": [
+    {"from_motif": "restrained", "axis": "intimate_projecting", "toward": "intimate", "removed_in": "0.2",
+     "reason": "Projection belongs to R2 (intimate). Do not count the same implication twice under different motif names."}
+  ],
+  "materials": {
+    "status": "not_defined",
+    "note": "The ~20-material palette is a scope target, not an inventory. It is deliberately empty until documented with exact material identity or note/accord, sources, and uncertainties."
+  },
+  "worked_example": {
+    "status": "documented_expectations_only",
+    "notice": "Synthetic, manually authored fixtures. Not Qloo records, tags, or search results. Not executed by the spike.",
+    "support_threshold_distinct_domains": 2,
+    "support_threshold_note": "Demonstration only; not a validated confidence threshold. Multiple domains are not necessarily independent evidence.",
+    "fixtures": [
+      {"id": "B1", "domain": "brand", "invented_description": "Unadorned products; controlled geometric design", "manual_motifs": ["restrained", "precise"], "synthetic": true},
+      {"id": "F1", "domain": "movie", "invented_description": "Sparse composition; controlled framing", "manual_motifs": ["restrained", "precise"], "synthetic": true},
+      {"id": "M1", "domain": "music artist", "invented_description": "Sparse arrangement; intimate recording impression", "manual_motifs": ["restrained", "intimate"], "synthetic": true}
+    ],
+    "expected": {
+      "domain_support": {"restrained": 3, "precise": 2, "intimate": 1},
+      "active_motifs": ["restrained", "precise"],
+      "qualitative_targets": {"light_dense": "light", "raw_polished": "polished"},
+      "unknown_axes": ["warm_cool", "natural_synthetic", "intimate_projecting", "sweet_dry"],
+      "materials": "not selected"
+    },
+    "regression_expectations": [
+      "Reordering fixtures does not change the result.",
+      "Duplicating B1 within the same domain does not create new domain support.",
+      "Removing F1 reduces precise to one domain; polished becomes unknown.",
+      "The weak intimate motif must not reappear indirectly through restrained.",
+      "Unknown axes remain unknown in the written brief."
+    ]
+  }
+}
