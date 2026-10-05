@@ -40,7 +40,7 @@ The key never goes into this folder, a prompt, or a chat.
 |---|---|---|
 | Qloo credential | `qloo setup --qloo` (stored in the harness's private config), or `QLOO_API_KEY` in the environment of a server or cloud session | yes |
 | `QLOO_HARNESS_BIN` | full path to `qloo` if it is not on `PATH` | no |
-| Base URL | only if the event instructions specify one: `qloo config set base-url <url>` | no |
+| Event base URL | hackathon keys only work against `https://hackathon.api.qloo.com`. MOTIF passes it to the harness on every live run from `config/manifest.json` (`harness_environment`). | no |
 
 ```sh
 # Placeholders only; leave values empty in anything you commit
@@ -48,9 +48,19 @@ QLOO_API_KEY=
 QLOO_HARNESS_BIN=
 ```
 
+To use `qloo` directly outside MOTIF (for example `qloo setup --status`),
+add the base URL to your shell profile as the organizers instructed:
+
+```sh
+export QLOO_BASE_URL=https://hackathon.api.qloo.com
+export QLOO_TRUSTED_BASE_URL=https://hackathon.api.qloo.com
+```
+
 In a Claude Code cloud session, add `QLOO_API_KEY` in the environment
-settings (the environment menu in the session title bar, then Edit) and start
-a new session. The harness also needs installing there (`npm install --global @qloo/qloo-harness`).
+settings (the environment menu in the session title bar, then Edit), allow
+`hackathon.api.qloo.com` under the environment's network access (it is not
+reachable by default), and start a new session. The harness also needs
+installing there (`npm install --global @qloo/qloo-harness`).
 
 Then:
 

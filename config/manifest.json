@@ -1,6 +1,11 @@
 {
-  "manifest_version": "0.1.0",
+  "manifest_version": "0.2.0",
   "description": "Live request manifest for the MOTIF Qloo feasibility spike (MOTIF_QLOO_FEASIBILITY.md rev 0.2, section 8). Seeds are inputs, not Qloo IDs. Entity types are the harness 0.1.26 type list; their availability under the event credential is not verified until a live run.",
+  "harness_environment": {
+    "QLOO_BASE_URL": "https://hackathon.api.qloo.com",
+    "QLOO_TRUSTED_BASE_URL": "https://hackathon.api.qloo.com"
+  },
+  "harness_environment_source": "Organizer kickoff email (Qloo), shared by the project owner on 2026-10-05: hackathon keys only work against the hackathon API. Non-secret values only; the credential never goes here.",
   "seeds": [
     {
       "key": "a24",

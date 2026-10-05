@@ -11,7 +11,7 @@ from typing import List, Optional
 from . import adapter
 from .compare import compare
 from .facts import render_facts
-from .manifest import build_plan, load_manifest
+from .manifest import build_plan, harness_environment, live_environment, load_manifest
 from .normalize import normalize_run
 from .readiness import Readiness, check_readiness
 from .runner import Runner, build_reuse_index
@@ -48,6 +48,8 @@ def _print_readiness(report: Readiness) -> None:
         value = report.non_secret_env.get(name)
         shown = f"set ({value})" if value else ("set" if present else "not set")
         print(f"  env {name:<27} {shown}")
+    if report.non_secret_env.get("QLOO_BASE_URL"):
+        print("  (base URL values are set for every live run from config/manifest.json)")
     if report.status_check_error:
         print(f"  status check error ............. {report.status_check_error}")
     print(f"  live mode ...................... {'READY' if report.live_ready else 'NOT READY'}")
@@ -58,7 +60,7 @@ def _print_readiness(report: Readiness) -> None:
 
 
 def cmd_check(args: argparse.Namespace) -> int:
-    report = check_readiness()
+    report = check_readiness(env=live_environment(harness_environment(load_manifest())))
     _print_readiness(report)
     return 0 if report.live_ready else 2
 
@@ -108,14 +110,15 @@ def cmd_run(args: argparse.Namespace) -> int:
             print("live mode needs --plan pilot|full (see `python3 -m motif_spike plan --plan pilot`)", file=sys.stderr)
             return 2
         plan = build_plan(load_manifest(), args.plan, _csv(args.seeds), _csv(args.domains), args.max_requests)
-        report = check_readiness()
+        env = live_environment(plan.harness_env)
+        report = check_readiness(env=env)
         if not report.live_ready:
             _print_readiness(report)
             print("\nLive run NOT started. Nothing was sent to Qloo and no synthetic data was substituted.")
             return 2
         readiness = report.to_record()
         harness_version = report.harness_version
-        transport = HarnessTransport(harness_command(), timeout_s=plan.timeout_s)
+        transport = HarnessTransport(harness_command(env), timeout_s=plan.timeout_s, env=env)
         sleep = time.sleep
         print(f"LIVE run, plan '{plan.name}': {len(plan.seeds)} seeds x {len(plan.domains)} domains, budget {plan.max_requests} invocations.")
 

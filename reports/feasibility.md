@@ -61,10 +61,16 @@ the live run, not what the answer is.
    on score differences.
 4. **Explainability.** With one seed as the only signal, per-result
    explainability is expected to point back to that seed and add little.
-5. **Unknown event terms.** Quota, rate limit, expiry, and any event base URL
-   were not found in the kit docs. The hackathon developer guide on
-   `docs.qloo.com` could not be read from this environment (network policy).
-   The budgets (20 pilot / 60 full) are conservative guesses.
+5. **Event terms.** The organizers' kickoff email (2026-10-05) gives the
+   event base URL (`https://hackathon.api.qloo.com`), now pinned in
+   `config/manifest.json`. Quota, rate limit, and expiry are still unknown.
+   The hackathon developer guide on `docs.qloo.com` could not be read from
+   this environment (network policy). The budgets (20 pilot / 60 full) are
+   conservative guesses.
+6. **Access route wording.** The kickoff email names `qloo exec` and
+   `qloo mcp` as supported; the kit also lists `qloo api`, which MOTIF needs
+   because the exec workflows drop per-entity tags. To be confirmed with the
+   organizers.
 
 ## Verification log
 
@@ -84,8 +90,10 @@ the live run, not what the answer is.
 
 1. Install Node.js ≥ 22.19.0 and `npm install --global @qloo/qloo-harness`.
 2. Configure the event credential outside this repo: `qloo setup --qloo`, or
-   `QLOO_API_KEY` in the environment settings of a cloud session.
-3. `python3 -m motif_spike check` → READY.
+   `QLOO_API_KEY` in the environment settings of a cloud session. In the
+   cloud environment, also allow `hackathon.api.qloo.com` under network
+   access. The base URL itself is set by `config/manifest.json`.
+3. `python3 -m motif_spike check` → READY, with base URL `https://hackathon.api.qloo.com`.
 4. `python3 -m motif_spike run --mode live --plan pilot`. Inspect the facts
    sheet and the raw shapes, fix the parsers if needed, then set
    `PARSER_STATUS` to `verified`.

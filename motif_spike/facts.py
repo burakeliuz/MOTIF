@@ -57,6 +57,7 @@ def render_facts(normalized: Dict[str, Any], comparison: Dict[str, Any]) -> str:
     run = normalized["run"]
     synthetic = bool(run.get("synthetic"))
     versions = run.get("versions", {})
+    base_url = (run.get("plan", {}).get("harness_env") or {}).get("QLOO_BASE_URL")
     lines: List[str] = [f"# MOTIF Qloo spike: run facts `{run['run_id']}`", ""]
     if synthetic:
         lines += [SYNTHETIC_BANNER, ""]
@@ -68,12 +69,16 @@ def render_facts(normalized: Dict[str, Any], comparison: Dict[str, Any]) -> str:
         ["Abort reason", run.get("abort_reason")],
         ["Started / finished (UTC)", f"{run.get('started_at')} / {run.get('finished_at')}"],
         ["Harness version", versions.get("harness")],
+        ["Harness base URL", base_url or ("not applicable" if synthetic else "harness default")],
         ["Adapter / parser status", f"{versions.get('adapter')} / {versions.get('parser_status')}"],
         ["Manifest version", versions.get("manifest")],
         ["Draft rule registry", f"{versions.get('draft_rule_registry')} (inactive draft; not applied by the spike)"],
         ["Feasibility verdict", "not_evaluated (this sheet lists facts only)"],
     ])
     lines += ["", f"Parser basis: {PARSER_BASIS}.", ""]
+    if base_url and not synthetic:
+        lines += [f"Requests went to `{base_url}`. The harness's `--dry-run` previews print its configured or default "
+                  "base URL instead, so preview URLs in the request log can differ from the address actually used.", ""]
 
     # 1. seed resolution ---------------------------------------------------
     lines += ["## 1. Seed resolution", ""]

@@ -29,7 +29,7 @@ def main() -> int:
     log = os.environ.get("FAKE_QLOO_LOG")
     if log:
         with open(log, "a", encoding="utf-8") as fh:
-            fh.write(json.dumps(argv) + "\n")
+            fh.write(json.dumps({"argv": argv, "base_url": os.environ.get("QLOO_BASE_URL")}) + "\n")
 
     if mode == "reject":
         print(json.dumps({"error": True, "code": "API_ERROR", "message": f"API request failed: 403 Forbidden (key {key})"}))

@@ -1,8 +1,42 @@
-# Qloo access notes (checked 2026-10-04, before any live credential)
+# Qloo access notes (checked 2026-10-04, updated 2026-10-05, before any live credential)
 
-These notes record what was read in official documentation and in the public
-harness package's source. None of it is a live observation. Re-check
-everything marked *open* once the event credential is configured.
+These notes record what was read in official documentation, in the public
+harness package's source, and in the organizers' kickoff email. None of it is
+a live observation. Re-check everything marked *open* once the event
+credential is configured.
+
+## Organizer kickoff email (shared by the project owner, 2026-10-05)
+
+- The hackathon kicked off on September 30; submissions are due October 30 on Devpost.
+- Keys are requested through the form in the developer guide
+  (`docs.qloo.com/reference/qloo-llm-hackathon-developer-guide#getting-your-api-key`)
+  and usually arrive by email within one business day. Keys are personal.
+- **Hackathon keys only work against the hackathon API.** The harness must
+  run with `QLOO_BASE_URL=https://hackathon.api.qloo.com` and
+  `QLOO_TRUSTED_BASE_URL=https://hackathon.api.qloo.com`. MOTIF sets both
+  from `config/manifest.json` for every live run, overriding any other shell
+  value. Not yet verified live.
+- `qloo setup --status` should report "Qloo data: ready" once the key is added.
+- First-request example: `qloo exec find_tags` for "jazz" returns five tags
+  all named Jazz with different types. This matches MOTIF's rule of never
+  merging tags by display name.
+- The email names `qloo exec` and `qloo mcp` as supported at the event (and not
+  the harness's chat, plan, or build modes). It does not mention `qloo api`,
+  which the kit's `docs/API_ACCESS.md` lists as a supported surface. MOTIF
+  uses `qloo api` because the exec workflows drop per-entity tags (`describe`
+  and `recommend` both compact entities). *Open: confirm on Discord that
+  `qloo api` is acceptable.*
+- Help: Discord `#qloo-hackathon`. Private matters such as a leaked key: email `ian@qloo.com`.
+- Rules repeated: keep the key on your machine or server; send no personal
+  data to Qloo; results describe what groups tend to like, not individuals.
+
+## Cloud environment network
+
+As of 2026-10-05, this project's Claude Code cloud environment refuses
+connections to `hackathon.api.qloo.com` (egress policy, CONNECT 403). The
+host must be added under the environment's network access before a live run
+there. `api.qloo.com` and `registry.npmjs.org` were reachable; `docs.qloo.com`
+and `devpost.com` were not.
 
 ## Sources read
 
@@ -29,8 +63,9 @@ everything marked *open* once the event credential is configured.
 - Readiness: `qloo setup --status --json` reports `qloo.ready` and
   `qloo.source` (`missing`, `environment`, ...) without the value. With a
   placeholder key it reports ready, so "ready" means configured, not accepted.
-- Event quota, rate limit, expiry, and base URL: the kit says organizers
-  publish them separately. *Open.* The manifest budgets (20 pilot / 60 full
+- Event base URL: now known from the kickoff email (see above).
+- Event quota, rate limit, and expiry: still unpublished in the material
+  available to us. *Open.* The manifest budgets (20 pilot / 60 full
   invocations) are conservative guesses, not event limits.
 
 ## What the harness prints (source, v0.1.26)
@@ -56,8 +91,10 @@ Consequences for MOTIF:
    `/entities` identifier lookup, so each call is about two API calls.
 4. The `--dry-run` URL uses the harness config's `base_url` (or
    `https://api.qloo.com`) and ignores a `QLOO_BASE_URL` environment
-   override, which the real request does honour. MOTIF records the preview as
-   "harness --dry-run" and the env-var presence separately.
+   override, which the real request does honour. Because MOTIF sets the event
+   base URL through the environment, preview URLs in the request log show
+   `api.qloo.com` while requests go to `hackathon.api.qloo.com`. The facts
+   sheet states the base URL actually used.
 5. `qloo api tags` has no `--dry-run`.
 
 ## Errors (source and observation)

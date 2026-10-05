@@ -26,6 +26,12 @@ Read `MOTIF_QLOO_FEASIBILITY.md` (rev 0.2) before changing anything. Then read
 - Scores are reported as returned: no percentages, no cross-request averaging, no "lift".
 - During the spike: no frontend, motif classifier, sensory engine, material list, or brief generation.
 
+## Live access facts (organizer email, 2026-10-05)
+
+- Hackathon keys only work against `https://hackathon.api.qloo.com`; `config/manifest.json` → `harness_environment` sets it for every live run.
+- The cloud environment must allow `hackathon.api.qloo.com` under network access (blocked by default as of 2026-10-05).
+- Help channel: Discord `#qloo-hackathon`. Whether `qloo api` (not only `qloo exec` / `qloo mcp`) is acceptable at the event is still to be confirmed.
+
 ## When live output first arrives
 
 `adapter.PARSER_STATUS` is `unverified`. Compare `data/raw/<run>/responses/*.json`

@@ -12,8 +12,8 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-from motif_spike import cli
-from motif_spike.manifest import build_plan
+from motif_spike import cli, readiness
+from motif_spike.manifest import build_plan, harness_environment, live_environment, load_manifest
 from motif_spike.normalize import normalize_run
 from motif_spike.readiness import check_readiness
 from motif_spike.runner import Runner, build_reuse_index
@@ -239,6 +239,42 @@ class LiveGuards(unittest.TestCase):
         resolutions = {r["seed_key"]: r for r in read_json(paths.normalized_dir / "seed_resolutions.json")}
         self.assertEqual(resolutions["a24"]["status"], "resolved")
         self.assertEqual(resolutions["muji"]["status"], "not_attempted")
+
+
+class EventBaseUrl(unittest.TestCase):
+    HACKATHON = "https://hackathon.api.qloo.com"
+
+    def test_live_manifest_pins_the_event_api(self):
+        plan = build_plan(load_manifest(), "pilot")
+        self.assertEqual(plan.harness_env, {"QLOO_BASE_URL": self.HACKATHON, "QLOO_TRUSTED_BASE_URL": self.HACKATHON})
+
+    def test_manifest_cannot_carry_a_credential(self):
+        with self.assertRaises(ValueError):
+            harness_environment({"harness_environment": {"QLOO_API_KEY": "should-never-be-here"}})
+
+    def test_manifest_overrides_the_shell_but_keeps_the_key(self):
+        env = live_environment({"QLOO_BASE_URL": self.HACKATHON},
+                               base={"QLOO_BASE_URL": "https://other.example", "QLOO_API_KEY": SECRET})
+        self.assertEqual(env["QLOO_BASE_URL"], self.HACKATHON)
+        self.assertEqual(env["QLOO_API_KEY"], SECRET)
+
+    def test_live_cli_run_sends_every_call_to_the_event_api(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            log = Path(tmp) / "calls.jsonl"
+            overrides = {"QLOO_API_KEY": SECRET, "FAKE_QLOO_MODE": "ok", "FAKE_QLOO_LOG": str(log), "QLOO_BASE_URL": "https://stale.example"}
+            with mock.patch.dict(os.environ, overrides), \
+                    mock.patch.object(cli, "harness_command", lambda env=None: FAKE_QLOO), \
+                    mock.patch.object(readiness, "harness_command", lambda env=None: FAKE_QLOO):
+                code, out = run_cli(["run", "--mode", "live", "--plan", "pilot", "--seeds", "a24", "--domains", "movie",
+                                     "--data-dir", str(Path(tmp) / "data")])
+            calls = read_jsonl(log)
+            paths = only_run(Path(tmp) / "data", "live-")
+            facts = (paths.normalized_dir / "facts.md").read_text(encoding="utf-8")
+        self.assertEqual(code, 0, out)
+        self.assertTrue(calls)
+        self.assertEqual({c["base_url"] for c in calls}, {self.HACKATHON})
+        self.assertIn(self.HACKATHON, facts)
+        self.assertNotIn(SECRET, facts)
 
 
 if __name__ == "__main__":

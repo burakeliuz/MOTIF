@@ -2,13 +2,18 @@
 
 from __future__ import annotations
 
+import os
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence
+from typing import Any, Dict, List, Mapping, Optional, Sequence
 
 from .util import CONFIG_DIR, read_json
 
 DEFAULT_MANIFEST = CONFIG_DIR / "manifest.json"
+
+# Non-secret harness settings a manifest may pin (the event base URL). The
+# credential is deliberately not on this list: it never belongs in the repo.
+ALLOWED_HARNESS_ENV = ("QLOO_BASE_URL", "QLOO_TRUSTED_BASE_URL")
 
 
 @dataclass
@@ -43,6 +48,7 @@ class Plan:
     max_retries: int
     retry_backoff_s: List[float]
     timeout_s: float
+    harness_env: Dict[str, str] = field(default_factory=dict)
 
     def snapshot(self) -> Dict[str, Any]:
         return asdict(self)
@@ -50,6 +56,26 @@ class Plan:
 
 def load_manifest(path: Optional[Path] = None) -> Dict[str, Any]:
     return read_json(path or DEFAULT_MANIFEST)
+
+
+def harness_environment(manifest: Dict[str, Any]) -> Dict[str, str]:
+    """Non-secret environment the harness must run with (for example the event base URL)."""
+    env = manifest.get("harness_environment") or {}
+    unknown = [name for name in env if name not in ALLOWED_HARNESS_ENV]
+    if unknown:
+        raise ValueError(
+            f"harness_environment may only set {', '.join(ALLOWED_HARNESS_ENV)}; got {', '.join(unknown)}. "
+            "Credentials never belong in the manifest."
+        )
+    return {name: str(value) for name, value in env.items()}
+
+
+def live_environment(harness_env: Dict[str, str], base: Optional[Mapping[str, str]] = None) -> Dict[str, str]:
+    """Environment for live harness calls: the user's environment, with the
+    manifest's non-secret settings taking precedence so every run targets the event API."""
+    env = dict(os.environ if base is None else base)
+    env.update(harness_env)
+    return env
 
 
 def _pick(available: Dict[str, Any], wanted: Sequence[str], what: str) -> List[Any]:
@@ -101,4 +127,5 @@ def build_plan(
         max_retries=int(defaults.get("max_retries", 2)),
         retry_backoff_s=[float(x) for x in defaults.get("retry_backoff_s", [3, 10])],
         timeout_s=float(defaults.get("timeout_s", 90)),
+        harness_env=harness_environment(manifest),
     )
