@@ -85,3 +85,14 @@ left open. Each states why and the smallest step that would unblock it.
 - **Official rules.** They were read through search excerpts only. Smallest
   step: the owner opens qloo.devpost.com and confirms the hosted-demo rule,
   the criteria, and the deadline.
+
+## Stage-4 items deferred (2026-10-06)
+
+| Item | Status | Smallest next step |
+|---|---|---|
+| Bounded LLM tool selection | Proposed, not implemented (the owner limited the LLM to text) | If approved: the LLM picks among the controller's allowed actions; code keeps the budget, allow-list, returned-ID rule, and stop conditions; the trace marks LLM-chosen steps |
+| LLM phrasing of questions | Template questions only | Same validator pattern as prose; options are always rendered by code |
+| T2 material verification | Blocked: supplier domains denied by the environment network policy | The owner allows the supplier domains (or checks 8 pages by hand); then set `verified_full_page` per property with URL, date, and supporting text (palette-0.3) |
+| Lexicon changes suggested by T1 | Proposed in `reports/holdout_t1.md` §2.5, not applied | Apply as lexicon-0.3 and evaluate on fresh held-out brands (T1 brands are no longer independent) |
+| Cross-session cache | In-session cache and explicit recorded replay only | Decide with hosting (stage 5): key by transport, base URL, and full request signature; label cached results with their fetch time |
+| Publishing recorded Qloo data | Unresolved: the kit's API_ACCESS.md does not address it | The owner asks the organizers; until then the public demo has no recorded mode |

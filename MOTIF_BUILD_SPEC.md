@@ -1,6 +1,6 @@
 # MOTIF build specification
 
-Revision 0.1 · 2026-10-06 · Stage 3 (product decisions) · Owner: Burak Eliuz
+Revision 0.2 · 2026-10-06 · accepted by the owner for stage 4 with the changes in section 0 · Owner: Burak Eliuz
 
 This document turns the stage-2 findings (`reports/feasibility.md`,
 recommendation **narrow**) into a buildable MVP. It is the contract for
@@ -13,6 +13,25 @@ How to read it:
 - **Design** choices are ours. Weights, thresholds, cue lists, and material
   profiles are design parameters with explicit versions, not validated statistics.
 - **Verified elsewhere** marks facts taken from official pages, with how they were checked.
+
+## 0. Revision 0.2: stage-4 decisions and resolved contradictions
+
+The owner's stage-4 brief accepted the scope (own descriptors and related
+brands and movies; music supported; people, books, places, and unscoped tag
+insights out) with the changes below. Where a later section still says
+otherwise, this section wins.
+
+| Topic | Rev 0.1 said | Rev 0.2 (implemented in `motif/`) | Why |
+|---|---|---|---|
+| Who controls research | §11: an LLM agent loop chooses tools when a key is set | A **deterministic state machine** (`motif/agent.py`) chooses every step from the observed state; the LLM writes prose only | The owner's brief limits the LLM to text. **Proposal, not implemented:** a bounded LLM tool choice among the same allowed actions, with code-enforced budget and allow-list; it needs the owner's approval |
+| Questions | LLM phrases questions | Template questions; LLM question phrasing deferred | Keeps the controller fully reproducible |
+| Music artists | Always fetched | Supported (`--include-artist`), **off by default** (`config/engine_params.json`) | Across the five reference brands they never changed a sensory target and cost one request per brand |
+| Explainability | Dropped | Still requested (`feature.explainability=true`), never used | Keeps live requests identical to stored recordings for replay |
+| LLM model | `claude-opus-5-5` default | **No implicit model.** `MOTIF_LLM_PROVIDER` + `MOTIF_LLM_MODEL` + key, all from the environment | The development model must not become a runtime requirement |
+| Materials | Palette-0.1 used for matching | Only properties with `verified_full_page` are used live. palette-0.2 has none verified (T2 blocked), so live results show targets without materials; `--allow-unverified-materials` gives a labelled design preview | Unverified properties must not drive live matching |
+| Lexicon | lexicon-0.1 | lexicon-0.2: negation guard; the own-only route counts cue groups | Owner requirements: negations and synonym or duplicate inflation |
+| Entity question | Offers exact-name candidates | engine-0.2 also offers every returned candidate of the requested type | T1 defect: the "Le Labo" brand came back as "Le Labo Fragrances" |
+| Cross-session cache | 24 h | In-session only; recorded replay is explicit (`--recorded`) | Smallest safe behaviour; revisit for hosting (stage 5) |
 
 ## 1. Decision
 
@@ -181,7 +200,7 @@ integration is added.
 | The same display name for different tag IDs | Never merged; shown with their namespace |
 | A selected entity of an unexpected type (for example a person) | Allowed. The engine runs, and the brief says the related evidence describes that entity's audience neighbourhood, not a brand |
 
-## 7. Motif classification (`config/motif_lexicon.json`, lexicon-0.1)
+## 7. Motif classification (`config/motif_lexicon.json`, lexicon-0.2)
 
 - **Method:** deterministic lexicon matching. Each match is stored as a
   `motif_annotation` with `method: "lexicon"`, `lexicon_version`, the matched
@@ -264,7 +283,7 @@ The UI shows both side by side and never multiplies them into one score.
 
 ## 9. Material palette and matching
 
-### 9.1 Palette (`config/material_palette.json`, palette-0.1)
+### 9.1 Palette (`config/material_palette.json`, palette-0.2; no property verified yet)
 
 | ID | Material | Kind | Profile (MOTIF's creative mapping) | Role |
 |---|---|---|---|---|
@@ -460,6 +479,13 @@ This is the reference path for tests.
   prompt version, the tool-call trace, the raw LLM text, and the validator
   result next to the engine snapshot.
 
+**Rev 0.2 model note:** MOTIF chooses no model implicitly. `MOTIF_LLM_MODEL`
+must be set. The task is short, validated prose from a fixed JSON, with no
+reasoning over evidence, so the single recommendation is `claude-sonnet-5-5`
+(USD 2/10 per million input/output tokens, half of `claude-opus-5-5`). The
+owner may choose either. Neither was called in stage 4: the SDK is not
+installed in the build environment, and the LLM path is tested with fakes only.
+
 ## 13. Modes and labels
 
 | Mode | Needs | What works | Label on every screen |
@@ -555,8 +581,8 @@ Minimal safe deployment:
 | Task | Content | Notes |
 |---|---|---|
 | T0 | Package `motif/` (engine) next to `motif_spike/` (spike stays as is); evidence snapshot format; reuse `transport.py` | — |
-| T1 | **Held-out check of lexicon-0.1** on 2 new brands (≤ 10 Qloo requests: 2 × search, entities, and 3 insights) | Needs the owner's OK before any request; report hits and misses; adjust the lexicon and bump the version only with the reason written down |
-| T2 | Verify the 8 supplier pages in full; set `verified_full_page` or correct the profiles | Needs access to the supplier domains (owner action, section 18) |
+| T1 | **Done 2026-10-06** (`reports/holdout_t1.md`, 9 requests). Original: held-out check of lexicon-0.1 on 2 new brands (≤ 10 Qloo requests: 2 × search, entities, and 3 insights) | Needs the owner's OK before any request; report hits and misses; adjust the lexicon and bump the version only with the reason written down |
+| T2 | **Blocked 2026-10-06** (supplier domains denied by the environment's network policy). Original: verify the 8 supplier pages in full; set `verified_full_page` or correct the profiles | Needs access to the supplier domains (owner action, section 18) |
 | T3 | Classifier (lexicon) + annotation records | — |
 | T4 | Translation (R1–R5), axis states, conflict handling | — |
 | T5 | Matcher, composition, gates, unrequested properties | — |
@@ -570,6 +596,13 @@ Minimal safe deployment:
 Recorded evidence snapshots of the stage-2 run serve as fixtures. They are
 labelled recorded live data and stay out of git unless the organizers allow
 it. Otherwise, tests use them locally and CI uses synthetic equivalents.
+
+Rev 0.2 note: the material selections in AC1 and AC2 apply to the labelled
+design preview (`--allow-unverified-materials`). In verified-only mode the
+expected material outcome is `no_verified_materials` until T2 verifies
+properties. Tests: `tests/test_motif_engine.py`, `tests/test_motif_agent.py`
+(synthetic, always run), and `tests/test_motif_recorded.py` (recorded live
+data, skipped when `data/` is absent).
 
 - **AC1 MUJI (real):**
   - Targets: light (R1, strong), polished (R3, strong), natural (R5, moderate).

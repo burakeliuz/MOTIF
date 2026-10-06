@@ -174,6 +174,20 @@ resolve several *open* items below. Details: `reports/feasibility.md`.
 - Unscoped tag insights (`filter.type=urn:tag`) return mostly place tags
   (payments, hotel ratings, dishes) at affinity ≈ 1.
 
+## Stage-4 live observations (2026-10-06)
+
+- **Engine sessions:** they use the same direct transport and base URL. The T1
+  held-out check sent 9 requests in total, all HTTP 200, with no retries
+  (`reports/holdout_t1.md`).
+- **Name resolution:** "Le Labo" returned two shops (`urn:entity:place`) with
+  the exact name, while the brand came back as "Le Labo Fragrances"
+  (`urn:entity:brand`). Exact-name matching alone is not enough for brand
+  input; the engine therefore offers every returned candidate of the requested
+  type and asks the user.
+- **Data sharing:** the kit's `docs/API_ACCESS.md` (read 2026-10-06) says to
+  "cache only what your project needs", but it does not address publishing
+  returned data. Raw responses stay in git-ignored `data/`.
+
 ## Data semantics from documentation
 
 - Response shapes (docs examples): insight entities carry `entity_id`, `name`,

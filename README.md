@@ -1,22 +1,97 @@
-# MOTIF: Qloo feasibility spike
+# MOTIF
 
-MOTIF will translate a brand's, event's, or creative identity's cultural context
-into an explainable olfactory direction and a perfumer brief. This repository
-currently contains only the first step: a small playground that tests whether
-the Qloo data accessible to the hackathon provides enough descriptive and
-differentiated evidence for that.
+MOTIF translates a brand's cultural context, as returned by Qloo, into an
+explainable olfactory direction for a perfumer. The pipeline is: Qloo
+evidence → motif → sensory target → material suggestion → brief.
 
-It is **not** the product: no frontend, motif classifier, sensory scoring,
-material matching, or brief generation. The project frame is
-[`MOTIF_QLOO_FEASIBILITY.md`](MOTIF_QLOO_FEASIBILITY.md) (rev 0.2).
+- **The deterministic engine** decides classification, sensory targets, and
+  material choices. The same evidence and versions give the same result.
+- **An optional LLM** only writes the prose, and the prose is validated
+  against the engine result.
+- **The output is a creative direction:** not a formula, not a dosage, and
+  not a prediction that anyone will like the scent.
 
-**Status:** live feasibility evaluated on 2026-10-06 (5 seeds × 6 domains, all
-requests HTTP 200). Recommendation: **narrow**. Product decisions for the MVP:
-[`MOTIF_BUILD_SPEC.md`](MOTIF_BUILD_SPEC.md); worked design examples (not
-engine output): [`reports/design_examples.md`](reports/design_examples.md). See
-[`reports/feasibility.md`](reports/feasibility.md) and the literal evidence excerpt
-[`reports/evidence_excerpt.md`](reports/evidence_excerpt.md). Submission notes:
-[`docs/SUBMISSION_NOTES.md`](docs/SUBMISSION_NOTES.md).
+**Status (stage 4, 2026-10-06):**
+
+- The command-line flow works end to end, live against the hackathon API and
+  replayed from recordings. The interface and hosting come in stage 5.
+- No material property is verified yet: the supplier pages were blocked in the
+  build environment (task T2). Live results therefore show sensory targets
+  but no materials, unless the labelled design preview is requested.
+- Key documents:
+  - [`MOTIF_BUILD_SPEC.md`](MOTIF_BUILD_SPEC.md) (rev 0.2)
+  - [`reports/holdout_t1.md`](reports/holdout_t1.md) (held-out brands)
+  - [`reports/design_examples.md`](reports/design_examples.md)
+  - [`reports/feasibility.md`](reports/feasibility.md)
+  - [`docs/SUBMISSION_NOTES.md`](docs/SUBMISSION_NOTES.md)
+
+## Engine quick start (Python 3.9+, standard library only)
+
+```sh
+git clone https://github.com/burakeliuz/MOTIF && cd MOTIF
+python3 -m unittest            # offline; recorded-data tests skip when data/ is absent
+
+# Live: needs the Qloo hackathon key in the environment (see below)
+python3 -m motif_spike check                                  # must say READY
+python3 -m motif run --reference "MUJI" --type brand          # 4 Qloo requests at most for a resolved brand
+python3 -m motif run --reference "Le Labo" --choose <QLOO_ID>  # answer an entity question with a returned ID
+python3 -m motif run --reference "MUJI" --allow-unverified-materials   # DESIGN PREVIEW of materials (labelled)
+
+# Recorded: replays a stored live run from data/ and sends nothing
+python3 -m motif run --reference "MUJI" --recorded <RUN_ID_OR_PATH>
+python3 -m motif compare --reference "MUJI" --recorded <RUN_ID_OR_PATH>   # own description only vs plus relations
+```
+
+**Options:**
+
+- `--type brand|movie|artist|any`
+- `--include-artist`: music is off by default.
+- `--resolve-conflict AXIS=POLE|open`
+- `--max-requests N`: the session budget, counting every network attempt.
+- `--json`: prints the brief JSON.
+
+Each session is saved under `data/motif_sessions/<id>/` (git-ignored):
+`session.json` (trace, requests, labels), `engine_result.json`, `brief.json`,
+and the raw responses for live sessions.
+
+**Exit codes:** 0 completed · 3 a question needs an answer · 4 stopped (access
+error, budget, or a missing recording) · 2 usage error.
+
+### Modes and labels
+
+| Mode | Needs | Label printed |
+|---|---|---|
+| Live | Qloo key in the environment | `LIVE · Qloo https://hackathon.api.qloo.com` |
+| Recorded | A stored run under `data/` | `RECORDED · Qloo data from run …` (never shown as live) |
+| No LLM | Nothing | The brief says `Brief (template)` |
+| LLM prose | `MOTIF_LLM_PROVIDER`, `MOTIF_LLM_MODEL`, a provider key, and `pip install anthropic` | `Brief (llm)`; invalid prose falls back to the template with a note |
+| Design preview | `--allow-unverified-materials` | `DESIGN PREVIEW: material properties are not verified …` |
+
+### Environment variables (names only; never commit values)
+
+```sh
+QLOO_API_KEY=            # hackathon key; in a Claude Code cloud session the proxy injects it instead
+MOTIF_LLM_PROVIDER=      # "anthropic" (only provider implemented); unset = template prose
+MOTIF_LLM_MODEL=         # required when a provider is set; no model is chosen implicitly
+MOTIF_LLM_EFFORT=        # optional, default "low"
+ANTHROPIC_API_KEY=       # read by the official SDK; never printed or stored by MOTIF
+MOTIF_DATA_DIR=          # optional data directory (default ./data)
+```
+
+The Qloo base URL is fixed in `config/manifest.json`, because hackathon keys
+only work against `https://hackathon.api.qloo.com`. Design rules are versioned
+in `config/` (`motif_lexicon.json`, `draft_rules.json`, `material_palette.json`,
+`engine_params.json`).
+
+---
+
+# Qloo feasibility spike (stages 1–2)
+
+The `motif_spike/` playground tested whether the Qloo data accessible to the
+hackathon is descriptive and differentiated enough. It is kept as is, and the
+engine reuses its transport, parsers, and request log. The project frame is
+[`MOTIF_QLOO_FEASIBILITY.md`](MOTIF_QLOO_FEASIBILITY.md) (rev 0.2). Evidence
+excerpt: [`reports/evidence_excerpt.md`](reports/evidence_excerpt.md).
 
 ## Requirements
 
@@ -29,7 +104,7 @@ engine output): [`reports/design_examples.md`](reports/design_examples.md). See
 
 ```sh
 python3 -m motif_spike run --mode synthetic    # invented fixtures, no network
-python3 -m unittest                            # 63 focused checks
+python3 -m unittest                            # all checks (spike and engine)
 python3 -m motif_spike plan --plan pilot       # commands a live pilot would send (nothing runs)
 python3 -m motif_spike check                   # live readiness (presence only)
 ```
@@ -113,13 +188,14 @@ output. See [`docs/EVIDENCE_CONTRACT.md`](docs/EVIDENCE_CONTRACT.md).
 ## Layout
 
 ```
-motif_spike/        adapter (harness boundary), runner, normalize, compare, facts, CLI
-config/             manifest.json (seeds, domains, plans), draft_rules.json (inactive)
+motif/              engine: evidence, classify, translate, materials, brief, llm, qloo access, agent (controller), CLI
+motif_spike/        stage 1-2 playground: adapter, transports, runner, normalize, compare, facts, CLI
+config/             manifest.json, draft_rules.json, motif_lexicon.json, material_palette.json, engine_params.json
 fixtures/synthetic/ invented scenarios and harness-shaped outputs
-data/               run outputs (git-ignored)
-reports/            feasibility.md (curated report; currently not_evaluated)
-docs/               evidence contract, Qloo access notes, deferred design, synthetic example output
-tests/              unittest suite (+ a fake harness used only by tests)
+data/               run and session outputs (git-ignored; live Qloo data stays here)
+reports/            feasibility.md, evidence_excerpt.md, design_examples.md, holdout_t1.md
+docs/               evidence contract, Qloo access notes, deferred design, submission notes, examples
+tests/              unittest suite (network blocked; synthetic fakes; recorded-data tests skip without data/)
 ```
 
 ## License

@@ -1,5 +1,17 @@
 # MOTIF design examples (stage 3)
 
+> **Stage-4 note:** the engine (`motif/`, engine-0.2, lexicon-0.2) now
+> reproduces the MUJI and Ralph Lauren chains below in its labelled design
+> preview (`python3 -m motif run --reference MUJI --recorded
+> live-20261006T103307Z-660d --allow-unverified-materials`). It differs in two
+> places:
+>
+> - Music is off by default, so Comme des Garçons `experimental` is moderate,
+>   not strong.
+> - Ralph Lauren's seed-only `heritage` is weak under lexicon-0.2.
+>
+> Live mode proposes no materials until their properties are verified.
+>
 > **Design examples, not engine output.** The values below were computed in
 > stage 3 by a scratch script that applies `config/motif_lexicon.json`
 > (lexicon-0.1), `config/draft_rules.json` (draft-0.2, rules R1–R5) and

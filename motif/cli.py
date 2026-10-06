@@ -186,6 +186,12 @@ def cmd_compare(args) -> int:
 def compare_report(evidence, config, allow_unverified=False) -> Dict[str, Any]:
     a = run_engine(evidence_subset(evidence, ["own"]), config, allow_unverified)
     b = run_engine(evidence, config, allow_unverified)
+    # Sensitivity check: is A empty only because the own-only route needs two cue groups?
+    import copy
+    relaxed_lexicon = copy.deepcopy(config.lexicon)
+    relaxed_lexicon["support"]["parameters"]["own_route_min_cue_groups"] = 1
+    relaxed = type(config)(relaxed_lexicon, config.rules, config.palette, config.params)
+    a1 = run_engine(evidence_subset(evidence, ["own"]), relaxed, allow_unverified)
     rows = {}
     for motif in sorted(set(a["motifs"]) | set(b["motifs"])):
         ia, ib = a["motifs"].get(motif), b["motifs"].get(motif)
@@ -200,13 +206,15 @@ def compare_report(evidence, config, allow_unverified=False) -> Dict[str, Any]:
     return {"A_outcome": a["outcome"], "B_outcome": b["outcome"],
             "A_targets": {k: v["value"] for k, v in a["axes"].items() if v["state"] == "target"},
             "B_targets": {k: v["value"] for k, v in b["axes"].items() if v["state"] == "target"},
+            "A_relaxed_targets": {k: v["value"] for k, v in a1["axes"].items() if v["state"] == "target"},
+            "A_relaxed_note": "A re-run with one own cue group sufficient (sensitivity check, not a product setting)",
             "B_conflicts": b["conflicted_axes"], "motifs": rows,
             "A_evidence_items": a["evidence_count"], "B_evidence_items": b["evidence_count"]}
 
 
 def _compare_text(reference: str, r: Dict[str, Any]) -> str:
     lines = [f"{reference}: A = own Qloo description only ({r['A_evidence_items']} items) · B = plus related brands/movies ({r['B_evidence_items']} items)",
-             f"  A outcome {r['A_outcome']}, targets {r['A_targets']}", f"  B outcome {r['B_outcome']}, targets {r['B_targets']}, conflicts {r['B_conflicts']}",
+             f"  A outcome {r['A_outcome']}, targets {r['A_targets']}; A with a one-cue threshold: {r['A_relaxed_targets']}", f"  B outcome {r['B_outcome']}, targets {r['B_targets']}, conflicts {r['B_conflicts']}",
              "  motif         A strength (own cue groups)      B strength [source kinds]   new from relations / A blocked only by threshold"]
     for m, row in r["motifs"].items():
         lines.append(f"  {m:13} {str(row['A_strength']):12} {str(row['A_own_cue_groups']):20} {str(row['B_strength']):10} "

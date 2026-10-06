@@ -14,4 +14,4 @@ Around it:
   cli.py        command line
 """
 
-ENGINE_VERSION = "engine-0.1"
+ENGINE_VERSION = "engine-0.2"  # 0.2: entity questions also offer candidates of the requested type (T1 finding)

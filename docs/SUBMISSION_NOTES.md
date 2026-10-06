@@ -6,7 +6,8 @@ summary in `docs/QLOO_ACCESS_NOTES.md`). Every roadmap stage adds to this file.
 `TBD` marks what later stages decide.
 
 Status: stage 2 (live Qloo feasibility) done on 2026-10-06; stage 3 product
-decisions written in `MOTIF_BUILD_SPEC.md` (rev 0.1, 2026-10-06). Worked design
+decisions in `MOTIF_BUILD_SPEC.md`; stage 4 (engine and research flow, command
+line) done on 2026-10-06 with the spec at rev 0.2. Worked design
 examples: `reports/design_examples.md`.
 
 ## 0. Event requirements (kept apart from the kit's advice)
@@ -100,6 +101,50 @@ In two cases they add a direction the own tags do not contain: Ralph Lauren
 "dense" and Comme des Garçons "polished". Five brands and a lexicon tuned on
 them support no general claim.
 
+## 2b. Stage 4: what runs and what Qloo demonstrably adds
+
+The command `python3 -m motif run --reference "<brand>"` runs a deterministic
+research controller:
+
+1. Search, with a question when the name is ambiguous.
+2. The brand's own `/entities` tags.
+3. Related brands.
+4. Related movies, but only when they can still change the result.
+5. Lexicon motifs, the six sensory axes via rules R1–R5, verified-only
+   material matching, and a brief.
+
+Every step logs its action, the observed state, and the reason. The LLM, when
+configured, only writes validated prose.
+
+**Qloo's contribution, measured with identical rules** (`python3 -m motif compare`):
+
+- **A** = the brand's own Qloo description only.
+- **A′** = A with one own cue sufficient (a sensitivity check: is A empty only
+  because of the threshold?).
+- **B** = A plus related brands and movies.
+
+| Brand | A | A′ | B | Reading |
+|---|---|---|---|---|
+| MUJI | 0 axes | light, polished, natural | light, polished, natural | Relations corroborate (strength weak → strong/moderate); no new direction |
+| Patagonia (held-out) | 0 | natural | natural | Corroboration only |
+| Ralph Lauren | 0 | polished | dense, polished | "dense" comes from relations only (one related brand + two movies) |
+| Comme des Garçons | 0 | none | polished | "polished" comes from relations only |
+| Le Labo (held-out) | 0 | none | light, polished | Both axes come from relations only (co-liked minimal fashion and skincare brands) |
+| A24 | 0 | none | none | None |
+| Nike | 0 | none | none | None |
+
+A is empty for every brand largely because of the design threshold, so A = 0
+is **not** evidence that Qloo improved quality.
+
+- **What relations do show:**
+  - In 2 of 7 brands they corroborate what the brand's own tags already hint at.
+  - In 3 of 7 they add a direction that the own tags do not contain.
+- **The caveat:** being co-liked with other brands is not the same as sharing
+  their aesthetic, so those relation-only axes are flagged `relations_only`
+  in every output.
+- Seven brands, and a lexicon partly written on five of them, support no
+  general claim.
+
 ## 3. Redacted request-to-result explanation
 
 Example from the full live run `live-20261006T103307Z-660d` (request `req 0011`; the credential is never stored):
@@ -144,6 +189,26 @@ More request-to-result pairs, with JSON Pointers: `reports/evidence_excerpt.md`.
   with its literal Qloo values, entity, request, and JSON Pointer
   (`MOTIF_BUILD_SPEC.md`, section 14). Screens: TBD (stage 5).
 
+### Stage-4 live trace (held-out brand Patagonia, session of 2026-10-06; key never stored)
+
+```text
+local:req:0001  GET /search?query=Patagonia&take=10                                  -> 200
+local:req:0002  GET /entities?entity_ids=DB4CE34E-3A63-4947-946F-9D52502C5762        -> 200
+local:req:0003  GET /v2/insights?filter.type=urn:entity:brand&signal.interests.entities=DB4CE34E-...&take=10&feature.explainability=true -> 200
+local:req:0004  GET /v2/insights?filter.type=urn:entity:movie&signal.interests.entities=DB4CE34E-...&take=10&feature.explainability=true -> 200
+Header on every request: X-Api-Key: [REDACTED] (added by the environment, never by MOTIF's code)
+```
+
+Result:
+
+- Resolved to `urn:entity:brand` Patagonia.
+- `natural` (moderate): own "Earthy Color Palettes" (req 0002) and The North
+  Face "Earthy and High-Visibility Tones" (req 0003).
+- Sensory target: natural impression (R5) only. The other five axes stay
+  `null`.
+- Outcome `partial_direction`: one axis is below the two-axis composition
+  threshold (a design parameter), so no materials are proposed.
+
 ## 4. Demo or screenshots
 
 A hosted demo is required by the official rules (section 0), so MOTIF will be
@@ -152,16 +217,19 @@ Screenshots: TBD (stage 6). They must contain no credential and no personal data
 
 ## 5. Setup from a clean environment
 
-Current (feasibility playground; Python 3.9+, standard library only):
+Current (engine CLI, stage 4; Python 3.9+, standard library only; the LLM is optional):
 
 ```sh
 git clone https://github.com/burakeliuz/MOTIF && cd MOTIF
-python3 -m unittest                                   # offline tests; network blocked
-python3 -m motif_spike run --mode synthetic           # no key, no network
-# with a hackathon key provided by the environment (QLOO_API_KEY or a proxy-injected credential):
-python3 -m motif_spike check
-python3 -m motif_spike run --mode live --plan pilot
+python3 -m unittest                                   # offline tests; network blocked; recorded-data tests skip
+# with the hackathon key in the environment (QLOO_API_KEY, or a proxy-injected credential):
+python3 -m motif_spike check                          # must say READY
+python3 -m motif run --reference "MUJI" --type brand  # live research, at most 4 Qloo requests for a resolved brand
+# optional LLM prose: pip install anthropic; set MOTIF_LLM_PROVIDER=anthropic, MOTIF_LLM_MODEL=<model>, ANTHROPIC_API_KEY
 ```
+
+A clean clone has no recordings (`data/` is git-ignored), so `--recorded` needs
+a live run first.
 
 - Final product setup, verified in a clean environment: TBD (stage 6)
 
@@ -196,4 +264,21 @@ Known from the feasibility stage (`reports/feasibility.md`):
     intimate/projecting axis cannot be set from evidence today.
   - Material descriptors come from supplier pages located by search but not
     yet read in full.
-- Limitations of the final product: TBD (stages 4–6)
+- Stage 4 additions:
+  - **No material property is verified yet.** The supplier pages were blocked
+    in the build environment, so live runs propose no materials; a labelled
+    design preview can show them.
+  - **Lexicon blind spots seen on held-out brands:**
+    - film-technique words ("Sparse interviewing") and landscape words
+      ("Lush" mountains) can match cues (only weak so far);
+    - frequent own descriptors such as "Neutral Tones", "Functional", and
+      "Rugged Utility" match no cue.
+  - **Name resolution:** brand names may resolve to shops or to a variant name
+    ("Le Labo" → "Le Labo Fragrances"); MOTIF asks the user instead of guessing.
+  - **Relation-only axes:** these describe a brand's co-liked neighbourhood,
+    not the brand itself.
+  - **Data sharing:** whether raw or recorded Qloo responses may appear in a
+    public repository or demo is not addressed by the kit's `API_ACCESS.md`.
+    Raw data stays private (`data/` is git-ignored); only small curated
+    excerpts are committed. Organizer confirmation is pending.
+- Limitations of the final product: TBD (stages 5–6)

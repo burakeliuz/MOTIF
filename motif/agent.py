@@ -169,10 +169,14 @@ class Controller:
                        "exactly one candidate fits the name and type; the others are listed", rec)
             return dict(base, status="resolved", method="auto_single_match", qloo_id=res["qloo_id"], name=res["name"],
                         types=res["types"], alternatives=alts)
-        options = res["alternatives"] if res["status"] == "ambiguous" else res["near_matches"]
-        options = [{"qloo_id": o["qloo_id"], "name": o["name"], "types": o["types"],
-                    "disambiguation": next((p["disambiguation"] for p in public if p["qloo_id"] == o["qloo_id"]), None)}
-                   for o in options]
+        exact_or_near = res["alternatives"] if res["status"] == "ambiguous" else res["near_matches"]
+        ids = [o["qloo_id"] for o in exact_or_near]
+        # Candidates of the requested type are always offered too, even when their name differs
+        # (T1: "Le Labo" returned the brand as "Le Labo Fragrances" and only two shops matched the name).
+        wanted = set(REFERENCE_TYPES[self.reference_type])
+        ids += [p["qloo_id"] for p in public if wanted & set(p["types"]) and p["qloo_id"] not in ids]
+        options = [dict(p, name_matches_input=p["qloo_id"] in {o["qloo_id"] for o in exact_or_near})
+                   for i in ids for p in public if p["qloo_id"] == i]
         why = ("several returned candidates share this name and type" if res["status"] == "ambiguous"
                else "no returned candidate has exactly this name")
         self._step("resolve", f"{len(public)} candidates; {res['status']}", "ask_user", why, rec)

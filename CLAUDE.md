@@ -1,9 +1,9 @@
 # MOTIF working notes for Claude Code
 
-Current phase: **stage 3 product decisions written** (`MOTIF_BUILD_SPEC.md` rev 0.1, 2026-10-06; awaiting the owner's acceptance). Stage 2 recommendation: `narrow`.
+Current phase: **stage 4 done** (engine and research flow from the command line, `motif/`; spec accepted at rev 0.2 on 2026-10-06). Next: stage 5 (interface and hosting). Known blocker: material verification (T2).
 Read `MOTIF_QLOO_FEASIBILITY.md` (rev 0.2) and `MOTIF_BUILD_SPEC.md` before
 changing anything. Then read `README.md`, `docs/QLOO_ACCESS_NOTES.md`,
-`reports/feasibility.md`, and `reports/design_examples.md`.
+`reports/feasibility.md`, `reports/design_examples.md`, and `reports/holdout_t1.md`.
 
 ## Communication with the project owner
 
@@ -33,18 +33,22 @@ Every stage adds to `docs/SUBMISSION_NOTES.md`, mapped to the six items of the k
 ## Commands
 
 - `python3 -m unittest`: run before every commit.
+- `python3 -m motif run --reference NAME [--type brand|any] [--choose ID] [--recorded RUN] [--include-artist] [--allow-unverified-materials]` and `python3 -m motif compare --reference NAME --recorded RUN`
 - `python3 -m motif_spike check | plan --plan pilot | run --mode synthetic | run --mode live --plan pilot|full | renormalize --run latest-live | excerpt --run latest-live`
 
 ## Non-negotiables
 
 - Never ask for, print, store, or commit a credential. In the cloud environment the key is an environment API credential that the agent proxy injects; `QLOO_API_KEY=proxy-injected` is only a placeholder. Locally: `QLOO_API_KEY` or `qloo setup --qloo`.
-- Qloo access goes through `motif_spike/transport.py` only: `DirectTransport` (default; the organizers allow own tooling) or `HarnessTransport` (`--transport harness`). Do not add a third integration.
+- Qloo access goes through `motif_spike/transport.py` only: `DirectTransport` (default; the organizers allow own tooling) or `HarnessTransport` (`--transport harness`). The engine wraps it in `motif/qloo.py` (budget, retries, session cache, explicit recorded replay). Do not add a third integration.
 - Never fall back from a failed live call to fixtures, another endpoint, or another credential.
 - Keep `qloo_observation`, `motif_annotation`, `design_rule`, and `synthetic_fixture` separate. Synthetic data is never evidence.
 - Copy returned values literally with their raw pointer. Do not infer cultural traits from entity names or model memory.
 - Keep the six axes and pole order. Unknown axes are `null`. Five draft rules only; no `restrained → intimate`.
 - Scores are reported as returned: no percentages, no cross-request averaging, no "lift".
-- Until the owner accepts `MOTIF_BUILD_SPEC.md`: design and documents only (no engine, classifier, frontend, or brief generation code). After acceptance, build in the spec's order: engine and agent in stage 4 (`motif/`, leaving `motif_spike/` intact), interface and hosting in stage 5.
+- The spec was accepted for stage 4 (rev 0.2). Build in its order: interface and hosting in stage 5, without changing engine decisions in the UI. `motif_spike/` stays intact.
+- Research control is a deterministic state machine (`motif/agent.py`). The LLM writes validated prose only; giving it tool choice needs the owner's approval.
+- Live matching uses only material properties with `verified_full_page`; unverified ones appear only in the labelled design preview.
+- Held-out brands used once (T1: Le Labo, Patagonia) are no longer independent validation.
 - `config/motif_lexicon.json`, `config/material_palette.json`, and `config/draft_rules.json` are versioned design rules: change them only with a version bump and a written reason. Material profiles are MOTIF's creative mapping; supplier descriptors stay in `source` and are not verified in full until task T2.
 - Results of the engine are a creative direction, never a formula, dosage, or preference prediction. Unknown or conflicted axes stay `null`.
 

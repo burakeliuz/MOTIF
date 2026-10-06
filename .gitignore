@@ -2,6 +2,7 @@
 # source control unless the event's data terms allow sharing (see data/README.md).
 data/raw/*
 data/normalized/*
+data/motif_sessions/
 !data/raw/.gitkeep
 !data/normalized/.gitkeep
 
