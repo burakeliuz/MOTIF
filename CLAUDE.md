@@ -10,6 +10,12 @@ Read `MOTIF_QLOO_FEASIBILITY.md` (rev 0.2) before changing anything. Then read
 - Use plain language for a non-technical reader; longer is fine. The first time a technical term appears (for example harness, API, JSON, commit), explain it in one short sentence.
 - Code, code comments, and repository documents stay in English (the hackathon submission is in English).
 
+## Branches and main
+
+- `main` is the public default branch (judges and new cloud sessions start from it). Work happens on the session's own branch.
+- Never push to `main` without the owner's explicit OK in the current session. When a stage ends, show `git log origin/main..HEAD` in plain Turkish and ask whether to update `main` (fast-forward only).
+- New sessions clone `main`, so unmerged work on an old session branch is invisible to them: remind the owner before they open a new session.
+
 ## Commands
 
 - `python3 -m unittest`: run before every commit.
