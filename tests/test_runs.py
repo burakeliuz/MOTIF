@@ -192,7 +192,7 @@ class LiveGuards(unittest.TestCase):
 
     def test_live_mode_without_harness_refuses_and_writes_nothing(self):
         with mock.patch.dict(os.environ, {"PATH": "", "QLOO_HARNESS_BIN": ""}):
-            code, out = run_cli(["run", "--mode", "live", "--plan", "pilot", "--data-dir", self.tmp.name])
+            code, out = run_cli(["run", "--mode", "live", "--plan", "pilot", "--transport", "harness", "--data-dir", self.tmp.name])
         self.assertEqual(code, 2)
         self.assertIn("no synthetic data was substituted", out)
         self.assertFalse((self.root / "raw").exists())
@@ -265,7 +265,7 @@ class EventBaseUrl(unittest.TestCase):
             with mock.patch.dict(os.environ, overrides), \
                     mock.patch.object(cli, "harness_command", lambda env=None: FAKE_QLOO), \
                     mock.patch.object(readiness, "harness_command", lambda env=None: FAKE_QLOO):
-                code, out = run_cli(["run", "--mode", "live", "--plan", "pilot", "--seeds", "a24", "--domains", "movie",
+                code, out = run_cli(["run", "--mode", "live", "--plan", "pilot", "--transport", "harness", "--seeds", "a24", "--domains", "movie",
                                      "--data-dir", str(Path(tmp) / "data")])
             calls = read_jsonl(log)
             paths = only_run(Path(tmp) / "data", "live-")

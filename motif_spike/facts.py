@@ -68,6 +68,7 @@ def render_facts(normalized: Dict[str, Any], comparison: Dict[str, Any]) -> str:
         ["Live execution status", run.get("live_execution_status")],
         ["Abort reason", run.get("abort_reason")],
         ["Started / finished (UTC)", f"{run.get('started_at')} / {run.get('finished_at')}"],
+        ["Transport", versions.get("transport")],
         ["Harness version", versions.get("harness")],
         ["Harness base URL", base_url or ("not applicable" if synthetic else "harness default")],
         ["Adapter / parser status", f"{versions.get('adapter')} / {versions.get('parser_status')}"],
@@ -76,7 +77,7 @@ def render_facts(normalized: Dict[str, Any], comparison: Dict[str, Any]) -> str:
         ["Feasibility verdict", "not_evaluated (this sheet lists facts only)"],
     ])
     lines += ["", f"Parser basis: {PARSER_BASIS}.", ""]
-    if base_url and not synthetic:
+    if base_url and not synthetic and versions.get("transport") == "harness":
         lines += [f"Requests went to `{base_url}`. The harness's `--dry-run` previews print its configured or default "
                   "base URL instead, so preview URLs in the request log can differ from the address actually used.", ""]
 

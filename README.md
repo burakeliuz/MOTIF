@@ -40,7 +40,8 @@ The key never goes into this folder, a prompt, or a chat.
 |---|---|---|
 | Qloo credential | `qloo setup --qloo` (stored in the harness's private config), or `QLOO_API_KEY` in the environment of a server or cloud session | yes |
 | `QLOO_HARNESS_BIN` | full path to `qloo` if it is not on `PATH` | no |
-| Event base URL | hackathon keys only work against `https://hackathon.api.qloo.com`. MOTIF passes it to the harness on every live run from `config/manifest.json` (`harness_environment`). | no |
+| Event base URL | hackathon keys only work against `https://hackathon.api.qloo.com`. MOTIF uses it on every live run from `config/manifest.json` (`harness_environment`). | no |
+| Transport | `direct` (default): MOTIF's own HTTPS client, which keeps full response bodies. `harness`: the official `qloo` CLI (`--transport harness`). | no |
 
 ```sh
 # Placeholders only; leave values empty in anything you commit
@@ -56,11 +57,12 @@ export QLOO_BASE_URL=https://hackathon.api.qloo.com
 export QLOO_TRUSTED_BASE_URL=https://hackathon.api.qloo.com
 ```
 
-In a Claude Code cloud session, add `QLOO_API_KEY` in the environment
-settings (the environment menu in the session title bar, then Edit), allow
-`hackathon.api.qloo.com` under the environment's network access (it is not
-reachable by default), and start a new session. The harness also needs
-installing there (`npm install --global @qloo/qloo-harness`).
+In a Claude Code cloud session (Pro/Max), store the key as an environment
+**API credential** for host `hackathon.api.qloo.com` with header `X-Api-Key`
+(no prefix). The agent proxy adds it to outgoing requests, so the key never
+enters the session, and the host becomes reachable. The direct transport sends
+no key header of its own, which is what lets the proxy add it. Optionally set
+`QLOO_API_KEY=proxy-injected` as a non-secret placeholder.
 
 Then:
 
@@ -86,8 +88,8 @@ For each seed (A24, MUJI, Comme des Garçons, Nike, Ralph Lauren; see `config/ma
 3. `qloo api insights` per domain → related entities with tags, properties, affinity, and explainability if returned.
 4. `qloo exec entity_tags` → tag insights for the seed.
 
-Each request records the exact harness command, the HTTP request the harness
-reports (`--dry-run`), a status, its attempts, and a pointer to the saved
+Each request records the command, the exact HTTP request (method, URL,
+parameters; never the key), a status, its attempts, and a pointer to the saved
 output. See [`docs/EVIDENCE_CONTRACT.md`](docs/EVIDENCE_CONTRACT.md).
 
 ## Rules the playground enforces

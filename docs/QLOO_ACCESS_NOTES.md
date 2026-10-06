@@ -30,6 +30,23 @@ credential is configured.
 - Rules repeated: keep the key on your machine or server; send no personal
   data to Qloo; results describe what groups tend to like, not individuals.
 
+## Direct transport (2026-10-06)
+
+- The kickoff email lets participants "build your own tooling", so MOTIF's
+  default live transport is now its own HTTPS client (`DirectTransport`).
+  It sends the same parameters the harness sends (dry-run verified) and saves
+  the complete response body, so tag results and top-level fields are no
+  longer lost. The harness remains available with `--transport harness`.
+- Live check on 2026-10-06 in the cloud environment: with the key stored as an
+  environment API credential (host `hackathon.api.qloo.com`, header
+  `X-Api-Key`, no prefix), a request without an `X-Api-Key` header returned
+  HTTP 200 and `/search?query=A24&take=3` listed `A24` as `urn:entity:brand`.
+  The same request through the harness returned 403: the harness sends its own
+  placeholder key header, and the proxy does not replace it.
+- During development two test cases accidentally ran the default (direct)
+  transport against the real API (at most 16 requests, results discarded).
+  Tests now block all network access.
+
 ## Cloud environment network
 
 As of 2026-10-05, this project's Claude Code cloud environment refuses

@@ -1,6 +1,8 @@
 {
-  "manifest_version": "0.2.0",
+  "manifest_version": "0.3.0",
   "description": "Live request manifest for the MOTIF Qloo feasibility spike (MOTIF_QLOO_FEASIBILITY.md rev 0.2, section 8). Seeds are inputs, not Qloo IDs. Entity types are the harness 0.1.26 type list; their availability under the event credential is not verified until a live run.",
+  "live_transport": "direct",
+  "live_transport_note": "direct: MOTIF's own HTTPS client (allowed by the organizers' kickoff email: 'build your own tooling'); keeps full response bodies. harness: the official @qloo/qloo-harness CLI.",
   "harness_environment": {
     "QLOO_BASE_URL": "https://hackathon.api.qloo.com",
     "QLOO_TRUSTED_BASE_URL": "https://hackathon.api.qloo.com"

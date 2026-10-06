@@ -13,9 +13,9 @@ from .compare import compare
 from .facts import render_facts
 from .manifest import build_plan, harness_environment, live_environment, load_manifest
 from .normalize import normalize_run
-from .readiness import Readiness, check_readiness
+from .readiness import Readiness, check_direct_readiness, check_readiness
 from .runner import Runner, build_reuse_index
-from .transport import FixtureTransport, HarnessTransport, harness_command
+from .transport import DirectTransport, FixtureTransport, HarnessTransport, direct_api_key, harness_command
 from .util import CONFIG_DIR, FIXTURES_DIR, RunPaths, data_root, new_run_id, read_json, write_json
 
 SCENARIOS = {
@@ -40,10 +40,15 @@ def _print_readiness(report: Readiness) -> None:
         return "unknown" if flag is None else ("yes" if flag else "no")
 
     print("Qloo live-mode readiness (presence only; no secret value is shown; no API call)")
-    print(f"  harness (`qloo`) found ......... {yes(report.harness_found)}")
-    print(f"  harness version ................ {report.harness_version or 'unknown'} (needs >= {'.'.join(map(str, adapter.MIN_HARNESS_VERSION))})")
-    print(f"  credential configured .......... {yes(report.credential_configured)}"
-          + (f" (source: {report.credential_source})" if report.credential_source else ""))
+    print(f"  transport ...................... {report.transport}")
+    if report.transport == "direct":
+        print(f"  base URL ....................... {report.base_url or 'invalid or missing'}")
+        print(f"  credential ..................... {report.credential_note}")
+    else:
+        print(f"  harness (`qloo`) found ......... {yes(report.harness_found)}")
+        print(f"  harness version ................ {report.harness_version or 'unknown'} (needs >= {'.'.join(map(str, adapter.MIN_HARNESS_VERSION))})")
+        print(f"  credential configured .......... {yes(report.credential_configured)}"
+              + (f" (source: {report.credential_source})" if report.credential_source else ""))
     for name, present in report.env_present.items():
         value = report.non_secret_env.get(name)
         shown = f"set ({value})" if value else ("set" if present else "not set")
@@ -59,8 +64,17 @@ def _print_readiness(report: Readiness) -> None:
         print("  Note: 'configured' is not 'accepted'. Only a live request shows whether Qloo accepts the credential.")
 
 
+def _transport_choice(args: argparse.Namespace, manifest: dict) -> str:
+    return getattr(args, "transport", None) or manifest.get("live_transport", "direct")
+
+
+def _live_readiness(transport: str, env: dict) -> Readiness:
+    return check_direct_readiness(env=env) if transport == "direct" else check_readiness(env=env)
+
+
 def cmd_check(args: argparse.Namespace) -> int:
-    report = check_readiness(env=live_environment(harness_environment(load_manifest())))
+    manifest = load_manifest()
+    report = _live_readiness(_transport_choice(args, manifest), live_environment(harness_environment(manifest)))
     _print_readiness(report)
     return 0 if report.live_ready else 2
 
@@ -109,16 +123,21 @@ def cmd_run(args: argparse.Namespace) -> int:
         if not args.plan:
             print("live mode needs --plan pilot|full (see `python3 -m motif_spike plan --plan pilot`)", file=sys.stderr)
             return 2
-        plan = build_plan(load_manifest(), args.plan, _csv(args.seeds), _csv(args.domains), args.max_requests)
+        manifest = load_manifest()
+        plan = build_plan(manifest, args.plan, _csv(args.seeds), _csv(args.domains), args.max_requests)
         env = live_environment(plan.harness_env)
-        report = check_readiness(env=env)
+        choice = _transport_choice(args, manifest)
+        report = _live_readiness(choice, env)
         if not report.live_ready:
             _print_readiness(report)
             print("\nLive run NOT started. Nothing was sent to Qloo and no synthetic data was substituted.")
             return 2
         readiness = report.to_record()
         harness_version = report.harness_version
-        transport = HarnessTransport(harness_command(env), timeout_s=plan.timeout_s, env=env)
+        if choice == "direct":
+            transport = DirectTransport(report.base_url, api_key=direct_api_key(env), timeout_s=plan.timeout_s)
+        else:
+            transport = HarnessTransport(harness_command(env), timeout_s=plan.timeout_s, env=env)
         sleep = time.sleep
         print(f"LIVE run, plan '{plan.name}': {len(plan.seeds)} seeds x {len(plan.domains)} domains, budget {plan.max_requests} invocations.")
 
@@ -165,7 +184,8 @@ def main(argv: Optional[List[str]] = None) -> int:
     parser = argparse.ArgumentParser(prog="python3 -m motif_spike", description="MOTIF Qloo feasibility spike (evidence playground).")
     sub = parser.add_subparsers(dest="command", required=True)
 
-    sub.add_parser("check", help="live readiness: harness, version, credential presence (no values, no API call)")
+    p_check = sub.add_parser("check", help="live readiness: transport, base URL, credential presence (no values, no API call)")
+    p_check.add_argument("--transport", choices=["direct", "harness"], help="default: manifest live_transport (direct)")
 
     p_plan = sub.add_parser("plan", help="print the harness commands a live plan would send (executes nothing)")
     p_plan.add_argument("--plan", default="pilot")
@@ -180,6 +200,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     p_run.add_argument("--seeds", help="comma-separated seed keys (default: the plan's)")
     p_run.add_argument("--domains", help="comma-separated domain keys (default: the plan's)")
     p_run.add_argument("--max-requests", type=int, help="override the plan's invocation budget")
+    p_run.add_argument("--transport", choices=["direct", "harness"], help="live only; default: manifest live_transport (direct)")
     p_run.add_argument("--no-reuse", action="store_true", help="live only: do not reuse identical successful live responses")
     p_run.add_argument("--data-dir", help="data root (default: ./data or $MOTIF_DATA_DIR)")
 

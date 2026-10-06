@@ -17,8 +17,8 @@ Read `MOTIF_QLOO_FEASIBILITY.md` (rev 0.2) before changing anything. Then read
 
 ## Non-negotiables
 
-- Never ask for, print, store, or commit a credential. The harness holds it (`qloo setup --qloo` or `QLOO_API_KEY`).
-- Qloo access goes only through `@qloo/qloo-harness` (`qloo api` / `qloo exec`). Do not add a direct HTTP client or a second integration.
+- Never ask for, print, store, or commit a credential. In the cloud environment the key is an environment API credential that the agent proxy injects; `QLOO_API_KEY=proxy-injected` is only a placeholder. Locally: `QLOO_API_KEY` or `qloo setup --qloo`.
+- Qloo access goes through `motif_spike/transport.py` only: `DirectTransport` (default; the organizers allow own tooling) or `HarnessTransport` (`--transport harness`). Do not add a third integration.
 - Never fall back from a failed live call to fixtures, another endpoint, or another credential.
 - Keep `qloo_observation`, `motif_annotation`, `design_rule`, and `synthetic_fixture` separate. Synthetic data is never evidence.
 - Copy returned values literally with their raw pointer. Do not infer cultural traits from entity names or model memory.
@@ -29,8 +29,9 @@ Read `MOTIF_QLOO_FEASIBILITY.md` (rev 0.2) before changing anything. Then read
 ## Live access facts (organizer email, 2026-10-05)
 
 - Hackathon keys only work against `https://hackathon.api.qloo.com`; `config/manifest.json` → `harness_environment` sets it for every live run.
-- The cloud environment must allow `hackathon.api.qloo.com` under network access (blocked by default as of 2026-10-05).
-- Help channel: Discord `#qloo-hackathon`. Whether `qloo api` (not only `qloo exec` / `qloo mcp`) is acceptable at the event is still to be confirmed.
+- Verified 2026-10-06: the cloud environment's API credential for `hackathon.api.qloo.com` opens the host and injects the key into requests that carry no `X-Api-Key` header. It does not replace a header the harness already sends, so the harness transport fails with 403 there; use the direct transport.
+- Tests block all network access (`tests/__init__.py`); never weaken that.
+- Help channel: Discord `#qloo-hackathon`.
 
 ## When live output first arrives
 

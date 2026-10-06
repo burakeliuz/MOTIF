@@ -1,12 +1,12 @@
-"""Boundary between MOTIF and the official Qloo harness (`@qloo/qloo-harness`).
+"""Boundary between MOTIF and the Qloo API.
 
-The event's supported Qloo surfaces are the harness commands (`qloo api`,
-`qloo exec`, `qloo mcp`, `qloo explore`). This adapter shells out to the first
-two and never calls the Qloo HTTP API itself, so it never handles the
-credential: the harness reads it from `qloo setup --qloo` or `QLOO_API_KEY`.
+Requests are described as harness-style commands (`qloo api ...`,
+`qloo exec ...`). A transport then either runs them with the official harness
+(`@qloo/qloo-harness`) or, by default, sends the equivalent HTTPS request
+itself (`http_request` below; see transport.DirectTransport).
 
-What the harness prints is a projection of the API response, not the HTTP body
-(read from harness 0.1.26 source, see docs/QLOO_ACCESS_NOTES.md):
+With the harness, what is saved is a projection of the API response, not the
+HTTP body (read from harness 0.1.26 source, see docs/QLOO_ACCESS_NOTES.md):
 
 * `qloo api search --json`   -> the `results` list
 * `qloo api entity --json`   -> one entity object
@@ -14,7 +14,8 @@ What the harness prints is a projection of the API response, not the HTTP body
   not printed, which is why tag insights use `qloo exec entity_tags`)
 * `qloo exec entity_tags`    -> a workflow envelope with compact tags
 
-The parsers below accept those documented shapes, record the shape actually
+The direct transport saves the full HTTP body instead. The parsers below
+accept both kinds of documented shapes, record the shape actually
 seen, and report anything else as `unrecognized_shape` instead of guessing.
 They have not been checked against live output yet.
 """
@@ -119,6 +120,55 @@ def seed_tags_argv(entity_id: str, limit: int) -> List[str]:
 
 def display_command(argv: Sequence[str]) -> str:
     return "qloo " + " ".join(shlex.quote(a) for a in argv)
+
+
+def parse_flags(argv: Sequence[str]) -> Dict[str, str]:
+    """`--flag value` pairs of an adapter command (bare flags such as --json are skipped)."""
+    flags: Dict[str, str] = {}
+    for i, token in enumerate(argv):
+        if token.startswith("--") and i + 1 < len(argv) and not argv[i + 1].startswith("--"):
+            flags[token] = argv[i + 1]
+    return flags
+
+
+def _param_value(value: Any) -> str:
+    return str(value).lower() if isinstance(value, bool) else str(value)
+
+
+def http_request(argv: Sequence[str]) -> Tuple[str, Dict[str, str]]:
+    """The Qloo HTTP request (path, query params) an adapter command stands for.
+
+    Used by the direct transport. Parameters mirror what the harness sends
+    (checked with `--dry-run` against harness 0.1.26), so both transports ask
+    the same question.
+    """
+    argv = [a for a in argv if a != "--dry-run"]
+    command = tuple(argv[:2])
+    flags = parse_flags(argv)
+    if command == ("api", "search"):
+        params = {"query": flags["--query"], "take": flags["--take"]}
+        if "--type" in flags:
+            params["types"] = flags["--type"]
+        return "/search", params
+    if command == ("api", "entity"):
+        return "/entities", {"entity_ids": flags["--id"]}
+    if command == ("api", "insights"):
+        params = {
+            "filter.type": flags["--type"],
+            "signal.interests.entities": flags["--signal-entities"],
+            "take": flags["--take"],
+        }
+        if "--params" in flags:
+            params.update({k: _param_value(v) for k, v in json.loads(flags["--params"]).items()})
+        return "/v2/insights", params
+    if command == ("exec", "entity_tags"):
+        payload = json.loads(flags["--input"])
+        return "/v2/insights", {
+            "filter.type": "urn:tag",
+            "signal.interests.entities": ",".join(payload["entities"]),
+            "take": str(payload.get("limit", 10)),
+        }
+    raise ValueError(f"no HTTP mapping for command {' '.join(argv[:2])!r}")
 
 
 # --- outcome classification ------------------------------------------------
@@ -240,6 +290,10 @@ def locate_items(operation: str, doc: Any) -> Tuple[List[Tuple[str, Any]], str]:
     if operation == OP_SEED_TAGS:
         if isinstance(doc, dict) and isinstance(doc.get("results"), list):
             return [(join_pointer("/results", i), it) for i, it in enumerate(doc["results"])], "workflow_envelope.results"
+        # Direct API body: {"results": {"tags": [...]}} (taste-analysis reference).
+        tags = get_path(doc, ("results", "tags"))
+        if isinstance(tags, list):
+            return [(join_pointer("/results/tags", i), it) for i, it in enumerate(tags)], "results.tags"
         return [], "unrecognized"
 
     if operation == OP_SEED_DETAIL and isinstance(doc, dict) and any(k in doc for k in ("entity_id", "id", "name")):

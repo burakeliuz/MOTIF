@@ -18,7 +18,6 @@ from . import adapter
 from .adapter import (
     ABORT_STATUSES,
     DATA_STATUSES,
-    DRY_RUN_SUPPORTED,
     OP_RELATED,
     OP_SEARCH,
     OP_SEED_DETAIL,
@@ -219,7 +218,7 @@ class Runner:
                        finished_at=rec["started_at"])
             return rec, None
 
-        if operation in DRY_RUN_SUPPORTED:
+        if self.transport.supports_preview(operation):
             self._preview(rec, argv)
 
         outcome: Optional[Outcome] = None
@@ -282,7 +281,10 @@ class Runner:
             preview = None
         if isinstance(preview, dict) and preview.get("error") is not True:
             rec["api_request_preview"] = preview
-            rec["preview_source"] = "synthetic preview (no request)" if self.synthetic else "harness --dry-run"
+            rec["preview_source"] = {
+                "fixture": "synthetic preview (no request)",
+                "direct": "direct client (the exact request sent)",
+            }.get(getattr(self.transport, "name", ""), "harness --dry-run")
         else:
             rec["preview_source"] = "unavailable: dry-run did not return a request description"
 
@@ -347,6 +349,7 @@ class Runner:
                 "manifest": self.plan.manifest_version,
                 "draft_rule_registry": self.registry_version,
                 "harness": self.harness_version,
+                "transport": getattr(self.transport, "name", None),
             },
             "readiness": self.readiness,
             "plan": self.plan.snapshot(),
