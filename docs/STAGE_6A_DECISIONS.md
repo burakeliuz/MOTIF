@@ -1,7 +1,7 @@
 # Stage 6A: product logic, Qloo contribution, and art direction
 
-Status: **proposal, 2026-10-06.** Nothing in this document is approved by being
-written down. Each item below is marked **current** (already in the product),
+Status: **proposal of 2026-10-06, updated after the owner's 6B decisions (see §0).**
+Nothing in this document is approved by being written down; §0 records what the owner approved. Each item below is marked **current** (already in the product),
 **proposed** (recommended for 6B), or **awaiting approval** (the owner decides).
 Stage 6A changed no engine code, made no live Qloo or LLM call, and did not
 touch the deployed demo (`https://motif-pxh8.onrender.com`, behind the review gate).
@@ -15,6 +15,35 @@ the owner. Quoted Qloo phrases in this document are limited to those already in
 the committed curated excerpt (`reports/evidence_excerpt.md`,
 `reports/design_examples.md`).
 
+## 0. Owner decisions for 6B (2026-10-06) and what was built
+
+| ID | Decision by the owner | Status after 6B |
+|---|---|---|
+| D12 | Art direction **A (editorial)** as the base: the "If a brand / were a / scent." headline, A's typography, layout, and colour. Only B's Top/Heart/Base strips are adopted, redrawn in A's language. The "B with A's mobile patterns" mix was not chosen. | Implemented in `motif/web/static/` |
+| D2 | Brand plus an optional one-line creative intent; a second alternative is not required. | Implemented: `user_intent`, shown in the brief, never changes motifs, axes, or materials |
+| D3 | Alternative reading | Not built (not required) |
+| D9 | The LLM keeps writing the brief and may offer at most three user-accepted readings for descriptors the lexicon does not read. No tool choice, rules, materials, or scores. | Implemented: `motif/interpret.py`, labelled "Suggested interpretation — not applied", accept/reject per session |
+| D7 | A small trial with two fresh brands instead of six; the 24 Qloo requests and 6–12 LLM calls are not approved. | Run within 8 Qloo requests and 5 LLM calls: `reports/trial_6b.md` |
+| D13 | The review password stays. Removing it for judges is not an automatic requirement. | Gate kept; see §1 correction |
+| D4 | Distinctive vs. common descriptors | Shown as information only, from a frozen seven-brand sample (`config/reference_sample.json`); no effect on scores |
+| D5, D6, D8, D11 | Relation-only label, per-direction basis, unmapped motifs as open questions, one-page brief and PDF | Implemented |
+| D10 | Palette extension | Still awaiting approval, now tied to one rule candidate (§0.1) |
+
+### 0.1 Decision package awaiting approval: one rule and one material
+
+Measured offline on the nine recorded brands (no new request; configs unchanged):
+
+| Candidate | Rationale | Effect on the recorded brands | Risk |
+|---|---|---|---|
+| **R6: provocation → raw texture** (counterpart of R3, precision → polished) | Edgy, rebellious, subversive descriptors read as an unpolished, transgressive texture; a design hypothesis like R1–R5 | 6 of 9 unchanged. Comme des Garçons: texture becomes **conflicted** (polished from related references vs. raw from its own descriptors) and the user chooses. A24: first direction (**raw**, partial). Supreme: **raw + light**, composed with bergamot and vetiver. | Written after seeing CDG, A24, and Supreme, so none of them would be independent evidence for it; needs fresh brands |
+| **Olibanum (frankincense) oil**, one specific supplier grade, verified on a full Givaudan or Firmenich page | The only verified raw material today is vetiver; an incense family material would give R6 a second raw option. Verify dry/raw only if the supplier's words support it | No effect unless R6 is approved | Supplier text may not support "raw"; then it is not added |
+
+Lavender (cool) and benzoin (sweet/warm) stay out: no rule can target cool, sweet, or warm, so adding them would change no result. Vetiver and bergamot already exist.
+
+### 0.2 Correction: competition access
+
+The 6A text below said a demo behind private access "does not appear to qualify". The owner read the full official rules on 2026-10-06: their Testing section accepts login details in the testing instructions for private sites, while the hackathon homepage carries wording against private access, and the rules say the official rules prevail in a conflict. MOTIF therefore keeps the review gate; whether a password-protected demo is accepted, and whether the testing-instructions field is visible only to judges, must be confirmed with the organizers. The build environment could not open `qloo.devpost.com` (egress blocked), so this rests on the owner's reading.
+
 ## 1. Competition basis (search-index text, not full pages)
 
 On 2026-10-06 the official pages <https://qloo.devpost.com/> and
@@ -26,8 +55,7 @@ pages and must be re-checked against the full current text before submission.
   use of Qloo), design, potential impact, quality of the idea. Ties go to the
   technical criterion first. Equal weights are no guarantee of any score.
 - A working external demo, a public repository, and an open-source license are
-  expected; a demo behind private access does not appear to qualify (the review
-  gate must be off at submission); a video is not required.
+  expected; a video is not required. On private access, see the correction in §0.2.
 - Implication we draw: a product that would work the same without Qloo does not
   meet the intended differentiation, and more API calls are not value by themselves.
 
@@ -35,7 +63,7 @@ pages and must be re-checked against the full current text before submission.
 
 | Criterion | Concrete product evidence to show | Exists today? |
 |---|---|---|
-| Technological implementation / Qloo use | Per brand: what the brand's own entry says vs. what its audience neighbourhood (related brands, films) adds, measured with identical rules (A/A′/B), with every phrase traceable to entity and request; distinctive vs. common descriptors | A/A′/B and traceability: yes. Distinctiveness and the per-axis "why it changed" view: proposed (§3) |
+| Technological implementation / Qloo use | Per brand: what the brand's own entry says vs. what references Qloo relates to it (related brands, films) add, measured with identical rules (A/A′/B), with every phrase traceable to entity and request; distinctive vs. common descriptors | A/A′/B and traceability: yes. Distinctiveness and the per-axis "why it changed" view: proposed (§3) |
 | Design | One coherent art direction (§8) where the scent idea leads and the evidence is one tap away; a printable brief | Current UI works but was not liked; two prototypes in this stage |
 | Potential impact | A one-page brief a brand/creative team can hand to a perfumer (§7), with open decisions spelled out | Brief exists as text and JSON; the readable one-page layout and PDF are proposed |
 | Quality of the idea | "If this brand were a scent": cultural motifs → sensory direction, honest about what culture cannot decide | Yes for brands with clear aesthetics (MUJI, Le Labo); weak for brands whose identity is conceptual (CDG, A24) |
@@ -44,8 +72,8 @@ pages and must be re-checked against the full current text before submission.
 
 ### 2.1 What works (keep)
 
-- **MUJI is legible end to end** (current): own descriptors and audience
-  neighbourhood agree on restraint, precision, and naturalness; three axes set,
+- **MUJI is legible end to end** (current): own descriptors and the references Qloo relates to MUJI
+  agree on restraint, precision, and naturalness; three axes set,
   three left open; verified materials with the supplier's own words.
 - **Provenance is honest** (current): Qloo values are copied literally with
   their position; relation-only directions are flagged; unknown axes stay empty.
@@ -59,7 +87,7 @@ not creative quality. The recorded data shows three gaps.
 
 1. **Distinctive motifs are lost.** Comme des Garçons' own entry contains
    *Deconstructed Silhouettes*, *Subversive*, *Avant-Garde*, and *Provocative*.
-   "Deconstructed silhouettes" also appears on four of the brands its audience likes,
+   "Deconstructed silhouettes" also appears on four of the brands Qloo relates to CDG,
    and "subversive" on two. Today these feed motifs (`experimental`,
    `provocative`) that have no translation rule, so CDG ends as
    `partial_direction` with only *polished*, and that axis comes from
@@ -102,13 +130,13 @@ alternative reading. Events and other new input types stay out of scope.
 | Layer | Example | Category |
 |---|---|---|
 | Brand's own descriptors | MUJI's own *Clean Lines*, *Natural Materials* | `qloo_observation` |
-| Qloo relations | "Brands/films the same audience likes" (the list itself) | `qloo_observation` |
+| Qloo relations | "Brands/films Qloo relates to the brand" (the list itself) | `qloo_observation` |
 | Descriptors of related entities | *Muted* on *Still Walking* | `qloo_observation`, marked as a neighbour's property |
 | User's stated intent (proposed) | "for a store home fragrance" | new `user_intent`, never evidence |
 | MOTIF's readings and translations | motif *restraint* → weight *light* | `motif_annotation`, `design_rule` |
 
 A neighbour's property is never automatically the brand's property. A direction
-that only the neighbourhood supports is labelled **audience neighbourhood**
+that only those references support is labelled **from related references only**
 (today: `relations_only`) everywhere, including the brief.
 
 ### 3.2 Shared, distinctive, and conflicting motifs (proposed)
@@ -149,8 +177,8 @@ assumed.
 Keep A (own entry only), A′ (one own cue sufficient), and B (own + relations)
 with identical rules (`docs/SUBMISSION_NOTES.md` §2b; A = 0 everywhere is a
 threshold effect, not proof of quality). Proposed 6B addition: for each axis,
-one plain sentence: "set by Muji's own entry, corroborated by its audience",
-"set only by its audience neighbourhood", or "unchanged: relations added
+one plain sentence: "from Muji's own descriptors; the same motif also appears in references Qloo relates to Muji",
+"derived only from references Qloo relates to Muji", or "unchanged: relations added
 nothing new". A direction added by relations is not a supported brand property.
 
 ## 4. 6B evaluation plan (proposed, awaiting approval)
@@ -265,9 +293,9 @@ Supplier phrases are quoted; nothing is described as smelled or balanced.
 > from naturalness, moderate). Left open: temperature, projection, sweetness.
 >
 > **Why this fits Muji.** Muji's own Qloo entry: Clean Lines, Natural
-> Materials, Unpretentious, Functional Minimalist Form. Brands its audience
-> also likes (Urban Research, Creema) repeat Minimalist, Natural Tones, Clean
-> Lines; films its audience also likes (Still Walking, Like Father, Like Son)
+> Materials, Unpretentious, Functional Minimalist Form. Brands Qloo relates
+> to Muji (Urban Research, Creema) repeat Minimalist, Natural Tones, Clean
+> Lines; films Qloo relates to Muji (Still Walking, Like Father, Like Son)
 > repeat Muted, Understated elegance. These corroborate Muji's own description;
 > they do not define it.
 >
@@ -320,7 +348,7 @@ Files (private, git-ignored): `data/design_preview/stage6a/prototype-A-editorial
 | D2 | Optional one-line intent as a separate `user_intent` layer | awaiting approval |
 | D3 | Offer one alternative reading only when the evidence contains one | awaiting approval |
 | D4 | Distinctive-motif weighting with a versioned reference set | proposed |
-| D5 | "Audience neighbourhood" label for relation-only directions in UI and brief | proposed (extends current `relations_only`) |
+| D5 | "From related references only" label for relation-only directions in UI and brief | proposed (extends current `relations_only`) |
 | D6 | Per-axis plain explanation of what relations changed | proposed |
 | D7 | E1/E2/E3 evaluation on six pre-registered fresh brands | awaiting approval (spends Qloo and LLM budget) |
 | D8 | Unmapped motifs shown in brief and PDF with translation open; no ad-hoc mappings | proposed |
@@ -338,7 +366,7 @@ art direction (D12), and, if wanted, the LLM authority (D9). Then:
 1. The engine still passes every existing test; any rule, lexicon, or palette
    change carries a version bump and a written reason.
 2. Every claim in the result and the PDF maps to one of the five layers in §3.1;
-   relation-only directions read "audience neighbourhood".
+   relation-only directions read "derived only from references Qloo relates to the brand".
 3. Unknown axes stay empty in every view, including the PDF.
 4. The chosen art direction is implemented for start, research, result, and
    mobile with real data, without fake progress, and without building HTML

@@ -19,8 +19,19 @@ rules, because devpost.com could not be opened from the build environment.
 The owner must confirm these on the page itself.
 
 - Deadline: October 30, 2026, 11:45 pm EDT (October 31, 06:45 Türkiye time).
-- A functional demo hosted externally that judges can try end to end; local-only
-  or private-access submissions do not qualify. A demo video is reported as not required.
+  Judging period: November 2–16, 2026 (US Eastern), so the demo must work until at
+  least November 17 in Türkiye. Suggested final access and budget check: October 27–28.
+- A functional demo hosted externally that judges can try end to end. A demo video
+  is reported as not required.
+- **Private access (corrected 2026-10-06):** the official rules' Testing section,
+  read in full by the owner, accepts login details in the testing instructions for
+  private sites; the hackathon homepage has wording against private access; the
+  rules say the official rules prevail in a conflict. MOTIF keeps its review
+  password for now. Two things need the organizers' confirmation before relying
+  on it: that a password-protected demo is accepted, and that the testing
+  instructions field is visible only to judges. The password is never written
+  into a public description. (The build environment cannot open devpost.com, so
+  this rests on the owner's reading.)
 - A public repository with all code, assets, and run instructions, plus a text description.
 - Judging criteria: Technological Implementation, Design, Potential Impact,
   and Quality of the Idea (no weights seen).
@@ -197,6 +208,37 @@ brands, plans a three-arm evaluation (own entry only, plus relations, LLM only),
 and maps each judging criterion to product evidence. Its items are proposals
 until the owner approves them; no engine or deployment change was made.
 
+## 2e. Stage 6B: the chosen experience and a two-brand trial
+
+- **Interface:** art direction A (editorial) with Top/Heart/Base scent strips. The
+  result leads with a plain scent idea, then the starting materials (each strip is
+  MOTIF's visual shorthand for supplier-described properties, darker where the
+  direction asks for them, lighter on dimensions the evidence leaves open), a
+  short cultural basis per direction, open decisions, and the brief. "How it was
+  made" is closed by default; technical records sit one level deeper.
+- **Creative intent:** an optional line stored as `user_intent`; it appears in the
+  brief and changes no motif, direction, or material.
+- **Suggested interpretations:** on request, Claude may suggest up to three
+  readings for descriptors the lexicon does not read, validated against a JSON
+  schema and MOTIF's checks; accepting one records the user's note, never Qloo
+  evidence. Live example (Supreme): readings for its own "Exclusive", "Defiant",
+  and "Vibrant Color Palettes".
+- **Honest basis per direction:** "from the brand's own descriptors", "the same
+  motif also appears in references Qloo relates to the brand", or "derived only
+  from those references: a creative suggestion". Motifs without a rule stay as
+  open design questions (Comme des Garçons: experimentation and provocation).
+- **Printable brief:** `/brief/<id>` renders one A4 page from the stored result;
+  the technical JSON stays a separate download.
+- **Budgets:** daily counters persist in a file with a lock and reserve-then-release
+  accounting; LLM calls are reserved in the ledger before they are sent; both fail
+  closed. One Qloo cache per brand means changing the intent repeats no request.
+- **Two-brand trial** (`reports/trial_6b.md`, pre-registered): Aesop received the
+  same direction and materials as MUJI, with "light" only from related references;
+  Supreme received one relation-only direction plus provocation as an open
+  question, and no materials. An LLM-only brief (same intent) was more vivid and
+  more practical on first read but untraceable and outside the verified palette.
+  No human rating was made; no arm is called better.
+
 ## 3. Redacted request-to-result explanation
 
 Example from the full live run `live-20261006T103307Z-660d` (request `req 0011`; the credential is never stored):
@@ -263,15 +305,14 @@ Result:
 
 ## 4. Demo or screenshots
 
-A hosted demo is required by the official rules (section 0). Stage 5 chose a
-Render free web service (`render.yaml`, README "Hosting"): it keeps keys
-server-side as environment variables and needs no paid plan. Deployment needs
-the owner's Render account; the URL is added here once it is live.
+Hosted demo: <https://motif-pxh8.onrender.com> (Render free web service, deployed
+from `main` by the owner; keys are server-side environment variables).
 
-During private review the demo is behind a temporary password gate
-(`MOTIF_ACCESS_PROTECTION=on`, `MOTIF_ACCESS_PASSWORD`; README "Web interface").
-Before submission it must be opened (`MOTIF_ACCESS_PROTECTION=off`), because the
-rules require a demo judges can try.
+The demo is behind a review password (`MOTIF_ACCESS_PROTECTION=on`,
+`MOTIF_ACCESS_PASSWORD`). Whether it stays on for judging is the owner's decision
+after the organizers confirm (section 0); turning it off is one environment
+variable. Copy-ready Devpost texts and a testing-instructions draft with a
+password placeholder: `docs/DEVPOST_SUBMISSION.md`.
 
 Server variables (names only): `QLOO_API_KEY`, `MOTIF_ACCESS_PROTECTION`,
 `MOTIF_ACCESS_PASSWORD`, `MOTIF_ANTHROPIC_API_KEY` (optional), `MOTIF_LLM_MODEL`, `MOTIF_LLM_MAX_CALLS`,
@@ -303,6 +344,21 @@ a live run first.
 - Final product setup, verified in a clean environment: TBD (stage 6)
 
 ## 6. Known limitations
+
+- Stage 6B additions:
+  - **Low specificity among minimal brands:** MUJI, Le Labo, and Aesop all receive
+    light/polished/natural and the same three materials. Five rules and seven
+    verified materials cannot separate them; what makes each distinct sits in
+    descriptors MOTIF does not translate (for example Aesop's "Architectural Store
+    Interiors"). The suggestion layer shows such descriptors but changes nothing.
+  - **Counters on the free host:** daily counters and the LLM ledger live on the
+    instance's disk, which a free Render instance resets on restart or redeploy;
+    within one instance they hold across concurrent requests. Provider-side
+    limits (Anthropic workspace spend limit, the Qloo key's quota) remain the
+    outer guard. A persistent store would need a paid disk or an external
+    service (not set up; owner decision).
+  - **The two trial brands** are no longer independent if rule R6 is adopted.
+
 
 Known from the feasibility stage (`reports/feasibility.md`):
 

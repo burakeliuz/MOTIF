@@ -1,6 +1,6 @@
 # MOTIF working notes for Claude Code
 
-Current phase: **stage 5 done** (web interface `motif/web/`, palette-0.3 with 7 of 8 materials verified, lexicon-0.3, engine-0.3, LLM prose; spec rev 0.3 on 2026-10-06). Hosting files are ready for Render; the deploy needs the owner's account. Stage 6A (review, no product change): proposals in `docs/STAGE_6A_DECISIONS.md`, not approved until the owner says so; private design previews in git-ignored `data/design_preview/`. Next: 6B only after the owner's decisions, then stage 6 (clean-environment test, demo, Devpost texts).
+Current phase: **stage 6B done on the session branch** (art direction A with scent strips, creative intent, user-accepted LLM readings, printable brief, persistent budget counters; spec rev 0.4; two-brand trial in `reports/trial_6b.md`). Hosted demo: https://motif-pxh8.onrender.com (behind the review password; deploys from `main` by the owner). Pending owner decisions: rule R6 + one material (`docs/STAGE_6A_DECISIONS.md` §0.1), the gate at judging time. Next: stage 6 (clean-environment test, final checks on Oct 27–28, Devpost edits by the owner).
 Read `MOTIF_QLOO_FEASIBILITY.md` (rev 0.2) and `MOTIF_BUILD_SPEC.md` before
 changing anything. Then read `README.md`, `docs/QLOO_ACCESS_NOTES.md`,
 `reports/feasibility.md`, `reports/design_examples.md`, and `reports/holdout_t1.md`.
@@ -25,7 +25,8 @@ One Claude Code cloud session per stage; each stage ends with tests, a push to t
 2. Live Qloo test: pilot, then full plan after the owner's OK; `reports/feasibility.md`; a small curated evidence excerpt in `reports/`; `docs/SUBMISSION_NOTES.md` skeleton.
 3. Product decisions: `MOTIF_BUILD_SPEC.md` written (runtime LLM optional, Python stdlib web stack, hosted demo required by the official rules). The spike rules below end when the owner accepts this spec.
 4. Engine and agentic flow, end to end from the command line.
-5. Interface and hosting: done (Render free web service prepared in `render.yaml`; deployed URL pending the owner's account).
+5. Interface and hosting: done; deployed by the owner at https://motif-pxh8.onrender.com.
+   6A/6B. Product review and the chosen experience: done on the session branch (see `docs/STAGE_6A_DECISIONS.md`).
 6. Clean-environment setup test, demo, and Devpost texts.
 
 Every stage adds to `docs/SUBMISSION_NOTES.md`, mapped to the six items of the kit's submission guide (see `docs/QLOO_ACCESS_NOTES.md`).
@@ -50,6 +51,9 @@ Every stage adds to `docs/SUBMISSION_NOTES.md`, mapped to the six items of the k
 - Research control is a deterministic state machine (`motif/agent.py`). The LLM writes validated prose only; giving it tool choice needs the owner's approval.
 - LLM: key only from `MOTIF_ANTHROPIC_API_KEY`; default `claude-sonnet-5-5`; never switch models silently; every real call goes through the ledger (`data/llm_calls.jsonl`). A failed call or invalid text shows the labelled template, never as LLM output.
 - Web review gate (`motif/web/access.py`): password only from `MOTIF_ACCESS_PASSWORD`; protection on by default and fail-closed; every page and API except `/healthz` and the sign-in page is behind it. Open it (`MOTIF_ACCESS_PROTECTION=off`) only on the owner's word.
+- Creative intent and accepted LLM readings are user data (`user_intent`, `user_preference`): never evidence, never change motifs, axes, materials, or scores. The LLM may suggest readings only on the user's request, at most three, validated in `motif/interpret.py`.
+- Wording: related brands and films are "references Qloo relates to" a brand; never claim anything about audiences.
+- Budget counters (`data/web_usage.json`, `data/llm_calls.jsonl`) reserve before spending and fail closed; do not bypass them.
 - Web: keys stay server-side; the UI never builds HTML from data; no fake progress; identical requests and answers must not repeat Qloo or LLM calls.
 - Live matching uses only material properties with `verified_full_page`; unverified ones appear only in the labelled design preview.
 - Held-out brands used once (T1: Le Labo, Patagonia) are no longer independent validation.

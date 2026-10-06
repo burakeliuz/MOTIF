@@ -1,6 +1,6 @@
 # MOTIF build specification
 
-Revision 0.3 · 2026-10-06 · rev 0.2 accepted by the owner for stage 4; rev 0.3 records the stage-5 decisions (section 0b) · Owner: Burak Eliuz
+Revision 0.4 · 2026-10-06 · rev 0.2 accepted for stage 4; rev 0.3 records stage 5 (section 0b); rev 0.4 records the owner's 6B decisions (section 0c) · Owner: Burak Eliuz
 
 This document turns the stage-2 findings (`reports/feasibility.md`,
 recommendation **narrow**) into a buildable MVP. It is the contract for
@@ -49,6 +49,22 @@ Where a later section still says otherwise, this section wins.
 | Hosting | Candidates | Render free web service (`render.yaml`, Python from `.python-version`), keys as Render environment variables | Free instance, secrets server-side, no paid plan |
 | Review access | Public demo | Temporary password gate (`motif/web/access.py`): server-side check, Secure/HttpOnly/SameSite=Strict session cookie, limited wrong attempts, fail-closed without a password; `/healthz` stays public and data-free. Turned off before submission | Owner wants a private review period; judges need open access later |
 | Runtime | Python 3.11 container | Python 3.13 (matches the build environment); engine still stdlib-only, `anthropic==1.11.0` the only dependency | Fewer moving parts |
+
+## 0c. Revision 0.4: stage-6B decisions (approved by the owner)
+
+| Topic | Rev 0.4 (implemented) |
+|---|---|
+| Art direction | A (editorial): Archivo + Newsreader, one signal accent, 12-column asymmetric grid; Top/Heart/Base scent strips adapted from B. Strip textures are MOTIF's shorthand for supplier-described properties (darker where the direction asks, lighter on open dimensions), never a measurement; strip heights are equal so they imply no evaporation or longevity. |
+| Result order | Scent idea → starting materials → short cultural basis per direction → open decisions → brief → optional suggestions → "How it was made" (closed); technical records one level deeper |
+| Input | Brand + optional one-line creative intent (`user_intent`, max 140 characters): recorded in the brief, never changes motifs, axes, materials, or scores; no hidden keywords |
+| LLM authority | Prose, plus up to three user-requested readings for descriptors the lexicon does not read (`motif/interpret.py`): JSON-schema output, offered descriptors only, length and content checks, sources attached by MOTIF; accept/reject stored as a user preference, never evidence, no global lexicon or rule change. No tool choice. |
+| Wording | Related entities are "references Qloo relates to" the brand; no statements about audiences; repetition is a pattern, not proof |
+| Unmapped motifs | Kept as open design questions in the result, the brief, and the PDF |
+| Reference sample | `config/reference_sample.json` (sample-0.1): descriptors common in seven recorded brands, display only |
+| Brief output | `/brief/<id>`: one A4 page from the stored result (browser print to PDF); `brief.json` stays the technical download (schema brief-0.2: `idea`, `basis`, `open_design_questions`, `user_intent`, `accepted_readings`) |
+| Budgets | File-locked daily counters (`web_usage.json`) with reserve/release; LLM ledger reserves before each call; both fail closed. One Qloo cache per brand within 30 minutes. |
+| Access | Review gate kept (owner decision); its removal for judging is not automatic and awaits organizer confirmation |
+| Rules and palette | Unchanged (draft-0.2, palette-0.3). Candidate R6 and one material are a pending decision package (`docs/STAGE_6A_DECISIONS.md` §0.1) |
 
 ## 1. Decision
 
@@ -215,7 +231,7 @@ integration is added.
 | No exact-name match | **Ask:** show near matches; the user may pick one or rephrase. Never pick a "similar" entity silently |
 | Zero results | Empty state: "Qloo returned no entity for this name"; suggest checking spelling or type |
 | The same display name for different tag IDs | Never merged; shown with their namespace |
-| A selected entity of an unexpected type (for example a person) | Allowed. The engine runs, and the brief says the related evidence describes that entity's audience neighbourhood, not a brand |
+| A selected entity of an unexpected type (for example a person) | Allowed. The engine runs, and the brief says the related evidence describes references Qloo relates to that entity, not a brand |
 
 ## 7. Motif classification (`config/motif_lexicon.json`, lexicon-0.2)
 

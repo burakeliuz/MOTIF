@@ -37,7 +37,7 @@
     for (const q of r.design_questions) decisions.push(cap(q.label) + ": " + q.text);
     decisions.push("Proportions, further materials, and whether it reads as " + brand + ": only smelling can decide.");
 
-    sheet.replaceChildren(
+    sheet.replaceChildren(...[
       h("div", { class: "hd" }, h("span", { class: "lg", text: "MOTIF" }),
         h("span", { class: "m" }, "Perfumer brief · scent direction", h("br"), (s.data_label === "recorded" ? "Recorded Qloo data" : "Live Qloo data") + (date ? ", " + date : ""))),
       h("h1", { text: brand }),
@@ -57,7 +57,7 @@
             h("div", { class: "q", text: "“" + (asked[0] && asked[0].supplier_text || m.scent || "") + "”" }),
             h("div", { class: "x" }, "Serves: " + asked.map((p) => p.axis.toLowerCase() + " → " + p.pole).join(", ") + ".",
               other.length ? [" ", h("b", { text: "Also" }), " supplier-described: " + other.map((p) => p.pole + " (" + p.axis.toLowerCase() + " is open)").join(", ") + "."] : "")));
-        })) : h("div", {}, h("p", { text: r.materials.status_text }))),
+        })) : h("div", {}, h("p", { text: r.headline + (r.headline_note ? " " + r.headline_note : "") }))),
 
       h("div", { class: "grid" }, h("h2", {}, h("span", { text: "02" }), "Why " + brand),
         targets.length ? h("ul", { class: "basis" }, targets.map((a) => {
@@ -75,8 +75,8 @@
         h("ol", {}, accepted.map((x) => h("li", { text: x.descriptor + ": " + x.reading + " (accepted by you; not Qloo evidence; no rule applied)" })))) : null,
 
       h("div", { class: "ft" },
-        h("span", {}, "Limits: a creative direction, not a formula: not smelled, not balanced, no proportions, no prediction of who will like it. Sources: Qloo Hackathon API descriptors for " + brand + " and references Qloo relates to it" + (date ? " (" + date + ")" : "") + "; supplier pages (" + domains.join(", ") + "), read 2026-10-06. Direction and materials: MOTIF " + r.versions.engine + ", " + r.versions.lexicon + ", rules " + r.versions.rules + ", " + r.versions.palette + ". " + (s.brief && s.brief.author === "llm" ? "Brief wording by Claude (" + s.brief.model + "), checked against the result. " : "") + "Full evidence trail: technical JSON."),
-        h("span", { text: "1 / 1" })));
+        h("span", {}, "Limits: a creative direction, not a formula: not smelled, not balanced, no proportions, no prediction of who will like it. Sources: Qloo Hackathon API descriptors for " + brand + " and references Qloo relates to it" + (date ? " (" + date + ")" : "") + (domains.length ? "; supplier pages (" + domains.join(", ") + "), read 2026-10-06" : "") + ". Direction and materials: MOTIF " + r.versions.engine + ", " + r.versions.lexicon + ", rules " + r.versions.rules + ", " + r.versions.palette + ". " + (s.brief && s.brief.author === "llm" ? "Brief wording by Claude (" + s.brief.model + "), checked against the result. " : "") + "Full evidence trail: technical JSON."),
+        h("span", { text: "1 / 1" }))].filter(Boolean));
   }
 
   async function load() {
