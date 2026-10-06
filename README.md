@@ -11,7 +11,9 @@ material matching, or brief generation. The project frame is
 [`MOTIF_QLOO_FEASIBILITY.md`](MOTIF_QLOO_FEASIBILITY.md) (rev 0.2).
 
 **Status:** live feasibility evaluated on 2026-10-06 (5 seeds × 6 domains, all
-requests HTTP 200). Recommendation: **narrow**. See
+requests HTTP 200). Recommendation: **narrow**. Product decisions for the MVP:
+[`MOTIF_BUILD_SPEC.md`](MOTIF_BUILD_SPEC.md); worked design examples (not
+engine output): [`reports/design_examples.md`](reports/design_examples.md). See
 [`reports/feasibility.md`](reports/feasibility.md) and the literal evidence excerpt
 [`reports/evidence_excerpt.md`](reports/evidence_excerpt.md). Submission notes:
 [`docs/SUBMISSION_NOTES.md`](docs/SUBMISSION_NOTES.md).

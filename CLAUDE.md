@@ -1,8 +1,9 @@
 # MOTIF working notes for Claude Code
 
-Current phase: **Qloo feasibility spike** (stage 2 live run done 2026-10-06, recommendation `narrow`; stage 3 = product decisions).
-Read `MOTIF_QLOO_FEASIBILITY.md` (rev 0.2) before changing anything. Then read
-`README.md`, `docs/QLOO_ACCESS_NOTES.md`, and `reports/feasibility.md`.
+Current phase: **stage 3 product decisions written** (`MOTIF_BUILD_SPEC.md` rev 0.1, 2026-10-06; awaiting the owner's acceptance). Stage 2 recommendation: `narrow`.
+Read `MOTIF_QLOO_FEASIBILITY.md` (rev 0.2) and `MOTIF_BUILD_SPEC.md` before
+changing anything. Then read `README.md`, `docs/QLOO_ACCESS_NOTES.md`,
+`reports/feasibility.md`, and `reports/design_examples.md`.
 
 ## Communication with the project owner
 
@@ -22,9 +23,9 @@ One Claude Code cloud session per stage; each stage ends with tests, a push to t
 
 1. Offline preparation: done.
 2. Live Qloo test: pilot, then full plan after the owner's OK; `reports/feasibility.md`; a small curated evidence excerpt in `reports/`; `docs/SUBMISSION_NOTES.md` skeleton.
-3. Product decisions: `MOTIF_BUILD_SPEC.md`, including runtime LLM yes/no, web stack, and whether to host a demo. The spike rules above end when this spec is accepted.
+3. Product decisions: `MOTIF_BUILD_SPEC.md` written (runtime LLM optional, Python stdlib web stack, hosted demo required by the official rules). The spike rules below end when the owner accepts this spec.
 4. Engine and agentic flow, end to end from the command line.
-5. Interface (and hosting only if the spec chose it).
+5. Interface and hosting (the spec chose hosting: the official rules require a hosted demo).
 6. Clean-environment setup test, demo, and Devpost texts.
 
 Every stage adds to `docs/SUBMISSION_NOTES.md`, mapped to the six items of the kit's submission guide (see `docs/QLOO_ACCESS_NOTES.md`).
@@ -43,7 +44,9 @@ Every stage adds to `docs/SUBMISSION_NOTES.md`, mapped to the six items of the k
 - Copy returned values literally with their raw pointer. Do not infer cultural traits from entity names or model memory.
 - Keep the six axes and pole order. Unknown axes are `null`. Five draft rules only; no `restrained → intimate`.
 - Scores are reported as returned: no percentages, no cross-request averaging, no "lift".
-- During the spike: no frontend, motif classifier, sensory engine, material list, or brief generation.
+- Until the owner accepts `MOTIF_BUILD_SPEC.md`: design and documents only (no engine, classifier, frontend, or brief generation code). After acceptance, build in the spec's order: engine and agent in stage 4 (`motif/`, leaving `motif_spike/` intact), interface and hosting in stage 5.
+- `config/motif_lexicon.json`, `config/material_palette.json`, and `config/draft_rules.json` are versioned design rules: change them only with a version bump and a written reason. Material profiles are MOTIF's creative mapping; supplier descriptors stay in `source` and are not verified in full until task T2.
+- Results of the engine are a creative direction, never a formula, dosage, or preference prediction. Unknown or conflicted axes stay `null`.
 
 ## Live access facts (organizer email, 2026-10-05)
 

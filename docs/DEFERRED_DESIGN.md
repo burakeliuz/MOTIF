@@ -58,3 +58,30 @@ Read-out rules:
 - Report counts with denominators and the seeds involved. No significance
   claims from five seeds.
 - No fragrance-preference or audience-acceptance claim follows from either run.
+
+## Stage-3 decisions deferred (2026-10-06)
+
+Decided items live in `MOTIF_BUILD_SPEC.md`. The items below were consciously
+left open. Each states why and the smallest step that would unblock it.
+
+| Item | Why deferred | Smallest next step |
+|---|---|---|
+| Rules for the seven unmapped motifs (experimental, provocative, heritage, industrial, playful, melancholic, romantic) | No justified sensory mapping; the draft-0.2 notice forbids shortcuts such as heritage → warm | Write one candidate rule with its rationale and "decides nothing about" list, review it against Comme des Garçons and A24 evidence, and bump the rules version |
+| An `intimate` path (R2) | "intimate" style tags appear for all five reference seeds, so lexicon-0.1 treats them as context; no palette entry has an `intimate` profile | Find a non-common cue set for closeness in held-out data (task T1), and a sourced material whose supplier descriptor supports skin-close use |
+| Multi-reference input (2–3 references) | Support counting across seeds (are two seeds' own tags two anchors?) is undesigned and untested | Define per-seed anchors and a merge rule, and test on two recorded seeds |
+| LLM suggestions for descriptors the lexicon misses | Would reintroduce non-determinism into classification | A suggestion-only UI: the user accepts a suggestion, it is stored as a `manual` annotation, and it is never applied automatically |
+| People, books, places, and scoped tag insights | Stage 2 found occupations, subject matter, location effects, and generic venue tags | Test `filter.tag.types` scoping and place `ambience`/`decor` on two recorded seeds before adding any domain |
+| Commonness reference set | Five seeds is a small reference; one query must not define its own reference | Extend the frozen reference with the T1 held-out brands and bump the lexicon version |
+| Material palette beyond 8 entries | Only sourced entries are allowed; descriptors not yet read in full | Task T2 (full supplier pages), then add entries only with a source and an uncertainty note |
+| Shipping recorded Qloo values in the public demo | Event data terms are unclear | The owner asks the organizers; until then recorded mode is off in the public build |
+
+### Critical gaps that the spec does not paper over
+
+- **Lexicon validation.** All numbers in `reports/design_examples.md` come
+  from the five seeds the lexicon was written on. Smallest step: task T1
+  (≤ 10 Qloo requests, owner's OK).
+- **Material descriptors.** They are search excerpts of supplier pages.
+  Smallest step: task T2 (read 8 pages in full, or the owner checks them manually).
+- **Official rules.** They were read through search excerpts only. Smallest
+  step: the owner opens qloo.devpost.com and confirms the hosted-demo rule,
+  the criteria, and the deadline.

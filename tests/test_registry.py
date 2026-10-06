@@ -68,5 +68,39 @@ class DraftRegistryBaseline(unittest.TestCase):
         self.assertNotIn("intimate_projecting", example["expected"]["qualitative_targets"])
 
 
+class Stage3DesignConfigs(unittest.TestCase):
+    """The stage-3 lexicon and palette must stay inside the rev 0.2 baseline."""
+
+    def setUp(self):
+        self.registry = read_json(CONFIG_DIR / "draft_rules.json")
+        self.lexicon = read_json(CONFIG_DIR / "motif_lexicon.json")
+        self.palette = read_json(CONFIG_DIR / "material_palette.json")
+        self.axes = {a["key"]: (a["first_pole"], a["second_pole"]) for a in self.registry["axes"]}
+
+    def test_lexicon_uses_only_the_twelve_motifs(self):
+        self.assertEqual(set(self.lexicon["cue_groups"]), {m["id"] for m in self.registry["motifs"]})
+
+    def test_palette_profiles_use_baseline_axes_and_poles(self):
+        for material in self.palette["materials"]:
+            for axis, pole in material["motif_profile"].items():
+                with self.subTest(material=material["material_id"], axis=axis):
+                    self.assertIn(pole, self.axes[axis])
+                    self.assertIn(axis, material["basis_terms"])
+
+    def test_palette_entries_keep_source_apart_from_mapping(self):
+        for material in self.palette["materials"]:
+            with self.subTest(material=material["material_id"]):
+                self.assertTrue(material["source"]["urls"])
+                self.assertIn(material["source"]["status"], self.palette["verification"]["status_values"])
+                self.assertNotIn("motif_profile", material["source"])
+
+    def test_palette_01_has_no_sourced_intimate_material(self):
+        # MOTIF_BUILD_SPEC.md 9.1: no supplier excerpt supported skin-close use in palette-0.1.
+        if self.palette["palette_version"] != "palette-0.1":
+            self.skipTest("later palettes may add a sourced intimate material")
+        self.assertFalse(any(m["motif_profile"].get("intimate_projecting") == "intimate"
+                             for m in self.palette["materials"]))
+
+
 if __name__ == "__main__":
     unittest.main()

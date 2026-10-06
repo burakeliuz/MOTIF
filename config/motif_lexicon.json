@@ -1,0 +1,396 @@
+{
+  "lexicon_version": "lexicon-0.1",
+  "status": "draft_for_stage4",
+  "provenance_category": "design_rule (classification rule, human-authored)",
+  "notice": "Authored in stage 3 after reading the five stage-2 seeds; it is therefore tuned on them and must be checked on held-out brands (MOTIF_BUILD_SPEC.md, stage-4 task T1). Cue words are classification rules, not Qloo labels. Weights and thresholds are design parameters, not validated statistics.",
+  "match": {
+    "normalization": "lowercase; '-' and non-letters become spaces; whole-word phrase match of any variant inside the tag name",
+    "namespaces": {
+      "own": [
+        "urn:tag:aesthetic_property:qloo",
+        "urn:tag:personal_style:qloo",
+        "urn:tag:emotional_tone:qloo"
+      ],
+      "brand": [
+        "urn:tag:aesthetic_property:qloo",
+        "urn:tag:emotional_tone:qloo"
+      ],
+      "movie": [
+        "urn:tag:style:qloo"
+      ],
+      "artist": [
+        "urn:tag:style:qloo"
+      ]
+    },
+    "ignore_tag_names": [
+      "null"
+    ],
+    "exclude_patterns": [
+      "\\b(pop|rock|rap|hip hop|soul|folk|r b|jazz|electronic|punk|wave|funk|synth|indie|trap|boom bap|chillwave)\\b",
+      "\\bcombat\\b"
+    ],
+    "exclude_patterns_note": "First pattern: music genre names inside urn:tag:style:qloo (for example 'Baroque Pop' is a genre, not opulence); applied to every source for simplicity. Second: 'close quarter combat' is not closeness.",
+    "bare_pole_word_tags_are_not_cues": [
+      "warm",
+      "cool",
+      "light",
+      "dense",
+      "raw",
+      "polished",
+      "natural",
+      "synthetic",
+      "projecting",
+      "sweet",
+      "dry"
+    ],
+    "bare_pole_word_note": "A tag whose whole name is a single axis pole word (for example 'Raw', 'Polished', 'Warm') never counts as a cue; axes move only through motif rules R1-R5. 'Intimate' is exempt because it is a motif name; it is a common cue in the reference set anyway. Phrases such as 'Natural Materials' remain cues."
+  },
+  "cue_groups": {
+    "restrained": [
+      {
+        "cue_id": "restrained",
+        "variants": [
+          "restrained"
+        ]
+      },
+      {
+        "cue_id": "understated",
+        "variants": [
+          "understated"
+        ]
+      },
+      {
+        "cue_id": "muted",
+        "variants": [
+          "muted"
+        ]
+      },
+      {
+        "cue_id": "reserved",
+        "variants": [
+          "reserved"
+        ]
+      },
+      {
+        "cue_id": "sparse",
+        "variants": [
+          "sparse"
+        ]
+      },
+      {
+        "cue_id": "unshowy",
+        "variants": [
+          "unshowy"
+        ]
+      },
+      {
+        "cue_id": "minimalist",
+        "variants": [
+          "minimalist",
+          "minimalism"
+        ]
+      },
+      {
+        "cue_id": "unpretentious",
+        "variants": [
+          "unpretentious"
+        ]
+      }
+    ],
+    "intimate": [
+      {
+        "cue_id": "intimate",
+        "variants": [
+          "intimate",
+          "intimacy"
+        ]
+      },
+      {
+        "cue_id": "confessional",
+        "variants": [
+          "confessional"
+        ]
+      }
+    ],
+    "precise": [
+      {
+        "cue_id": "precise",
+        "variants": [
+          "precise",
+          "precision"
+        ]
+      },
+      {
+        "cue_id": "meticulous",
+        "variants": [
+          "meticulous",
+          "meticulously"
+        ]
+      },
+      {
+        "cue_id": "tailoring",
+        "variants": [
+          "tailoring",
+          "tailored"
+        ]
+      },
+      {
+        "cue_id": "clean lines",
+        "variants": [
+          "clean lines"
+        ]
+      },
+      {
+        "cue_id": "architectural",
+        "variants": [
+          "architectural"
+        ]
+      },
+      {
+        "cue_id": "geometric",
+        "variants": [
+          "geometric"
+        ]
+      },
+      {
+        "cue_id": "symmetry",
+        "variants": [
+          "symmetry"
+        ]
+      },
+      {
+        "cue_id": "structured",
+        "variants": [
+          "structured"
+        ]
+      }
+    ],
+    "opulent": [
+      {
+        "cue_id": "opulent",
+        "variants": [
+          "opulent"
+        ]
+      },
+      {
+        "cue_id": "lush",
+        "variants": [
+          "lush"
+        ]
+      },
+      {
+        "cue_id": "luxurious",
+        "variants": [
+          "luxurious"
+        ]
+      },
+      {
+        "cue_id": "baroque",
+        "variants": [
+          "baroque"
+        ]
+      },
+      {
+        "cue_id": "lavish",
+        "variants": [
+          "lavish"
+        ]
+      },
+      {
+        "cue_id": "ornate",
+        "variants": [
+          "ornate"
+        ]
+      },
+      {
+        "cue_id": "sumptuous",
+        "variants": [
+          "sumptuous"
+        ]
+      }
+    ],
+    "natural": [
+      {
+        "cue_id": "natural materials",
+        "variants": [
+          "natural materials"
+        ]
+      },
+      {
+        "cue_id": "natural tones",
+        "variants": [
+          "natural tones"
+        ]
+      },
+      {
+        "cue_id": "earthy",
+        "variants": [
+          "earthy"
+        ]
+      },
+      {
+        "cue_id": "handcrafted",
+        "variants": [
+          "handcrafted"
+        ]
+      },
+      {
+        "cue_id": "organic",
+        "variants": [
+          "organic"
+        ]
+      },
+      {
+        "cue_id": "botanical",
+        "variants": [
+          "botanical"
+        ]
+      }
+    ],
+    "experimental": [
+      {
+        "cue_id": "experimental",
+        "variants": [
+          "experimental"
+        ]
+      },
+      {
+        "cue_id": "avant garde",
+        "variants": [
+          "avant garde"
+        ]
+      },
+      {
+        "cue_id": "deconstructed",
+        "variants": [
+          "deconstructed",
+          "deconstruction"
+        ]
+      },
+      {
+        "cue_id": "conceptual",
+        "variants": [
+          "conceptual"
+        ]
+      }
+    ],
+    "provocative": [
+      {
+        "cue_id": "provocative",
+        "variants": [
+          "provocative"
+        ]
+      },
+      {
+        "cue_id": "subversive",
+        "variants": [
+          "subversive"
+        ]
+      },
+      {
+        "cue_id": "edgy",
+        "variants": [
+          "edgy"
+        ]
+      },
+      {
+        "cue_id": "rebellious",
+        "variants": [
+          "rebellious"
+        ]
+      }
+    ],
+    "heritage": [
+      {
+        "cue_id": "heritage",
+        "variants": [
+          "heritage"
+        ]
+      },
+      {
+        "cue_id": "classic",
+        "variants": [
+          "classic"
+        ]
+      },
+      {
+        "cue_id": "timeless",
+        "variants": [
+          "timeless"
+        ]
+      }
+    ],
+    "playful": [
+      {
+        "cue_id": "playful",
+        "variants": [
+          "playful"
+        ]
+      },
+      {
+        "cue_id": "whimsical",
+        "variants": [
+          "whimsical"
+        ]
+      }
+    ],
+    "melancholic": [
+      {
+        "cue_id": "melancholic",
+        "variants": [
+          "melancholic",
+          "melancholy"
+        ]
+      }
+    ],
+    "romantic": [
+      {
+        "cue_id": "romantic",
+        "variants": [
+          "romantic"
+        ]
+      }
+    ],
+    "industrial": [
+      {
+        "cue_id": "industrial",
+        "variants": [
+          "industrial"
+        ]
+      }
+    ]
+  },
+  "commonness": {
+    "rule": "A cue group is 'common' when it matches descriptors (own or related, scope above) for at least common_cue_min_seeds of the reference seeds. Common cues are shown as context and never count toward motif support.",
+    "common_cue_min_seeds": 4,
+    "reference_set": "stage-2 full run live-20261006T103307Z-660d, seeds a24, muji, cdg, nike, ralph_lauren",
+    "common_cue_groups_in_reference_set": [
+      "intimate",
+      "minimalist",
+      "playful",
+      "precise"
+    ],
+    "note": "Frozen per lexicon version so that a single user query is scored against a fixed reference, not against itself."
+  },
+  "support": {
+    "source_kinds": [
+      "own",
+      "brand",
+      "movie",
+      "artist"
+    ],
+    "anchor_sources": [
+      "own",
+      "brand"
+    ],
+    "counting": "Support counts distinct source kinds with at least one non-common cue match. Repeats of the same cue or tag ID inside one source kind add no support. Several entities in one domain are one source kind.",
+    "strength": {
+      "strong": "anchored and >= 3 source kinds",
+      "moderate": "anchored and >= 2 source kinds, or own source with >= 2 distinct non-common cue tag IDs",
+      "weak": "some non-common evidence but below moderate (for example media domains only)",
+      "context_only": "only common cues matched"
+    },
+    "activation": "A motif is active when its strength is strong or moderate.",
+    "independence_note": "Distinct source kinds are not proof of independent evidence; the label is a design parameter."
+  }
+}
