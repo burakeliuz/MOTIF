@@ -189,6 +189,14 @@ MUJI (search, own entry, related brands, related films) and Le Labo (search,
 then, after choosing the brand, own entry, related brands, related films; the
 search was not repeated).
 
+## 2d. Stage 6A: review of product logic and Qloo contribution (proposals)
+
+`docs/STAGE_6A_DECISIONS.md` compares the original idea with the current
+product, separates common from distinctive Qloo descriptors on the recorded
+brands, plans a three-arm evaluation (own entry only, plus relations, LLM only),
+and maps each judging criterion to product evidence. Its items are proposals
+until the owner approves them; no engine or deployment change was made.
+
 ## 3. Redacted request-to-result explanation
 
 Example from the full live run `live-20261006T103307Z-660d` (request `req 0011`; the credential is never stored):

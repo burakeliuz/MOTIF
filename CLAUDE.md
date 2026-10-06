@@ -1,6 +1,6 @@
 # MOTIF working notes for Claude Code
 
-Current phase: **stage 5 done** (web interface `motif/web/`, palette-0.3 with 7 of 8 materials verified, lexicon-0.3, engine-0.3, LLM prose; spec rev 0.3 on 2026-10-06). Hosting files are ready for Render; the deploy needs the owner's account. Next: stage 6 (clean-environment test, demo, Devpost texts).
+Current phase: **stage 5 done** (web interface `motif/web/`, palette-0.3 with 7 of 8 materials verified, lexicon-0.3, engine-0.3, LLM prose; spec rev 0.3 on 2026-10-06). Hosting files are ready for Render; the deploy needs the owner's account. Stage 6A (review, no product change): proposals in `docs/STAGE_6A_DECISIONS.md`, not approved until the owner says so; private design previews in git-ignored `data/design_preview/`. Next: 6B only after the owner's decisions, then stage 6 (clean-environment test, demo, Devpost texts).
 Read `MOTIF_QLOO_FEASIBILITY.md` (rev 0.2) and `MOTIF_BUILD_SPEC.md` before
 changing anything. Then read `README.md`, `docs/QLOO_ACCESS_NOTES.md`,
 `reports/feasibility.md`, `reports/design_examples.md`, and `reports/holdout_t1.md`.
