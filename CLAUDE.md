@@ -16,6 +16,19 @@ Read `MOTIF_QLOO_FEASIBILITY.md` (rev 0.2) before changing anything. Then read
 - Never push to `main` without the owner's explicit OK in the current session. When a stage ends, show `git log origin/main..HEAD` in plain Turkish and ask whether to update `main` (fast-forward only).
 - New sessions clone `main`, so unmerged work on an old session branch is invisible to them: remind the owner before they open a new session.
 
+## Roadmap (revised 2026-10-06)
+
+One Claude Code cloud session per stage; each stage ends with tests, a push to the session branch, and the `main` question below.
+
+1. Offline preparation: done.
+2. Live Qloo test: pilot, then full plan after the owner's OK; `reports/feasibility.md`; a small curated evidence excerpt in `reports/`; `docs/SUBMISSION_NOTES.md` skeleton.
+3. Product decisions: `MOTIF_BUILD_SPEC.md`, including runtime LLM yes/no, web stack, and whether to host a demo. The spike rules above end when this spec is accepted.
+4. Engine and agentic flow, end to end from the command line.
+5. Interface (and hosting only if the spec chose it).
+6. Clean-environment setup test, demo, and Devpost texts.
+
+Every stage adds to `docs/SUBMISSION_NOTES.md`, mapped to the six items of the kit's submission guide (see `docs/QLOO_ACCESS_NOTES.md`).
+
 ## Commands
 
 - `python3 -m unittest`: run before every commit.

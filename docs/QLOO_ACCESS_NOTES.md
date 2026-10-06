@@ -30,6 +30,25 @@ credential is configured.
 - Rules repeated: keep the key on your machine or server; send no personal
   data to Qloo; results describe what groups tend to like, not individuals.
 
+## Submission guide and judging (kit `docs/SUBMISSION.md`, read 2026-10-06)
+
+Each submission should include:
+
+1. A short product problem statement.
+2. The Qloo workflow or MCP tools used and why they fit the problem.
+3. A redacted request-to-result explanation, including entity/tag choices.
+4. A short demo or screenshots with no credential or personal data.
+5. Setup steps another participant can run from a clean environment.
+6. Known limitations, including what the result does not establish.
+
+Judges are asked to consider usefulness, technical execution, provenance and
+user clarity, responsible data handling, and reproducibility. Projects are
+"stronger when they use Qloo results as evidence in a clear product flow".
+A hosted demo is not listed as a requirement; a short demo or screenshots is.
+The kit's `docs/SAFE_USE.md` also asks projects to separate a Qloo result from
+the project's own interpretation and to ask for clarification when an entity
+or tag choice would materially change a result.
+
 ## Direct transport (2026-10-06)
 
 - The kickoff email lets participants "build your own tooling", so MOTIF's
