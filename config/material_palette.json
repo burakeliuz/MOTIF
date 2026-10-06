@@ -1,16 +1,29 @@
 {
-  "palette_version": "palette-0.1",
+  "palette_version": "palette-0.2",
   "status": "draft_for_stage4",
   "notice": "Starting palette for the MVP, not a catalogue. Eight entries are enough to exercise rules R1, R3, R4 and R5; no entry is mapped to the 'intimate' pole (R2), so an intimate target stays unmatched. 'source' holds what the supplier says; 'motif_profile' is MOTIF's creative mapping (design_rule) and is not a supplier claim. Not a formula: no dosage, no safety or regulatory assessment (IFRA limits are out of scope and must be checked by the perfumer).",
   "verification": {
     "status_values": {
-      "source_located_excerpt_only": "The supplier's own product page was located by web search and the descriptor below comes from the search excerpt of that page. The page itself could not be opened from the stage-3 environment (egress blocked for supplier domains), so wording is paraphrase-level and must be checked against the full page before any public claim.",
-      "verified_full_page": "Descriptor checked against the complete supplier page or sheet (stage-4 task T2)."
+      "unverified_excerpt": "Supplier page located by web search; the descriptor comes from a search excerpt. Not usable in live matching.",
+      "verified_full_page": "Checked against the complete supplier page or technical sheet; the record names the URL, access date and the supporting text."
     },
-    "checked_on": "2026-10-06"
+    "checked_on": "2026-10-06",
+    "live_matching_rule": "The engine uses only properties whose verification status is verified_full_page. Unverified properties are used only in the explicitly labelled design preview (--allow-unverified-materials).",
+    "t2_attempt": {
+      "date": "2026-10-06",
+      "result": "blocked",
+      "detail": "www.iff.com, www.givaudan.com, www.firmenich.com and studio.dsm-firmenich.com refused by the environment's network policy (curl and web fetch)."
+    }
   },
   "profile_rules": {
-    "axes": ["warm_cool", "light_dense", "raw_polished", "natural_synthetic", "intimate_projecting", "sweet_dry"],
+    "axes": [
+      "warm_cool",
+      "light_dense",
+      "raw_polished",
+      "natural_synthetic",
+      "intimate_projecting",
+      "sweet_dry"
+    ],
     "values": "Each axis is a pole name or absent. Absent means MOTIF makes no claim about the material on that axis, never neutral.",
     "basis": "A pole is assigned only when a supplier descriptor term points to it (listed in 'basis_terms'); conflicting descriptors leave the axis absent and are listed under 'uncertainties'.",
     "natural_synthetic_note": "The axis is an aesthetic impression, not ingredient origin; 'origin' is recorded separately."
@@ -24,14 +37,45 @@
       "origin": "synthetic",
       "supplier": "dsm-firmenich",
       "source": {
-        "urls": ["https://www.firmenich.com/sites/default/files/uploads/files/ingredients/marketing-sheet/perfumery/HEDIONE_964898.pdf", "https://studio.dsm-firmenich.com/product/hedioner-pe-964898"],
-        "status": "source_located_excerpt_only",
+        "urls": [
+          "https://www.firmenich.com/sites/default/files/uploads/files/ingredients/marketing-sheet/perfumery/HEDIONE_964898.pdf",
+          "https://studio.dsm-firmenich.com/product/hedioner-pe-964898"
+        ],
+        "status": "unverified_excerpt",
         "descriptor_excerpt": "elegant, transparent floral, jasmine note with citrus freshness; natural white flower effect; luminosity and silkiness"
       },
-      "motif_profile": {"light_dense": "light", "raw_polished": "polished"},
-      "basis_terms": {"light_dense": ["transparent", "luminosity"], "raw_polished": ["elegant", "silkiness"]},
+      "motif_profile": {
+        "light_dense": "light",
+        "raw_polished": "polished"
+      },
+      "basis_terms": {
+        "light_dense": [
+          "transparent",
+          "luminosity"
+        ],
+        "raw_polished": [
+          "elegant",
+          "silkiness"
+        ]
+      },
       "composition_role": "heart",
-      "uncertainties": ["Supplier also writes 'natural white flower effect'; natural_synthetic left absent because the term describes a floral effect, not an overall impression."]
+      "uncertainties": [
+        "Supplier also writes 'natural white flower effect'; natural_synthetic left absent because the term describes a floral effect, not an overall impression."
+      ],
+      "property_verification": {
+        "light_dense": {
+          "status": "unverified_excerpt",
+          "source_url": null,
+          "accessed": null,
+          "supporting_text": null
+        },
+        "raw_polished": {
+          "status": "unverified_excerpt",
+          "source_url": null,
+          "accessed": null,
+          "supporting_text": null
+        }
+      }
     },
     {
       "material_id": "M02",
@@ -41,14 +85,46 @@
       "origin": "natural",
       "supplier": "Givaudan (Bergamot Oil Italy); IFF LMR (Bergamot Oil CP Italy)",
       "source": {
-        "urls": ["https://www.givaudan.com/fragrance-beauty/fragrance-ingredients-business/natural-ingredients/bergamot-oil-italy", "https://www.iff.com/scent/lmr-compendium/bergamot-oil-cp-italy-org-fcr-csm/"],
-        "status": "source_located_excerpt_only",
+        "urls": [
+          "https://www.givaudan.com/fragrance-beauty/fragrance-ingredients-business/natural-ingredients/bergamot-oil-italy",
+          "https://www.iff.com/scent/lmr-compendium/bergamot-oil-cp-italy-org-fcr-csm/"
+        ],
+        "status": "unverified_excerpt",
         "descriptor_excerpt": "zesty, fresh citrus with floral and herbal undertones; bright and sparkling; used as a top note to bring freshness and naturalness"
       },
-      "motif_profile": {"light_dense": "light", "natural_synthetic": "natural"},
-      "basis_terms": {"light_dense": ["bright", "sparkling", "top note"], "natural_synthetic": ["naturalness"]},
+      "motif_profile": {
+        "light_dense": "light",
+        "natural_synthetic": "natural"
+      },
+      "basis_terms": {
+        "light_dense": [
+          "bright",
+          "sparkling",
+          "top note"
+        ],
+        "natural_synthetic": [
+          "naturalness"
+        ]
+      },
       "composition_role": "top",
-      "uncertainties": ["One excerpt also calls the top note 'rich, sweet and fruity'; sweet_dry left absent.", "The grade (and its regulatory restrictions) must be chosen by the perfumer."]
+      "uncertainties": [
+        "One excerpt also calls the top note 'rich, sweet and fruity'; sweet_dry left absent.",
+        "The grade (and its regulatory restrictions) must be chosen by the perfumer."
+      ],
+      "property_verification": {
+        "light_dense": {
+          "status": "unverified_excerpt",
+          "source_url": null,
+          "accessed": null,
+          "supporting_text": null
+        },
+        "natural_synthetic": {
+          "status": "unverified_excerpt",
+          "source_url": null,
+          "accessed": null,
+          "supporting_text": null
+        }
+      }
     },
     {
       "material_id": "M03",
@@ -58,14 +134,33 @@
       "origin": "synthetic",
       "supplier": "IFF",
       "source": {
-        "urls": ["https://www.iff.com/scent/ingredients-compendium/iso-e-super/"],
-        "status": "source_located_excerpt_only",
+        "urls": [
+          "https://www.iff.com/scent/ingredients-compendium/iso-e-super/"
+        ],
+        "status": "unverified_excerpt",
         "descriptor_excerpt": "smooth, woody, amber with a 'velvet'-like sensation; imparts fullness and subtle strength"
       },
-      "motif_profile": {"raw_polished": "polished"},
-      "basis_terms": {"raw_polished": ["smooth", "velvet"]},
+      "motif_profile": {
+        "raw_polished": "polished"
+      },
+      "basis_terms": {
+        "raw_polished": [
+          "smooth",
+          "velvet"
+        ]
+      },
       "composition_role": "heart|base",
-      "uncertainties": ["'fullness' could suggest density, 'subtle' the opposite; light_dense left absent."]
+      "uncertainties": [
+        "'fullness' could suggest density, 'subtle' the opposite; light_dense left absent."
+      ],
+      "property_verification": {
+        "raw_polished": {
+          "status": "unverified_excerpt",
+          "source_url": null,
+          "accessed": null,
+          "supporting_text": null
+        }
+      }
     },
     {
       "material_id": "M04",
@@ -75,14 +170,44 @@
       "origin": "synthetic (biotechnology)",
       "supplier": "dsm-firmenich",
       "source": {
-        "urls": ["https://www.firmenich.com/sites/default/files/uploads/files/ingredients/marketing-sheet/perfumery/AMBROX_SUPER_909158.pdf"],
-        "status": "source_located_excerpt_only",
+        "urls": [
+          "https://www.firmenich.com/sites/default/files/uploads/files/ingredients/marketing-sheet/perfumery/AMBROX_SUPER_909158.pdf"
+        ],
+        "status": "unverified_excerpt",
         "descriptor_excerpt": "extremely powerful and elegant ambery odor with a musky, woody tonality; highly diffusive; ambery effect from top notes to dry down"
       },
-      "motif_profile": {"light_dense": "dense", "intimate_projecting": "projecting"},
-      "basis_terms": {"light_dense": ["extremely powerful", "ambery"], "intimate_projecting": ["highly diffusive"]},
+      "motif_profile": {
+        "light_dense": "dense",
+        "intimate_projecting": "projecting"
+      },
+      "basis_terms": {
+        "light_dense": [
+          "extremely powerful",
+          "ambery"
+        ],
+        "intimate_projecting": [
+          "highly diffusive"
+        ]
+      },
       "composition_role": "base",
-      "uncertainties": ["'elegant' could support polished; left absent to avoid double use of a single adjective.", "Projection is a property the cultural evidence does not ask for unless R2 or a projecting target exists."]
+      "uncertainties": [
+        "'elegant' could support polished; left absent to avoid double use of a single adjective.",
+        "Projection is a property the cultural evidence does not ask for unless R2 or a projecting target exists."
+      ],
+      "property_verification": {
+        "light_dense": {
+          "status": "unverified_excerpt",
+          "source_url": null,
+          "accessed": null,
+          "supporting_text": null
+        },
+        "intimate_projecting": {
+          "status": "unverified_excerpt",
+          "source_url": null,
+          "accessed": null,
+          "supporting_text": null
+        }
+      }
     },
     {
       "material_id": "M05",
@@ -92,14 +217,43 @@
       "origin": "synthetic",
       "supplier": "dsm-firmenich",
       "source": {
-        "urls": ["https://www.firmenich.com/sites/default/files/uploads/files/ingredients/marketing-sheet/perfumery/HABANOLIDE_947303.pdf", "https://studio.dsm-firmenich.com/product/habanolider-pe-947303"],
-        "status": "source_located_excerpt_only",
+        "urls": [
+          "https://www.firmenich.com/sites/default/files/uploads/files/ingredients/marketing-sheet/perfumery/HABANOLIDE_947303.pdf",
+          "https://studio.dsm-firmenich.com/product/habanolider-pe-947303"
+        ],
+        "status": "unverified_excerpt",
         "descriptor_excerpt": "extremely elegant and substantive musk note, typical of macrocyclic musks, with a warm and slightly woody undertone; very powerful"
       },
-      "motif_profile": {"raw_polished": "polished", "warm_cool": "warm"},
-      "basis_terms": {"raw_polished": ["extremely elegant"], "warm_cool": ["warm"]},
+      "motif_profile": {
+        "raw_polished": "polished",
+        "warm_cool": "warm"
+      },
+      "basis_terms": {
+        "raw_polished": [
+          "extremely elegant"
+        ],
+        "warm_cool": [
+          "warm"
+        ]
+      },
       "composition_role": "base",
-      "uncertainties": ["Musks are often used for skin-close effects, but the supplier calls it 'very powerful'; intimate_projecting left absent."]
+      "uncertainties": [
+        "Musks are often used for skin-close effects, but the supplier calls it 'very powerful'; intimate_projecting left absent."
+      ],
+      "property_verification": {
+        "raw_polished": {
+          "status": "unverified_excerpt",
+          "source_url": null,
+          "accessed": null,
+          "supporting_text": null
+        },
+        "warm_cool": {
+          "status": "unverified_excerpt",
+          "source_url": null,
+          "accessed": null,
+          "supporting_text": null
+        }
+      }
     },
     {
       "material_id": "M06",
@@ -109,14 +263,54 @@
       "origin": "natural",
       "supplier": "Givaudan; IFF LMR; dsm-firmenich",
       "source": {
-        "urls": ["https://www.givaudan.com/fragrance-beauty/fragrance-ingredients-business/natural-ingredients/vetiver-oil-haiti", "https://www.iff.com/scent/lmr-compendium/vetiver-oil-haiti/"],
-        "status": "source_located_excerpt_only",
+        "urls": [
+          "https://www.givaudan.com/fragrance-beauty/fragrance-ingredients-business/natural-ingredients/vetiver-oil-haiti",
+          "https://www.iff.com/scent/lmr-compendium/vetiver-oil-haiti/"
+        ],
+        "status": "unverified_excerpt",
         "descriptor_excerpt": "dry and woody with earthy, smoky and nutty accents; fresh bitterness and a touch of grapefruit"
       },
-      "motif_profile": {"natural_synthetic": "natural", "raw_polished": "raw", "sweet_dry": "dry"},
-      "basis_terms": {"natural_synthetic": ["earthy"], "raw_polished": ["smoky", "earthy"], "sweet_dry": ["dry"]},
+      "motif_profile": {
+        "natural_synthetic": "natural",
+        "raw_polished": "raw",
+        "sweet_dry": "dry"
+      },
+      "basis_terms": {
+        "natural_synthetic": [
+          "earthy"
+        ],
+        "raw_polished": [
+          "smoky",
+          "earthy"
+        ],
+        "sweet_dry": [
+          "dry"
+        ]
+      },
       "composition_role": "base",
-      "uncertainties": ["'raw' is MOTIF's reading of 'earthy, smoky'; the supplier does not use the word."]
+      "uncertainties": [
+        "'raw' is MOTIF's reading of 'earthy, smoky'; the supplier does not use the word."
+      ],
+      "property_verification": {
+        "natural_synthetic": {
+          "status": "unverified_excerpt",
+          "source_url": null,
+          "accessed": null,
+          "supporting_text": null
+        },
+        "raw_polished": {
+          "status": "unverified_excerpt",
+          "source_url": null,
+          "accessed": null,
+          "supporting_text": null
+        },
+        "sweet_dry": {
+          "status": "unverified_excerpt",
+          "source_url": null,
+          "accessed": null,
+          "supporting_text": null
+        }
+      }
     },
     {
       "material_id": "M07",
@@ -126,14 +320,45 @@
       "origin": "natural",
       "supplier": "dsm-firmenich; Givaudan; IFF LMR",
       "source": {
-        "urls": ["https://www.firmenich.com/sites/default/files/uploads/files/ingredients/marketing-sheet/perfumery/LABDANUM_ABS_953418.pdf", "https://www.givaudan.com/fragrance-beauty/fragrance-ingredients-business/natural-ingredients/labdanum-absolute-spain-clear"],
-        "status": "source_located_excerpt_only",
+        "urls": [
+          "https://www.firmenich.com/sites/default/files/uploads/files/ingredients/marketing-sheet/perfumery/LABDANUM_ABS_953418.pdf",
+          "https://www.givaudan.com/fragrance-beauty/fragrance-ingredients-business/natural-ingredients/labdanum-absolute-spain-clear"
+        ],
+        "status": "unverified_excerpt",
         "descriptor_excerpt": "powerful amber note, balsamic and resinous, with smoky, leathery and animalic facets; warm and structured; adds roundness and body"
       },
-      "motif_profile": {"light_dense": "dense", "warm_cool": "warm"},
-      "basis_terms": {"light_dense": ["powerful", "body"], "warm_cool": ["warm"]},
+      "motif_profile": {
+        "light_dense": "dense",
+        "warm_cool": "warm"
+      },
+      "basis_terms": {
+        "light_dense": [
+          "powerful",
+          "body"
+        ],
+        "warm_cool": [
+          "warm"
+        ]
+      },
       "composition_role": "base",
-      "uncertainties": ["One grade is described as 'clean and refined', others as 'leathery, animalic'; raw_polished left absent.", "Facets differ strongly between grades."]
+      "uncertainties": [
+        "One grade is described as 'clean and refined', others as 'leathery, animalic'; raw_polished left absent.",
+        "Facets differ strongly between grades."
+      ],
+      "property_verification": {
+        "light_dense": {
+          "status": "unverified_excerpt",
+          "source_url": null,
+          "accessed": null,
+          "supporting_text": null
+        },
+        "warm_cool": {
+          "status": "unverified_excerpt",
+          "source_url": null,
+          "accessed": null,
+          "supporting_text": null
+        }
+      }
     },
     {
       "material_id": "M08",
@@ -143,14 +368,41 @@
       "origin": "natural",
       "supplier": "Givaudan; dsm-firmenich",
       "source": {
-        "urls": ["https://www.givaudan.com/fragrance-beauty/fragrance-ingredients-business/natural-ingredients/orris-pallida-butter-8-irones-france"],
-        "status": "source_located_excerpt_only",
+        "urls": [
+          "https://www.givaudan.com/fragrance-beauty/fragrance-ingredients-business/natural-ingredients/orris-pallida-butter-8-irones-france"
+        ],
+        "status": "unverified_excerpt",
         "descriptor_excerpt": "powdery, floral, green, woody, violet-like; rough in its earthy side but round like a musk; natural powdery and violet effects"
       },
-      "motif_profile": {"natural_synthetic": "natural"},
-      "basis_terms": {"natural_synthetic": ["natural powdery"]},
+      "motif_profile": {
+        "natural_synthetic": "natural"
+      },
+      "basis_terms": {
+        "natural_synthetic": [
+          "natural powdery"
+        ]
+      },
       "composition_role": "heart",
-      "uncertainties": ["'rough' and 'round' conflict; raw_polished left absent."]
+      "uncertainties": [
+        "'rough' and 'round' conflict; raw_polished left absent."
+      ],
+      "property_verification": {
+        "natural_synthetic": {
+          "status": "unverified_excerpt",
+          "source_url": null,
+          "accessed": null,
+          "supporting_text": null
+        }
+      }
+    }
+  ],
+  "changes": [
+    {
+      "version": "palette-0.2",
+      "date": "2026-10-06",
+      "changes": [
+        "Per-property verification records added; profiles unchanged. All properties remain unverified because supplier domains could not be opened from the build environment (stage-4 task T2 blocked)."
+      ]
     }
   ]
 }

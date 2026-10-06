@@ -96,7 +96,7 @@ class Stage3DesignConfigs(unittest.TestCase):
 
     def test_palette_01_has_no_sourced_intimate_material(self):
         # MOTIF_BUILD_SPEC.md 9.1: no supplier excerpt supported skin-close use in palette-0.1.
-        if self.palette["palette_version"] != "palette-0.1":
+        if self.palette["palette_version"] not in ("palette-0.1", "palette-0.2"):
             self.skipTest("later palettes may add a sourced intimate material")
         self.assertFalse(any(m["motif_profile"].get("intimate_projecting") == "intimate"
                              for m in self.palette["materials"]))

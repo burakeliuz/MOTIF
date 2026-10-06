@@ -1,0 +1,39 @@
+{
+  "params_version": "params-0.1",
+  "status": "frozen_for_t1",
+  "notice": "Design thresholds and weights for the MOTIF engine (MOTIF_BUILD_SPEC.md sections 7-9). They are design parameters, not scientific sufficiency criteria.",
+  "default_domains": [
+    "brand",
+    "movie"
+  ],
+  "optional_domains": [
+    "artist"
+  ],
+  "domain_note": "Music artists are supported but off by default: across the five stage-2 seeds they never changed a sensory target (no artist style tag matched a cue for MUJI or Ralph Lauren; for Comme des Garcons they only raised an unmapped motif from moderate to strong), while costing one Qloo request per brand.",
+  "related_take": 10,
+  "search_take": 10,
+  "evidence_weights": {
+    "strong": 1.0,
+    "moderate": 0.6
+  },
+  "min_target_axes_for_composition": 2,
+  "min_eligible_materials": 2,
+  "composition": {
+    "fill_to": 3,
+    "max_materials": 4,
+    "slots": {
+      "top": 1,
+      "heart": 2,
+      "base": 2
+    }
+  },
+  "budget": {
+    "max_requests_per_session": 8,
+    "max_retries": 2,
+    "retry_backoff_s": [
+      3,
+      10
+    ],
+    "timeout_s": 60
+  }
+}
