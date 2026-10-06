@@ -41,10 +41,12 @@ from motif_spike.util import data_root, iso, utc_now, write_json
 from ..agent import Controller
 from ..brief import build_brief
 from ..config import AXES, EngineConfig, load_config
+from ..interpret import suggest as suggest_readings
 from ..llm import write_prose, writer_from_env
 from ..qloo import LiveQloo, RecordedQloo
 from .access import AccessGate
 from .present import candidate_view, result_view
+from .usage import UsageError, UsageStore
 
 STATIC = Path(__file__).resolve().parent / "static"
 STEP_ORDER = [("resolve", "Find the brand in Qloo"), ("own", "Read the brand's own Qloo description"),
@@ -53,6 +55,8 @@ STEP_ORDER = [("resolve", "Find the brand in Qloo"), ("own", "Read the brand's o
 CSP = ("default-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; "
        "img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'")
 NAME_RE = re.compile(r"^[^\x00-\x1f\x7f]{1,80}$")
+INTENT_RE = re.compile(r"^[^\x00-\x1f\x7f]{0,140}$")
+REUSE_S = 1800
 
 
 def _int_env(name: str, default: int) -> int:
@@ -77,6 +81,9 @@ class WebSession:
         self.outcome: Optional[Dict[str, Any]] = None
         self.brief: Optional[Dict[str, Any]] = None
         self.prose: Optional[Dict[str, Any]] = None
+        self.llm_configured = False
+        self.suggestions: Optional[Dict[str, Any]] = None
+        self.suggest_lock = threading.Lock()
         self.error: Optional[str] = None
         self.finished: Optional[float] = None
 
@@ -90,10 +97,10 @@ class Hub:
         self.recorded = recorded
         self.sessions: Dict[str, WebSession] = {}
         self.by_key: Dict[tuple, str] = {}
+        self.by_ref: Dict[tuple, tuple] = {}  # reference -> (access, created, lock): one Qloo cache per reference
         self.lock = threading.Lock()
         self.ip_hits: Dict[str, deque] = defaultdict(deque)
-        self.day_sessions: Dict[str, int] = defaultdict(int)
-        self.day_qloo: Dict[str, int] = defaultdict(int)
+        self.usage = UsageStore(root / "web_usage.json")
         self.limits = {"per_ip_hour": _int_env("MOTIF_WEB_SESSIONS_PER_IP_HOUR", 8),
                        "per_day": _int_env("MOTIF_WEB_SESSIONS_PER_DAY", 120),
                        "qloo_per_day": _int_env("MOTIF_QLOO_MAX_CALLS_PER_DAY", 400)}
@@ -106,12 +113,15 @@ class Hub:
 
     # -- public API -----------------------------------------------------------------
 
+    def _writer(self):
+        return writer_from_env(self.env, ledger_path=self.root / "llm_calls.jsonl")["writer"]
+
     def describe(self) -> Dict[str, Any]:
-        llm = writer_from_env(self.env)
+        configured = bool(self.env.get("MOTIF_ANTHROPIC_API_KEY")) and self.env.get("MOTIF_LLM_PROVIDER", "anthropic") != "off"
         return {"mode": "recorded" if self.recorded else "live",
                 "mode_label": ("Recorded preview · stored Qloo data" if self.recorded else "Live · Qloo API"),
                 "live_available": bool(self.recorded or self.live_ready),
-                "llm": "configured" if llm["writer"] else "template",
+                "llm": "configured" if configured else "template",
                 "examples": ["MUJI", "Ralph Lauren"], "versions": self.config.versions}
 
     def create(self, body: Dict[str, Any], ip: str) -> (int, Dict[str, Any]):
@@ -121,17 +131,20 @@ class Hub:
         ref_type = body.get("type", "brand")
         if ref_type not in ("brand", "any"):
             return 400, {"error": "The MVP researches brands."}
+        intent = " ".join(str(body.get("intent") or "").split())
+        if not INTENT_RE.match(intent):
+            return 400, {"error": "Keep the creative intent to one line of at most 140 characters."}
         choose = body.get("choose") or None
         overrides = body.get("resolve_conflict") or {}
         if not isinstance(overrides, dict) or any(k not in AXES or not isinstance(v, str) for k, v in overrides.items()):
             return 400, {"error": "Invalid conflict answer."}
         parent = self.sessions.get(str(body.get("parent", ""))) if body.get("parent") else None
-        key = ("recorded" if self.recorded else "live", reference.casefold(), ref_type, choose or "",
-               json.dumps(overrides, sort_keys=True))
-        today = iso(utc_now())[:10]
+        mode = "recorded" if self.recorded else "live"
+        key = (mode, reference.casefold(), ref_type, choose or "", json.dumps(overrides, sort_keys=True), intent.casefold())
+        budget = self.config.params["budget"]["max_requests_per_session"]
         with self.lock:
             existing = self.by_key.get(key)
-            if existing and self.sessions[existing].status != "error" and time.time() - self.sessions[existing].created < 1800:
+            if existing and self.sessions[existing].status != "error" and time.time() - self.sessions[existing].created < REUSE_S:
                 return 200, {"id": existing, "reused": True}
             if not self.recorded and not self.live_ready:
                 return 503, {"error": "Live Qloo access is not configured on this server.", "kind": "qloo_unavailable"}
@@ -141,15 +154,23 @@ class Hub:
                     hits.popleft()
                 if len(hits) >= self.limits["per_ip_hour"]:
                     return 429, {"error": "Too many new searches from this connection; please try again in an hour.", "kind": "rate_limited"}
-                if self.day_sessions[today] >= self.limits["per_day"]:
+            try:  # reserve before any paid call; unused Qloo budget is released after the run
+                if parent is None and not self.usage.reserve("sessions", 1, self.limits["per_day"]):
                     return 429, {"error": "Today's demo capacity is used up; please try again tomorrow.", "kind": "daily_cap"}
-                if self.day_qloo[today] + self.config.params["budget"]["max_requests_per_session"] > self.limits["qloo_per_day"]:
+                if not self.usage.reserve("qloo", budget, self.limits["qloo_per_day"]):
+                    if parent is None:
+                        self.usage.release("sessions", 1)
                     return 429, {"error": "Today's Qloo request budget for this demo is used up.", "kind": "qloo_cap"}
-                hits.append(time.time())
-                self.day_sessions[today] += 1
+            except UsageError:
+                return 503, {"error": "The demo's usage budget cannot be verified right now, so no new research is started.",
+                             "kind": "budget_unverified"}
+            if parent is None:
+                self.ip_hits[ip].append(time.time())
             sid = secrets.token_urlsafe(9)
-            session = WebSession(sid, key, {"reference": reference, "type": ref_type, "choose": choose, "overrides": overrides},
-                                 "recorded" if self.recorded else "live", parent)
+            session = WebSession(sid, key, {"reference": reference, "type": ref_type, "choose": choose, "overrides": overrides,
+                                            "intent": intent or None}, mode, parent)
+            session.reserved = budget
+            session.day = self.usage.clock()
             self.sessions[sid] = session
             self.by_key[key] = sid
         threading.Thread(target=self._run, args=(session,), daemon=True).start()
@@ -162,7 +183,10 @@ class Hub:
         name = s.params["reference"]
         out: Dict[str, Any] = {"id": s.id, "status": s.status, "phase": s.phase, "reference": name,
                                "data_label": s.data_label, "steps": self._steps(s), "message": s.error,
-                               "choose": s.params["choose"], "overrides": s.params["overrides"]}
+                               "choose": s.params["choose"], "overrides": s.params["overrides"],
+                               "intent": s.params.get("intent"),
+                               "intent_effect": ("Recorded in the brief as your stated purpose. It did not change the "
+                                                 "motifs, the direction, or the materials." if s.params.get("intent") else None)}
         o = s.outcome
         if o:
             res = o.get("resolution") or {}
@@ -186,6 +210,7 @@ class Hub:
         if s.prose:
             out["brief"] = {"author": s.prose["author"], "text": s.prose["text"], "note": s.prose.get("note"),
                             "model": (s.prose.get("llm") or {}).get("model") if s.prose["author"] == "llm" else None}
+        out["suggestions"] = self._suggestions_view(s)
         if s.access is not None and s.data_label == "recorded":
             out["recorded_from"] = sorted({d.name for d in getattr(s.access, "recording_dirs", [])})
         if o and o.get("result") is not None:
@@ -197,12 +222,60 @@ class Hub:
         s = self.sessions.get(sid)
         return s.brief if s else None
 
+    # -- user-requested interpretation suggestions (never part of the engine result) --------
+
+    def _suggestions_view(self, s: WebSession) -> Dict[str, Any]:
+        if s.suggestions is not None:
+            return s.suggestions
+        has_result = bool(s.outcome and s.outcome.get("result") is not None and s.status in ("completed", "stopped"))
+        return {"status": "not_requested" if (s.llm_configured and has_result) else "unavailable", "suggestions": [],
+                "message": None if s.llm_configured else "Suggestions need an LLM key on the server; the result is unaffected."}
+
+    def suggest(self, sid: str) -> (int, Dict[str, Any]):
+        s = self.sessions.get(sid)
+        if not s:
+            return 404, {"error": "Unknown session."}
+        if not (s.outcome and s.outcome.get("result") is not None and s.status in ("completed", "stopped")):
+            return 409, {"error": "Suggestions are available once a result exists."}
+        with s.suggest_lock:  # one LLM call per session, reused on repeat requests
+            if s.suggestions is None:
+                name = (s.outcome.get("resolution") or {}).get("name") or s.params["reference"]
+                s.suggestions = suggest_readings(self._writer(), name, s.outcome["result"], s.params.get("intent"))
+        return 200, s.suggestions
+
+    def decide(self, sid: str, suggestion_id: str, decision: str) -> (int, Dict[str, Any]):
+        s = self.sessions.get(sid)
+        if not s or not s.suggestions:
+            return 404, {"error": "No suggestions for this session."}
+        if decision not in ("accept", "reject", "undo"):
+            return 400, {"error": "Invalid decision."}
+        for item in s.suggestions["suggestions"]:
+            if item["id"] == suggestion_id:
+                item["decision"] = {"accept": "accepted", "reject": "rejected", "undo": None}[decision]
+                item["label"] = ("Accepted by you — your interpretation, not Qloo evidence; no rule applied"
+                                 if decision == "accept" else "Suggested interpretation — not applied")
+                if s.brief is not None:  # rebuild the brief text record only; no new call
+                    s.brief = self._build_brief(s)
+                    self._persist(s)
+                return 200, s.suggestions
+        return 404, {"error": "Unknown suggestion."}
+
     # -- research ---------------------------------------------------------------------
+
+    def _ref_key(self, session: WebSession) -> tuple:
+        return (session.data_label, session.params["reference"].casefold(), session.params["type"])
 
     def _access(self, session: WebSession):
         if session.parent is not None and session.parent.access is not None:
-            return session.parent.access  # same cache and budget: answers never repeat requests
-        return self._new_access(self.root / "web_sessions" / session.id)
+            return session.parent.access, self.by_ref.get(self._ref_key(session.parent), (None, 0, threading.Lock()))[2]
+        with self.lock:  # same reference within the reuse window: same Qloo cache, nothing fetched twice
+            hit = self.by_ref.get(self._ref_key(session))
+            if hit and time.time() - hit[1] < REUSE_S:
+                return hit[0], hit[2]
+            access = self._new_access(self.root / "web_sessions" / session.id)
+            entry = (access, time.time(), threading.Lock())
+            self.by_ref[self._ref_key(session)] = entry
+            return access, entry[2]
 
     def _new_access(self, sdir: Path):
         budget = self.config.params["budget"]
@@ -212,59 +285,82 @@ class Hub:
         return LiveQloo(transport, self.live_ready.base_url, sdir, budget["max_requests_per_session"],
                         budget["max_retries"], budget["retry_backoff_s"], 30)
 
+    def _build_brief(self, s: WebSession) -> Dict[str, Any]:
+        accepted = [{k: v for k, v in item.items() if k in ("descriptor", "reading", "design_question", "source", "entities",
+                                                             "from_brand_itself")}
+                    for item in (s.suggestions or {}).get("suggestions", []) if item.get("decision") == "accepted"]
+        meta = {"data_label": s.data_label, "resolution": s.outcome["resolution"], "intent": s.params.get("intent")}
+        return build_brief(meta, s.outcome["result"], s.prose, accepted)
+
     def _run(self, s: WebSession) -> None:
-        today = iso(utc_now())[:10]
+        used = 0
         try:
-            access = self._access(s)
+            access, ref_lock = self._access(s)
             s.access = access
-            before = access.network_attempts
-            original = access.request
+            with ref_lock:  # sessions sharing one Qloo cache run one at a time
+                before = access.network_attempts
+                original = access.request
 
-            def tracked(operation, argv):
-                if operation == "search":
-                    s.phase = "resolve"
-                elif operation == "seed_detail":
-                    s.phase = "own"
-                else:
-                    s.phase = {"urn:entity:brand": "brand", "urn:entity:movie": "movie",
-                               "urn:entity:artist": "artist"}.get(argv[argv.index("--type") + 1], "brand")
-                return original(operation, argv)
+                def tracked(operation, argv):
+                    if operation == "search":
+                        s.phase = "resolve"
+                    elif operation == "seed_detail":
+                        s.phase = "own"
+                    else:
+                        s.phase = {"urn:entity:brand": "brand", "urn:entity:movie": "movie",
+                                   "urn:entity:artist": "artist"}.get(argv[argv.index("--type") + 1], "brand")
+                    return original(operation, argv)
 
-            access.request = tracked
-            p = s.params
-            controller = Controller(access, self.config, p["reference"], p["type"], p["choose"],
-                                    overrides=p["overrides"])
-            s.controller = controller
-            outcome = controller.run()
-            access.request = original
+                access.request = tracked
+                p = s.params
+                controller = Controller(access, self.config, p["reference"], p["type"], p["choose"], overrides=p["overrides"])
+                s.controller = controller
+                try:
+                    outcome = controller.run()
+                finally:
+                    access.request = original
+                    used = access.network_attempts - before
+            self._release(s, used)
             s.phase = "engine"
             s.outcome = outcome
-            with self.lock:
-                self.day_qloo[today] += access.network_attempts - before
             if outcome.get("result") is not None and outcome["status"] == "completed":
                 s.phase = "brief"
-                llm = writer_from_env(self.env, ledger_path=self.root / "llm_calls.jsonl")
+                writer = self._writer()
+                s.llm_configured = writer is not None
                 name = (outcome.get("resolution") or {}).get("name") or p["reference"]
-                s.prose = write_prose(name, outcome["result"], llm["writer"])
-                session_meta = {"data_label": s.data_label, "resolution": outcome["resolution"]}
-                s.brief = build_brief(session_meta, outcome["result"], s.prose)
-            s.status = outcome["status"]
+                s.prose = write_prose(name, outcome["result"], writer, intent=p.get("intent"))
+                s.brief = self._build_brief(s)
+            elif outcome.get("result") is not None:
+                s.llm_configured = self._writer() is not None
+            self._persist(s, outcome["status"])  # write files before the session reads as finished
             s.phase = "done"
-            self._persist(s)
+            s.status = outcome["status"]
         except Exception as exc:  # never leak internals; record the kind only
-            s.status = "error"
+            self._release(s, used)
             s.error = f"Something went wrong on the server ({type(exc).__name__}). No partial result is shown as complete."
             s.phase = "done"
+            s.status = "error"
         finally:
             s.finished = time.time()
 
-    def _persist(self, s: WebSession) -> None:
+    def _release(self, s: WebSession, used: int) -> None:
+        """Return the unused part of the Qloo reservation once; keeping it is the safe direction on error."""
+        if getattr(s, "released", False):
+            return
+        s.released = True
+        try:
+            self.usage.release("qloo", max(0, getattr(s, "reserved", 0) - used), getattr(s, "day", None))
+        except UsageError:
+            pass
+
+    def _persist(self, s: WebSession, status: Optional[str] = None) -> None:
         sdir = self.root / "web_sessions" / s.id
         sdir.mkdir(parents=True, exist_ok=True)
         meta = {"id": s.id, "created": iso(utc_now()), "params": s.params, "data_label": s.data_label,
-                "status": s.status, "outcome": (s.outcome or {}).get("outcome"), "trace": (s.outcome or {}).get("trace"),
+                "status": status or s.status, "outcome": (s.outcome or {}).get("outcome"), "trace": (s.outcome or {}).get("trace"),
                 "network_attempts": getattr(s.access, "network_attempts", None), "versions": self.config.versions,
-                "prose": {k: v for k, v in (s.prose or {}).items() if k != "text"} or None}
+                "prose": {k: v for k, v in (s.prose or {}).items() if k != "text"} or None,
+                "suggestions": s.suggestions}
         write_json(sdir / "session.json", meta)
         if s.brief:
             write_json(sdir / "brief.json", s.brief)
@@ -283,6 +379,7 @@ class Hub:
         for key, label in STEP_ORDER:
             if key in ("brand", "movie", "artist") and key not in domains:
                 continue
+            who = "Qloo" if key in ("resolve", "own", "brand", "movie", "artist") else "MOTIF"
             row = done.get(key)
             if row:
                 status = {"skip": "skipped", "stop": "stopped", "ask_user": "waiting"}.get(row["decision"], "done")
@@ -294,13 +391,17 @@ class Hub:
                 status, detail = "done", None
             elif key == "brief" and s.prose:
                 status = "done"
-                detail = ("written by " + (s.prose.get("llm") or {}).get("model", "LLM") + ", checked against the engine result"
-                          if s.prose["author"] == "llm" else s.prose.get("note"))
+                if s.prose["author"] == "llm":
+                    who = "Claude"
+                    detail = "written by " + (s.prose.get("llm") or {}).get("model", "LLM") + ", checked against the engine result"
+                else:
+                    detail = s.prose.get("note")
             elif key == "brief" and s.phase == "brief" and not finished:
                 status, detail = "running", None
+                who = "Claude" if s.llm_configured else "MOTIF"
             else:
                 status, detail = ("not_run" if finished else "pending"), None
-            steps.append({"key": key, "label": label, "status": status, "detail": detail})
+            steps.append({"key": key, "label": label, "status": status, "detail": detail, "who": who})
         return steps
 
     @staticmethod
@@ -316,7 +417,7 @@ class Hub:
 
 
 PUBLIC_FILES = {"/login": "login.html", "/login.js": "login.js", "/app.css": "app.css", "/favicon.svg": "favicon.svg"}
-APP_FILES = {"/": "index.html", "/app.js": "app.js"}
+APP_FILES = {"/": "index.html", "/app.js": "app.js", "/strips.js": "strips.js", "/print.js": "print.js", "/print.css": "print.css"}
 
 
 def make_handler(hub: Hub, gate: Optional[AccessGate] = None):
@@ -406,6 +507,8 @@ def make_handler(hub: Hub, gate: Optional[AccessGate] = None):
                 return self._json(200, view) if view else self._json(404, {"error": "Unknown session."})
             if path in APP_FILES:
                 return self._file(APP_FILES[path])
+            if re.fullmatch(r"/brief/[A-Za-z0-9_-]{6,20}", path):  # printable brief; data comes from the session API
+                return self._file("print.html")
             return self._json(404, {"error": "Not found."})
 
         def do_POST(self):
@@ -420,6 +523,16 @@ def make_handler(hub: Hub, gate: Optional[AccessGate] = None):
                 return self._json(code, payload, {"Set-Cookie": gate.cookie(token)} if token else None)
             if not self._authorized():  # checked before anything that could reach Qloo or the LLM
                 return self._deny(path)
+            m = re.fullmatch(r"/api/sessions/([A-Za-z0-9_-]{6,20})/suggestions(?:/(s[0-9]))?", path)
+            if m and not m.group(2):
+                code, payload = hub.suggest(m.group(1))
+                return self._json(code, payload)
+            if m:
+                body = self._body()
+                if body is None:
+                    return self._json(400, {"error": "Invalid request."})
+                code, payload = hub.decide(m.group(1), m.group(2), str(body.get("decision", "")))
+                return self._json(code, payload)
             if path != "/api/sessions":
                 return self._json(404, {"error": "Not found."})
             body = self._body()

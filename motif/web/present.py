@@ -11,6 +11,7 @@ from typing import Any, Dict, List, Optional
 
 from ..brief import AXIS_LABELS, open_axes
 from ..config import AXES
+from ..narrative import axis_basis, idea, is_common, open_design_questions, unread_descriptors
 
 POLES = {"warm_cool": ("warm", "cool"), "light_dense": ("light", "dense"), "raw_polished": ("raw", "polished"),
          "natural_synthetic": ("natural", "synthetic"), "intimate_projecting": ("intimate", "projecting"),
@@ -24,8 +25,20 @@ STRENGTH_WORDS = {"strong": "Strong support", "moderate": "Moderate support", "w
 TYPE_LABELS = {"urn:entity:brand": "Brand", "urn:entity:place": "Store or venue", "urn:entity:person": "Person",
                "urn:entity:book": "Book", "urn:entity:movie": "Film", "urn:entity:tv_show": "TV show",
                "urn:entity:artist": "Music artist", "urn:entity:locality": "Place name", "urn:entity:author": "Author"}
-RELATIONS_ONLY_TEXT = ("This direction comes only from brands and films that Qloo links to {name}, not from "
-                       "{name}'s own description. Being liked by the same audiences is not the same as sharing an aesthetic.")
+RELATIONS_ONLY_TEXT = ("Derived only from references Qloo relates to {name}, not from the brand's own descriptors: "
+                       "a creative suggestion, not a described trait of the brand.")
+# Plain-language copy for each palette material, written only from the supplier's own words
+# quoted in config/material_palette.json (presentation, not evidence).
+MATERIAL_PLAIN = {
+    "M01": {"what": "a transparent, jasmine-like molecule", "scent": "transparent floral with citrus freshness"},
+    "M02": {"what": "a cold-pressed citrus oil", "scent": "bright, sparkling citrus"},
+    "M03": {"what": "a woody molecule (properties not verified)", "scent": "not verified"},
+    "M04": {"what": "an ambery, woody molecule", "scent": "powerful ambery, musky-woody"},
+    "M05": {"what": "a musk molecule", "scent": "elegant musk with a slightly woody undertone"},
+    "M06": {"what": "a natural essential oil", "scent": "dry and woody, earthy and smoky"},
+    "M07": {"what": "a natural absolute", "scent": "warm, leathery, woody and ambery"},
+    "M08": {"what": "a natural orris (iris) extract", "scent": "earthy, with woody facets"},
+}
 OUTCOME_COPY = {
     "composed": ("A scent direction with verified starting materials.", None),
     "no_verified_materials": ("A scent direction, but no verified palette material fits it yet.",
@@ -76,6 +89,7 @@ def _axis_words(text: Optional[str]) -> Optional[str]:
 def evidence_view(e: Dict[str, Any], annotation: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     own = e["source_kind"] == "own"
     return {"id": e["evidence_id"], "source": SOURCE_LABELS[e["source_kind"]], "source_kind": e["source_kind"],
+            "common_in_sample": is_common(e["tag_name"]),
             "entity": e["entity_name"], "entity_rank": e["entity_rank"],
             "entity_role": ("the brand itself" if own else f"{SOURCE_LABELS[e['source_kind']].lower()}, result {e['entity_rank']}"),
             "tag": e["tag_name"], "tag_type": e["tag_type"],
@@ -97,6 +111,7 @@ def result_view(name: str, result: Dict[str, Any], rules: Dict[str, Any], palett
         v = result["axes"][axis]
         row = {"key": axis, "name": AXIS_NAMES[axis], "poles": POLES[axis], "state": v["state"], "value": v["value"]}
         if v["state"] == "target":
+            row.update(basis=axis_basis(name, result, axis))
             row.update(rules=v["rule_ids"], motifs=v["motifs"], strength=v["evidence_strength"],
                        strength_label=STRENGTH_WORDS[v["evidence_strength"]], rule_confidence="Draft creative rule",
                        relations_only=bool(v.get("relations_only")),
@@ -127,8 +142,16 @@ def result_view(name: str, result: Dict[str, Any], rules: Dict[str, Any], palett
     def material_view(row: Dict[str, Any]) -> Dict[str, Any]:
         src = by_id[row["material_id"]]
         checks = src.get("property_verification", {})
+        targets = {a for a in AXES if result["axes"][a]["state"] == "target"}
+        props = [{"axis": AXIS_NAMES[a], "pole": p, "requested": a in targets,
+                  "supplier_text": (checks.get(a) or {}).get("supporting_text"),
+                  "interpretation": (checks.get(a) or {}).get("motif_interpretation"),
+                  "source_url": (checks.get(a) or {}).get("source_url")}
+                 for a, p in sorted(row.get("usable_profile", {}).items(), key=lambda x: AXES.index(x[0]))]
+        plain = MATERIAL_PLAIN.get(row["material_id"], {})
         return {"id": row["material_id"], "name": row["name"], "slot": row.get("slot"), "score": row.get("score"),
-                "kind": src["kind"], "supplier": src.get("supplier"),
+                "kind": src["kind"], "supplier": src.get("supplier"), "plain": plain.get("what"), "scent": plain.get("scent"),
+                "props": props, "supplier_short": (src.get("supplier") or "").split(" (")[0],
                 "matches": [{"axis": AXIS_NAMES[a], "pole": row["usable_profile"][a],
                              "supplier_text": (checks.get(a) or {}).get("supporting_text"),
                              "interpretation": (checks.get(a) or {}).get("motif_interpretation"),
@@ -140,6 +163,10 @@ def result_view(name: str, result: Dict[str, Any], rules: Dict[str, Any], palett
                 "reason": _axis_words(row.get("reason"))}
     return {
         "outcome": result["outcome"],
+        "idea": idea(name, result),
+        "design_questions": open_design_questions(name, result),
+        "unread": unread_descriptors(result, limit=8),
+        "sample": {"brands": 7, "note": "Common in MOTIF's seven-brand reference sample; indicative only."},
         "headline": OUTCOME_COPY[result["outcome"]][0], "headline_note": OUTCOME_COPY[result["outcome"]][1],
         "direction": [{"axis": AXIS_NAMES[a], "value": result["axes"][a]["value"]} for a in AXES if result["axes"][a]["state"] == "target"],
         "open": [AXIS_NAMES[a] for a in open_axes(result)],

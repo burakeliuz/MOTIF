@@ -8,25 +8,23 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,350;0,9..144,500;0,9..144,600;1,9..144,350&family=Inter:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=Newsreader:opsz,wght@6..72,300..600&display=swap">
 <link rel="stylesheet" href="/app.css">
 <script src="/login.js" defer></script>
 </head>
 <body>
-<header class="masthead">
-  <div class="wrap masthead-row">
-    <span class="wordmark">MOTIF</span>
-  </div>
-</header>
+<header class="masthead"><div class="wrap"><div class="mast">
+  <span class="wordmark">MOTIF</span><p class="mast-mid">Scent direction from cultural evidence</p>
+</div></div></header>
 <main id="main">
   <div class="wrap">
     <section class="state-panel">
       <p class="kicker">Private review</p>
       <h1>Sign in</h1>
-      <p class="lede">This MOTIF demo is open only to its reviewer for now. Enter the access password.</p>
-      <form class="search" id="login" novalidate>
-        <label for="password">Access password</label>
-        <div class="search-row">
+      <p class="lede">This MOTIF demo is open to its reviewers only. Enter the access password you were given.</p>
+      <form class="login" id="login" novalidate>
+        <label class="kicker" for="password">Access password</label>
+        <div class="askrow">
           <input id="password" name="password" type="password" autocomplete="current-password" required aria-describedby="login-error">
           <button class="btn" type="submit" id="submit">Sign in</button>
         </div>

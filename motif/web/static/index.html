@@ -3,22 +3,25 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>MOTIF · scent direction from cultural evidence</title>
-<meta name="description" content="MOTIF reads a brand's cultural footprint in Qloo and translates it, with visible rules, into a scent direction and a perfumer brief.">
+<meta name="robots" content="noindex, nofollow">
+<title>MOTIF · if a brand were a scent</title>
+<meta name="description" content="MOTIF reads a brand's cultural descriptors in Qloo and translates them, with visible rules, into a scent direction and a perfumer brief.">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,350;0,9..144,500;0,9..144,600;1,9..144,350&family=Inter:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&display=swap">
 <link rel="stylesheet" href="/app.css">
+<script src="/strips.js" defer></script>
 <script src="/app.js" defer></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="masthead">
-  <div class="wrap masthead-row">
+  <div class="wrap"><div class="mast">
     <a class="wordmark" href="#/" aria-label="MOTIF, start page">MOTIF</a>
+    <p class="mast-mid">Scent direction from cultural evidence</p>
     <p class="mode" id="mode" hidden></p>
-  </div>
+  </div></div>
 </header>
 <main id="main" tabindex="-1">
   <div class="wrap" id="view"></div>
@@ -26,18 +29,14 @@
 </main>
 <footer class="colophon">
   <div class="wrap">
-    <p>MOTIF proposes a creative direction, never a formula, a dosage, or a prediction of who will like a scent.
-      Cultural descriptors come from the <a href="https://www.qloo.com/" rel="noopener noreferrer" target="_blank">Qloo</a> API;
-      the translation into scent is MOTIF's own, rule by rule.</p>
+    <p>MOTIF proposes a creative direction for a perfumer: nothing is smelled or balanced, there are no proportions, and nothing predicts who will like a scent.
+      Cultural descriptors come from the <a href="https://www.qloo.com/" rel="noopener noreferrer" target="_blank">Qloo</a> API; the translation into scent is MOTIF's, rule by rule.</p>
     <p class="versions" id="versions"></p>
   </div>
 </footer>
 <dialog id="evidence" aria-labelledby="evidence-title">
-  <div class="dialog-inner">
-    <div class="dialog-head">
-      <h2 id="evidence-title">Evidence</h2>
-      <button type="button" class="icon-btn" id="evidence-close" aria-label="Close">×</button>
-    </div>
+  <div class="dlg">
+    <div class="dlg-head"><h2 id="evidence-title">Where this phrase comes from</h2><button type="button" class="x" id="evidence-close" aria-label="Close">×</button></div>
     <div id="evidence-body"></div>
   </div>
 </dialog>
