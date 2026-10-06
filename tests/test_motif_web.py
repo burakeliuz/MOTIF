@@ -26,7 +26,9 @@ from types import SimpleNamespace
 
 from motif.qloo import LiveQloo
 from motif.web.access import COOKIE, FAILS_GLOBAL, FAILS_PER_IP, SESSION_TTL_S, AccessGate
+from motif.llm import BudgetExhausted, CallLedger
 from motif.web.server import Hub, make_handler
+from motif.web.usage import UsageError, UsageStore
 
 SEED = "SYN-BRAND-1"
 SECRET = "placeholder-TEST-ONLY-not-a-key-7f3c"
@@ -37,7 +39,8 @@ BRAND_TAGS = [(f"SYN-B{i}", f"SYN Brand {i}", [("Clean Lines", AESTHETIC), ("Mut
 def routes(search=None):
     search = search or search_body([(SEED, "Synthbrand", "urn:entity:brand"), ("SYN-PLACE", "Synthbrand", "urn:entity:place")])
     bodies = {"search": search,
-              "entity": entities_body(SEED, "Synthbrand", [("Unpretentious", TONE), ("Clean Lines", AESTHETIC), ("Natural Materials", AESTHETIC)]),
+              "entity": entities_body(SEED, "Synthbrand", [("Unpretentious", TONE), ("Clean Lines", AESTHETIC), ("Natural Materials", AESTHETIC),
+                                                           ("Dark Palette", AESTHETIC), ("Tactile Paper", AESTHETIC)]),
               "urn:entity:brand": insights_body(BRAND_TAGS),
               "urn:entity:movie": insights_body([("SYN-M1", "SYN Film", [("Muted", STYLE)])]),
               "urn:entity:artist": insights_body([])}
@@ -399,3 +402,157 @@ class AccessGateUnit(unittest.TestCase):
         gate = AccessGate(True, PASSWORD)
         self.assertNotIn(PASSWORD, repr(vars(gate)))
         self.assertNotIn(PASSWORD, gate.describe())
+
+
+class FakeWriter:
+    """Stands in for the LLM; counts calls; never touches the network."""
+
+    model = "fake-model"
+
+    def __init__(self, suggestions=None, fail=False):
+        self.calls = 0
+        self.suggestions = suggestions
+        self.fail = fail
+
+    def describe(self):
+        return {"provider": "fake", "model": self.model}
+
+    def write(self, payload, feedback=None):
+        raise RuntimeError("prose not exercised here")
+
+    def suggest(self, payload):
+        self.calls += 1
+        if self.fail:
+            raise RuntimeError("api error")
+        return self.suggestions
+
+
+class BudgetCounters(unittest.TestCase):
+    def test_concurrent_reservations_never_pass_the_cap_and_survive_a_new_store(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "usage.json"
+            stores = [UsageStore(path) for _ in range(4)]  # separate objects, as after a restart or in two processes
+            granted = []
+            threads = [threading.Thread(target=lambda st=st: granted.append(st.reserve("qloo", 8, 40))) for st in stores * 5]
+            for t in threads:
+                t.start()
+            for t in threads:
+                t.join()
+            self.assertEqual(granted.count(True), 5)
+            self.assertEqual(UsageStore(path).today()["qloo"], 40)
+            UsageStore(path).release("qloo", 6)
+            self.assertEqual(UsageStore(path).today()["qloo"], 34)
+
+    def test_unverifiable_budget_starts_no_research(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            hub = FakeHub(tmp)
+            (Path(tmp) / "web_usage.json").write_text("not json", encoding="utf-8")
+            code, body = hub.create({"reference": "Synthbrand"}, "10.0.0.1")
+            self.assertEqual((code, body["kind"]), (503, "budget_unverified"))
+            self.assertEqual((hub.sessions, hub.transports), ({}, []))
+
+    def test_llm_ledger_reserves_before_the_call_and_fails_closed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "llm_calls.jsonl"
+            a, b = CallLedger(path, 2), CallLedger(path, 2)
+            a.reserve("messages.create", "m")
+            b.reserve("interpret", "m")
+            a.record({"kind": "messages.create", "status": "ok"})  # results are not counted twice
+            with self.assertRaises(BudgetExhausted):
+                b.reserve("interpret", "m")
+            blocked = CallLedger(Path(tmp) / "missing-dir" / "x" / "ledger.jsonl", 5)
+            (Path(tmp) / "missing-dir").write_text("a file where a directory should be", encoding="utf-8")
+            with self.assertRaises(BudgetExhausted):
+                blocked.reserve("interpret", "m")
+
+
+class IntentAndReadings(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+
+    def hub(self, writer=None):
+        hub = FakeHub(self.tmp.name)
+        hub._writer = lambda: writer
+        self.addCleanup(lambda: settle(hub))
+        return hub
+
+    def test_intent_is_recorded_apart_and_changes_neither_result_nor_requests(self):
+        hub = self.hub()
+        _, plain = hub.create({"reference": "Synthbrand", "choose": SEED}, "10.0.0.1")
+        a = wait(hub, plain["id"])
+        before = calls(hub)
+        _, with_intent = hub.create({"reference": "Synthbrand", "choose": SEED, "intent": "a home scent for the store"}, "10.0.0.1")
+        b = wait(hub, with_intent["id"])
+        self.assertNotEqual(plain["id"], with_intent["id"])
+        self.assertEqual(calls(hub), before)  # same reference: the Qloo cache is reused
+        self.assertEqual(a["result"]["axes"], b["result"]["axes"])
+        self.assertEqual(a["result"]["materials"], b["result"]["materials"])
+        brief = hub.brief(with_intent["id"])
+        self.assertEqual(brief["user_intent"]["provenance"], "user_intent")
+        self.assertNotIn("a home scent", json.dumps(brief["evidence"]))
+        self.assertIn("did not change", b["intent_effect"])
+        self.assertEqual(hub.create({"reference": "Synthbrand", "intent": "x" * 141}, "10.0.0.1")[0], 400)
+
+    def test_suggestions_are_checked_cached_and_kept_out_of_the_evidence(self):
+        raw = {"suggestions": [
+            {"descriptor": "Dark Palette", "reading": "A taste for shadowed, low-key surfaces.", "design_question": "Keep the scent dim and quiet?"},
+            {"descriptor": "Made Up", "reading": "Not offered.", "design_question": "?"},
+            {"descriptor": "Tactile Paper", "reading": "Use 30% more vetiver.", "design_question": "?"},
+            {"descriptor": "Tactile Paper", "reading": "Paper-like tactility.", "design_question": "Dry or soft?", "extra": 1},
+        ]}
+        writer = FakeWriter(raw)
+        hub = self.hub(writer)
+        _, r = hub.create({"reference": "Synthbrand", "choose": SEED}, "10.0.0.1")
+        view = wait(hub, r["id"])
+        self.assertEqual(view["suggestions"]["status"], "not_requested")  # nothing is called before the user asks
+        self.assertEqual(writer.calls, 0)
+        code, sg = hub.suggest(r["id"])
+        self.assertEqual(code, 200)
+        self.assertEqual([x["descriptor"] for x in sg["suggestions"]], ["Dark Palette"])
+        self.assertEqual(sg["rejected"], 3)
+        self.assertTrue(sg["suggestions"][0]["from_brand_itself"])
+        self.assertEqual(sg["suggestions"][0]["label"], "Suggested interpretation — not applied")
+        hub.suggest(r["id"])
+        self.assertEqual(writer.calls, 1)  # reused within the session
+        result_before = json.dumps(hub.view(r["id"])["result"], sort_keys=True)
+        hub.decide(r["id"], "s1", "accept")
+        brief = hub.brief(r["id"])
+        self.assertEqual(brief["accepted_readings"][0]["provenance"], "user_preference")
+        self.assertNotIn("shadowed", json.dumps(brief["evidence"]) + json.dumps(brief["motifs"]) + json.dumps(brief["axes"]))
+        self.assertEqual(json.dumps(hub.view(r["id"])["result"], sort_keys=True), result_before)
+        hub.decide(r["id"], "s1", "reject")
+        self.assertEqual(hub.brief(r["id"])["accepted_readings"], [])
+        self.assertEqual(hub.decide(r["id"], "s1", "maybe")[0], 400)
+
+    def test_suggestions_degrade_without_a_key_or_on_api_errors(self):
+        hub = self.hub(None)
+        _, r = hub.create({"reference": "Synthbrand", "choose": SEED}, "10.0.0.1")
+        wait(hub, r["id"])
+        self.assertEqual(hub.suggest(r["id"])[1]["status"], "unavailable")
+        failing = self.hub(FakeWriter(fail=True))
+        _, r2 = failing.create({"reference": "Synthbrand", "choose": SEED}, "10.0.0.2")
+        v = wait(failing, r2["id"])
+        self.assertEqual(v["status"], "completed")
+        self.assertEqual(failing.suggest(r2["id"])[1]["status"], "failed")
+
+
+class GatedNewRoutes(unittest.TestCase):
+    def test_suggestions_decisions_and_print_page_need_sign_in(self):
+        srv = GatedServer(PASSWORD)
+        self.addCleanup(srv.close)
+        for path in ("/api/sessions/abcdefgh/suggestions", "/api/sessions/abcdefgh/suggestions/s1"):
+            self.assertEqual(srv.call("POST", path, {"decision": "accept"})[0], 401, path)
+        code, headers, _ = srv.call("GET", "/brief/abcdefgh")
+        self.assertEqual((code, headers["Location"]), (303, "/login"))
+        self.assertEqual(srv.call("GET", "/strips.js")[0], 401)
+        self.assertEqual(srv.created, [])
+
+
+class ProseWording(unittest.TestCase):
+    def test_audience_claims_are_rejected(self):
+        from motif.brief import validate_prose
+        result = {"materials": {"selected": []}, "axes": {a: {"state": "unknown"} for a in
+                  ("warm_cool", "light_dense", "raw_polished", "natural_synthetic", "intimate_projecting", "sweet_dry")}}
+        text = "Temperature, weight, texture, natural/synthetic, projection and sweetness stay open. Its audience loves calm."
+        self.assertTrue(any("claim" in p for p in validate_prose(text, result)))
