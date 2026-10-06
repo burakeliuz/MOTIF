@@ -36,6 +36,7 @@ evidence → motif → sensory target → material suggestion → brief.
 
 ```sh
 pip install -r requirements.txt   # only the Anthropic SDK; without it the brief uses the template
+export MOTIF_ACCESS_PROTECTION=off   # local use; by default the app asks for MOTIF_ACCESS_PASSWORD (see below)
 python3 -m motif.web              # http://127.0.0.1:8000, live Qloo (needs QLOO_API_KEY)
 MOTIF_LLM_PROVIDER=off python3 -m motif.web   # live Qloo, template prose, no LLM calls
 
@@ -53,6 +54,15 @@ response. Guards against repeated calls:
   first session's Qloo cache, so the search is not repeated.
 - Per-IP and per-day session caps, a daily Qloo attempt cap, and a daily LLM
   call cap. A reached cap is reported; nothing is replaced with sample data.
+
+**Temporary review gate.** While the hosted demo is under private review, every
+page and API except `/healthz` and the sign-in page needs a password
+(`MOTIF_ACCESS_PASSWORD`), checked on the server. A correct password sets a
+random session cookie (Secure, HttpOnly, SameSite=Strict, 12 hours, kept in
+server memory). Wrong attempts are limited per client (5 per 15 minutes) and
+globally (30 per 15 minutes). Protection is on by default; without a password
+nothing behind the gate opens. `/healthz` returns `{"ok": true}` only and calls
+no API. Set `MOTIF_ACCESS_PROTECTION=off` to open the demo.
 
 Recorded sessions are for local testing; recorded Qloo data is not published as
 demo data. Web sessions are saved under `data/web_sessions/` (git-ignored).
@@ -114,6 +124,8 @@ MOTIF_QLOO_MAX_CALLS_PER_DAY=   # web only, default 400
 MOTIF_WEB_SESSIONS_PER_DAY=     # web only, default 120
 MOTIF_WEB_SESSIONS_PER_IP_HOUR= # web only, default 8 (best effort; the daily caps are the hard limit)
 MOTIF_DATA_DIR=                 # optional data directory (default ./data)
+MOTIF_ACCESS_PROTECTION=        # web review gate, "on" by default (fail-closed); "off" opens the app
+MOTIF_ACCESS_PASSWORD=          # web review password; with protection on and no password, access stays closed
 HOST=, PORT=                    # web server bind address (default 127.0.0.1:8000)
 ```
 
@@ -131,8 +143,11 @@ first request after that takes about a minute). The Blueprint is
 
 1. Sign in to Render with GitHub and create a new Blueprint from this repository
    (branch `main`).
-2. When asked, enter the secret values for `QLOO_API_KEY` and, optionally,
-   `MOTIF_ANTHROPIC_API_KEY`. Keys from a Claude Code session are not carried over.
+2. When asked, enter the secret values for `QLOO_API_KEY`, `MOTIF_ACCESS_PASSWORD`,
+   and, optionally, `MOTIF_ANTHROPIC_API_KEY`. Keys from a Claude Code session are
+   not carried over. For a service created before the gate existed, add
+   `MOTIF_ACCESS_PASSWORD` (and `MOTIF_ACCESS_PROTECTION=on`) under the service's
+   environment variables, then deploy.
 3. Deploy, then open `https://<service>.onrender.com/healthz` and the start page.
 
 Limits on the free instance: sessions live in memory and are lost when the

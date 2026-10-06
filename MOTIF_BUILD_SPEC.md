@@ -47,6 +47,7 @@ Where a later section still says otherwise, this section wins.
 | Screens | Type selector; trace with "agent decision" labels | Brand input only; steps read from the controller trace; evidence opens in a dialog with Qloo and MOTIF parts kept apart; unknown axes have no mark | Owner's MVP scope (brands only) |
 | Recorded mode | A button in the public demo | Local preview only (`--recorded` flag); off in the hosted demo until data sharing is confirmed | Owner: local recordings are not public demo data |
 | Hosting | Candidates | Render free web service (`render.yaml`, Python from `.python-version`), keys as Render environment variables | Free instance, secrets server-side, no paid plan |
+| Review access | Public demo | Temporary password gate (`motif/web/access.py`): server-side check, Secure/HttpOnly/SameSite=Strict session cookie, limited wrong attempts, fail-closed without a password; `/healthz` stays public and data-free. Turned off before submission | Owner wants a private review period; judges need open access later |
 | Runtime | Python 3.11 container | Python 3.13 (matches the build environment); engine still stdlib-only, `anthropic==1.11.0` the only dependency | Fewer moving parts |
 
 ## 1. Decision

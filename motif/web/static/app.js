@@ -64,6 +64,7 @@ async function api(path, options) {
     const res = await fetch(path, Object.assign({ signal: ctrl.signal, headers: { "Content-Type": "application/json" } }, options || {}));
     let data = null;
     try { data = await res.json(); } catch (e) { data = null; }
+    if (res.status === 401 && data && data.kind === "auth_required") location.replace("/login");  // review gate
     return { ok: res.ok, status: res.status, data };
   } catch (e) {
     return { ok: false, status: 0, data: { error: "The server could not be reached." } };

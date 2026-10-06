@@ -49,6 +49,7 @@ Every stage adds to `docs/SUBMISSION_NOTES.md`, mapped to the six items of the k
 - The spec was accepted for stage 4 (rev 0.2). Build in its order: interface and hosting in stage 5, without changing engine decisions in the UI. `motif_spike/` stays intact.
 - Research control is a deterministic state machine (`motif/agent.py`). The LLM writes validated prose only; giving it tool choice needs the owner's approval.
 - LLM: key only from `MOTIF_ANTHROPIC_API_KEY`; default `claude-sonnet-5-5`; never switch models silently; every real call goes through the ledger (`data/llm_calls.jsonl`). A failed call or invalid text shows the labelled template, never as LLM output.
+- Web review gate (`motif/web/access.py`): password only from `MOTIF_ACCESS_PASSWORD`; protection on by default and fail-closed; every page and API except `/healthz` and the sign-in page is behind it. Open it (`MOTIF_ACCESS_PROTECTION=off`) only on the owner's word.
 - Web: keys stay server-side; the UI never builds HTML from data; no fake progress; identical requests and answers must not repeat Qloo or LLM calls.
 - Live matching uses only material properties with `verified_full_page`; unverified ones appear only in the labelled design preview.
 - Held-out brands used once (T1: Le Labo, Patagonia) are no longer independent validation.

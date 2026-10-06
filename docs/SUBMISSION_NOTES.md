@@ -260,8 +260,13 @@ Render free web service (`render.yaml`, README "Hosting"): it keeps keys
 server-side as environment variables and needs no paid plan. Deployment needs
 the owner's Render account; the URL is added here once it is live.
 
-Server variables (names only): `QLOO_API_KEY`, `MOTIF_ANTHROPIC_API_KEY`
-(optional), `MOTIF_LLM_MODEL`, `MOTIF_LLM_MAX_CALLS`,
+During private review the demo is behind a temporary password gate
+(`MOTIF_ACCESS_PROTECTION=on`, `MOTIF_ACCESS_PASSWORD`; README "Web interface").
+Before submission it must be opened (`MOTIF_ACCESS_PROTECTION=off`), because the
+rules require a demo judges can try.
+
+Server variables (names only): `QLOO_API_KEY`, `MOTIF_ACCESS_PROTECTION`,
+`MOTIF_ACCESS_PASSWORD`, `MOTIF_ANTHROPIC_API_KEY` (optional), `MOTIF_LLM_MODEL`, `MOTIF_LLM_MAX_CALLS`,
 `MOTIF_QLOO_MAX_CALLS_PER_DAY`, `MOTIF_WEB_SESSIONS_PER_DAY`,
 `MOTIF_WEB_SESSIONS_PER_IP_HOUR`.
 

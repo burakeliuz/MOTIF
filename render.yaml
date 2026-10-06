@@ -13,6 +13,10 @@ services:
     startCommand: python -m motif.web --host 0.0.0.0 --port $PORT
     healthCheckPath: /healthz
     envVars:
+      - key: MOTIF_ACCESS_PROTECTION  # temporary review gate; set to "off" to open the demo to judges
+        value: "on"
+      - key: MOTIF_ACCESS_PASSWORD    # review password (secret); with protection on and no password, access stays closed
+        sync: false
       - key: QLOO_API_KEY          # Qloo hackathon key (secret)
         sync: false
       - key: MOTIF_ANTHROPIC_API_KEY  # Anthropic key for brief prose (secret; optional)

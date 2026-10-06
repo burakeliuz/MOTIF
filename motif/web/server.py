@@ -43,6 +43,7 @@ from ..brief import build_brief
 from ..config import AXES, EngineConfig, load_config
 from ..llm import write_prose, writer_from_env
 from ..qloo import LiveQloo, RecordedQloo
+from .access import AccessGate
 from .present import candidate_view, result_view
 
 STATIC = Path(__file__).resolve().parent / "static"
@@ -314,7 +315,14 @@ class Hub:
                 }.get(kind, o.get("message") or "The research stopped.")
 
 
-def make_handler(hub: Hub):
+PUBLIC_FILES = {"/login": "login.html", "/login.js": "login.js", "/app.css": "app.css", "/favicon.svg": "favicon.svg"}
+APP_FILES = {"/": "index.html", "/app.js": "app.js"}
+
+
+def make_handler(hub: Hub, gate: Optional[AccessGate] = None):
+    """`gate` defaults to the environment's access settings (fail-closed: protection on)."""
+    gate = gate if gate is not None else AccessGate.from_env(os.environ)
+
     class Handler(BaseHTTPRequestHandler):
         server_version = "MOTIF"
         sys_version = ""
@@ -343,10 +351,48 @@ def make_handler(hub: Hub):
             fwd = self.headers.get("X-Forwarded-For", "")
             return fwd.split(",")[0].strip() if fwd else self.client_address[0]
 
+        def _file(self, name: str):
+            data = (STATIC / name).read_bytes()
+            ctype = {"html": "text/html; charset=utf-8", "css": "text/css; charset=utf-8",
+                     "js": "text/javascript; charset=utf-8", "svg": "image/svg+xml"}[name.rsplit(".", 1)[1]]
+            self._headers(200, ctype, len(data))
+            self.wfile.write(data)
+
+        def _redirect(self, location: str):
+            self._headers(303, "text/plain; charset=utf-8", 0, {"Location": location})
+
+        def _authorized(self) -> bool:
+            return gate.allowed(self.headers.get("Cookie"))
+
+        def _deny(self, path: str):
+            if path.startswith("/api/") or path.endswith(".js"):
+                return self._json(401, {"error": "Sign-in required.", "kind": "auth_required"})
+            return self._redirect("/login")
+
+        def _same_origin(self) -> bool:
+            origin = self.headers.get("Origin")
+            return not origin or urlparse(origin).netloc == self.headers.get("Host", "")
+
+        def _body(self) -> Optional[Dict[str, Any]]:
+            length = int(self.headers.get("Content-Length") or 0)
+            if length <= 0 or length > 4096:
+                return None
+            try:
+                body = json.loads(self.rfile.read(length).decode("utf-8"))
+            except (ValueError, UnicodeDecodeError):
+                return None
+            return body if isinstance(body, dict) else None
+
         def do_GET(self):
             path = urlparse(self.path).path
-            if path == "/healthz":
+            if path == "/healthz":  # for the host's health check: no data, no API calls
                 return self._json(200, {"ok": True})
+            if path == "/login" and (not gate.enabled or self._authorized()):
+                return self._redirect("/")
+            if path in PUBLIC_FILES:
+                return self._file(PUBLIC_FILES[path])
+            if not self._authorized():
+                return self._deny(path)
             if path == "/api/config":
                 return self._json(200, hub.describe())
             m = re.fullmatch(r"/api/sessions/([A-Za-z0-9_-]{6,20})(/brief\.json)?", path)
@@ -358,26 +404,26 @@ def make_handler(hub: Hub):
                     return self._json(200, brief, {"Content-Disposition": 'attachment; filename="motif-brief.json"'})
                 view = hub.view(m.group(1))
                 return self._json(200, view) if view else self._json(404, {"error": "Unknown session."})
-            name = {"/": "index.html", "/app.css": "app.css", "/app.js": "app.js", "/favicon.svg": "favicon.svg"}.get(path)
-            if not name:
-                return self._json(404, {"error": "Not found."})
-            data = (STATIC / name).read_bytes()
-            ctype = {"html": "text/html; charset=utf-8", "css": "text/css; charset=utf-8",
-                     "js": "text/javascript; charset=utf-8", "svg": "image/svg+xml"}[name.rsplit(".", 1)[1]]
-            self._headers(200, ctype, len(data))
-            self.wfile.write(data)
+            if path in APP_FILES:
+                return self._file(APP_FILES[path])
+            return self._json(404, {"error": "Not found."})
 
         def do_POST(self):
-            if urlparse(self.path).path != "/api/sessions":
+            path = urlparse(self.path).path
+            if not self._same_origin():
+                return self._json(403, {"error": "Cross-origin request refused."})
+            if path == "/api/login":
+                body = self._body()
+                if body is None:
+                    return self._json(400, {"error": "Invalid request."})
+                code, payload, token = gate.login(body.get("password"), self._ip())
+                return self._json(code, payload, {"Set-Cookie": gate.cookie(token)} if token else None)
+            if not self._authorized():  # checked before anything that could reach Qloo or the LLM
+                return self._deny(path)
+            if path != "/api/sessions":
                 return self._json(404, {"error": "Not found."})
-            length = int(self.headers.get("Content-Length") or 0)
-            if length <= 0 or length > 4096:
-                return self._json(400, {"error": "Invalid request."})
-            try:
-                body = json.loads(self.rfile.read(length).decode("utf-8"))
-            except (ValueError, UnicodeDecodeError):
-                return self._json(400, {"error": "Invalid JSON."})
-            if not isinstance(body, dict):
+            body = self._body()
+            if body is None:
                 return self._json(400, {"error": "Invalid request."})
             code, payload = hub.create(body, self._ip())
             self._json(code, payload)
@@ -395,8 +441,9 @@ def main(argv: Optional[List[str]] = None) -> int:
     root = data_root(args.data_dir)
     recorded = [Path(p) for p in args.recorded] if args.recorded else None
     hub = Hub(load_config(), root, recorded)
-    server = ThreadingHTTPServer((args.host, args.port), make_handler(hub))
+    gate = AccessGate.from_env(os.environ)
+    server = ThreadingHTTPServer((args.host, args.port), make_handler(hub, gate))
     mode = "RECORDED (local preview)" if recorded else ("LIVE" if hub.live_ready else "LIVE (Qloo not configured)")
-    print(f"MOTIF web on http://{args.host}:{args.port} · {mode} · LLM {hub.describe()['llm']}", flush=True)
+    print(f"MOTIF web on http://{args.host}:{args.port} · {mode} · LLM {hub.describe()['llm']} · {gate.describe()}", flush=True)
     server.serve_forever()
     return 0

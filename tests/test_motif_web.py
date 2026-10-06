@@ -25,6 +25,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 from motif.qloo import LiveQloo
+from motif.web.access import COOKIE, FAILS_GLOBAL, FAILS_PER_IP, SESSION_TTL_S, AccessGate
 from motif.web.server import Hub, make_handler
 
 SEED = "SYN-BRAND-1"
@@ -189,7 +190,7 @@ class HttpLayer(unittest.TestCase):
     def setUpClass(cls):
         cls.tmp = tempfile.TemporaryDirectory()
         cls.hub = FakeHub(cls.tmp.name)
-        cls.server = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(cls.hub))
+        cls.server = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(cls.hub, AccessGate(False, None)))
         cls.base = f"http://127.0.0.1:{cls.server.server_address[1]}"
         threading.Thread(target=cls.server.serve_forever, daemon=True).start()
         cls.opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
@@ -245,3 +246,156 @@ class HttpLayer(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+PASSWORD = "review-only-test-password-91"  # test value, not a real credential
+
+
+class NoRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, *args, **kwargs):
+        return None
+
+
+class GatedServer:
+    """A loopback server with the access gate on; its hub uses the synthetic fake transport."""
+
+    def __init__(self, password):
+        self.tmp = tempfile.TemporaryDirectory()
+        env = {"MOTIF_ANTHROPIC_API_KEY": "placeholder-TEST-ONLY-not-a-key", "MOTIF_LLM_MAX_CALLS": "5"}
+        self.hub = FakeHub(self.tmp.name, env=env)
+        self.created = []
+        original = self.hub.create
+        self.hub.create = lambda body, ip: (self.created.append(body), original(body, ip))[1]
+        self.gate = AccessGate(True, password)
+        self.server = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(self.hub, self.gate))
+        self.base = f"http://127.0.0.1:{self.server.server_address[1]}"
+        threading.Thread(target=self.server.serve_forever, daemon=True).start()
+        self.opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect)
+        self.seen = []
+
+    def close(self):
+        settle(self.hub)
+        self.server.shutdown()
+        self.server.server_close()
+        self.tmp.cleanup()
+
+    def call(self, method, path, body=None, cookie=None, headers=None):
+        h = dict(headers or {})
+        if cookie:
+            h["Cookie"] = cookie
+        if body is not None:
+            h["Content-Type"] = "application/json"
+        data = json.dumps(body).encode() if body is not None else None
+        req = urllib.request.Request(self.base + path, data=data, method=method, headers=h)
+        try:
+            with self.opener.open(req, timeout=5) as res:
+                out = res.status, dict(res.headers), res.read()
+        except urllib.error.HTTPError as err:
+            out = err.code, dict(err.headers), err.read()
+        self.seen.append(json.dumps(out[1]) + out[2].decode("utf-8", "replace"))
+        return out
+
+    def login(self, password, ip="10.9.9.9"):
+        return self.call("POST", "/api/login", {"password": password}, headers={"X-Forwarded-For": ip})
+
+
+class AccessGateHttp(unittest.TestCase):
+    """The review gate: nothing behind it, and nothing that reaches Qloo or the LLM, works without sign-in."""
+
+    def setUp(self):
+        self.srv = GatedServer(PASSWORD)
+        self.addCleanup(self.srv.close)
+
+    def assert_nothing_started(self):
+        self.assertEqual(self.srv.created, [])           # the hub was never asked to research
+        self.assertEqual(self.srv.hub.sessions, {})
+        self.assertEqual(self.srv.hub.transports, [])     # so no Qloo transport was ever built
+        self.assertFalse((Path(self.srv.tmp.name) / "llm_calls.jsonl").exists())  # and no LLM call was logged
+
+    def test_unauthorized_requests_reach_no_api_and_start_nothing(self):
+        for cookie in (None, f"{COOKIE}=forged-token", "other=1"):
+            code, _, body = self.srv.call("POST", "/api/sessions", {"reference": "Synthbrand"}, cookie=cookie)
+            self.assertEqual((code, json.loads(body)["kind"]), (401, "auth_required"))
+            for path in ("/api/config", "/api/sessions/abcdefgh", "/api/sessions/abcdefgh/brief.json", "/app.js"):
+                self.assertEqual(self.srv.call("GET", path, cookie=cookie)[0], 401, path)
+            code, headers, _ = self.srv.call("GET", "/", cookie=cookie)
+            self.assertEqual((code, headers["Location"]), (303, "/login"))
+        self.assert_nothing_started()
+
+    def test_health_check_and_sign_in_page_stay_public_without_data(self):
+        code, headers, body = self.srv.call("GET", "/healthz")
+        self.assertEqual((code, json.loads(body)), (200, {"ok": True}))
+        self.assertNotIn("Set-Cookie", headers)
+        for path in ("/login", "/login.js", "/app.css", "/favicon.svg"):
+            self.assertEqual(self.srv.call("GET", path)[0], 200, path)
+        self.assert_nothing_started()
+
+    def test_correct_password_sets_a_strict_cookie_that_opens_the_api(self):
+        self.assertEqual(self.srv.login("wrong")[0], 401)
+        code, headers, _ = self.srv.login(PASSWORD)
+        self.assertEqual(code, 200)
+        cookie = headers["Set-Cookie"]
+        for flag in ("HttpOnly", "Secure", "SameSite=Strict", "Path=/", f"Max-Age={SESSION_TTL_S}"):
+            self.assertIn(flag, cookie)
+        pair = cookie.split(";")[0]
+        self.assertEqual(self.srv.call("GET", "/api/config", cookie=pair)[0], 200)
+        self.assertEqual(self.srv.call("GET", "/", cookie=pair)[0], 200)
+        self.assertEqual(self.srv.call("GET", "/login", cookie=pair)[0], 303)
+        code, _, body = self.srv.call("POST", "/api/sessions", {"reference": "Synthbrand"}, cookie=pair)
+        self.assertEqual(code, 202)
+        self.assertEqual(len(self.srv.hub.transports), 1)
+        # the password never comes back in any header or body
+        self.assertFalse(any(PASSWORD in seen for seen in self.srv.seen))
+
+    def test_cross_origin_posts_are_refused(self):
+        code, _, _ = self.srv.call("POST", "/api/login", {"password": PASSWORD}, headers={"Origin": "https://evil.example"})
+        self.assertEqual(code, 403)
+        self.assertEqual(self.srv.gate.tokens, {})
+
+    def test_wrong_attempts_are_limited_per_client_and_globally(self):
+        for _ in range(FAILS_PER_IP):
+            self.assertEqual(self.srv.login("nope", ip="10.1.1.1")[0], 401)
+        self.assertEqual(self.srv.login(PASSWORD, ip="10.1.1.1")[0], 429)  # locked even with the right password
+        self.assertEqual(self.srv.login(PASSWORD, ip="10.1.1.2")[0], 200)  # another client is unaffected
+        # spoofing a new address per attempt still hits the global limit
+        for i in range(FAILS_GLOBAL):
+            self.srv.login("nope", ip=f"10.2.0.{i}")
+        self.assertEqual(self.srv.login(PASSWORD, ip="10.3.3.3")[0], 429)
+
+
+class AccessGateClosed(unittest.TestCase):
+    def test_protection_on_without_a_password_keeps_everything_closed(self):
+        srv = GatedServer(None)
+        self.addCleanup(srv.close)
+        code, _, body = srv.login("")
+        self.assertEqual((code, json.loads(body)["kind"]), (503, "access_closed"))
+        self.assertEqual(srv.login("anything")[0], 503)
+        self.assertEqual(srv.call("POST", "/api/sessions", {"reference": "Synthbrand"})[0], 401)
+        self.assertEqual(srv.call("GET", "/api/config")[0], 401)
+        self.assertEqual(srv.call("GET", "/healthz")[0], 200)
+        self.assertEqual(srv.created, [])
+        self.assertEqual(srv.hub.transports, [])
+
+
+class AccessGateUnit(unittest.TestCase):
+    def test_environment_defaults_are_fail_closed(self):
+        self.assertTrue(AccessGate.from_env({}).enabled)
+        self.assertFalse(AccessGate.from_env({}).configured)
+        self.assertFalse(AccessGate.from_env({}).allowed(None))
+        self.assertTrue(AccessGate.from_env({"MOTIF_ACCESS_PASSWORD": PASSWORD}).configured)
+        self.assertFalse(AccessGate.from_env({"MOTIF_ACCESS_PROTECTION": "off"}).enabled)
+        self.assertTrue(AccessGate.from_env({"MOTIF_ACCESS_PROTECTION": "off"}).allowed(None))
+
+    def test_tokens_expire(self):
+        now = [1000.0]
+        gate = AccessGate(True, PASSWORD, clock=lambda: now[0])
+        _, _, token = gate.login(PASSWORD, "10.0.0.1")
+        self.assertTrue(gate.allowed(f"{COOKIE}={token}"))
+        now[0] += SESSION_TTL_S + 1
+        self.assertFalse(gate.allowed(f"{COOKIE}={token}"))
+        self.assertEqual(gate.login(123, "10.0.0.1")[0], 401)  # non-string passwords are wrong, not errors
+
+    def test_the_password_is_not_kept_in_plain_text(self):
+        gate = AccessGate(True, PASSWORD)
+        self.assertNotIn(PASSWORD, repr(vars(gate)))
+        self.assertNotIn(PASSWORD, gate.describe())

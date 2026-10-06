@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>MOTIF · sign in</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,350;0,9..144,500;0,9..144,600;1,9..144,350&family=Inter:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="/app.css">
+<script src="/login.js" defer></script>
+</head>
+<body>
+<header class="masthead">
+  <div class="wrap masthead-row">
+    <span class="wordmark">MOTIF</span>
+  </div>
+</header>
+<main id="main">
+  <div class="wrap">
+    <section class="state-panel">
+      <p class="kicker">Private review</p>
+      <h1>Sign in</h1>
+      <p class="lede">This MOTIF demo is open only to its reviewer for now. Enter the access password.</p>
+      <form class="search" id="login" novalidate>
+        <label for="password">Access password</label>
+        <div class="search-row">
+          <input id="password" name="password" type="password" autocomplete="current-password" required aria-describedby="login-error">
+          <button class="btn" type="submit" id="submit">Sign in</button>
+        </div>
+        <p class="form-error" id="login-error" role="alert"></p>
+      </form>
+    </section>
+  </div>
+</main>
+</body>
+</html>
