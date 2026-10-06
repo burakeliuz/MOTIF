@@ -1,10 +1,7 @@
 # Local run outputs. Live runs contain Qloo response data; keep them out of
 # source control unless the event's data terms allow sharing (see data/README.md).
-data/raw/*
-data/normalized/*
-data/motif_sessions/
-!data/raw/.gitkeep
-!data/normalized/.gitkeep
+data/*
+!data/README.md
 
 # Credentials never belong in this folder. Use `qloo setup --qloo` instead.
 .env

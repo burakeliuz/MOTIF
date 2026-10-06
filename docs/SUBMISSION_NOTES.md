@@ -7,8 +7,9 @@ summary in `docs/QLOO_ACCESS_NOTES.md`). Every roadmap stage adds to this file.
 
 Status: stage 2 (live Qloo feasibility) done on 2026-10-06; stage 3 product
 decisions in `MOTIF_BUILD_SPEC.md`; stage 4 (engine and research flow, command
-line) done on 2026-10-06 with the spec at rev 0.2. Worked design
-examples: `reports/design_examples.md`.
+line) done on 2026-10-06 with the spec at rev 0.2; stage 5 (web interface,
+verified materials, LLM prose, hosting files) done on 2026-10-06 with the spec at
+rev 0.3. Worked design examples: `reports/design_examples.md`.
 
 ## 0. Event requirements (kept apart from the kit's advice)
 
@@ -145,6 +146,49 @@ is **not** evidence that Qloo improved quality.
 - Seven brands, and a lexicon partly written on five of them, support no
   general claim.
 
+## 2c. Stage 5: interface, verified materials, and LLM prose
+
+**Web flow** (`python3 -m motif.web`, stdlib server, vanilla JS):
+
+1. Start: one brand field plus two example buttons (MUJI, Ralph Lauren) that
+   start the real flow.
+2. Entity choice when Qloo's search is ambiguous: brands can be chosen; stores
+   and other entity types are shown, disabled, with the reason (live check:
+   "Le Labo" offers two shops and the brand "Le Labo Fragrances").
+3. Research: each line is a real controller step read from the server
+   (resolve, own description, related brands, related films, translation,
+   brief), with skip and stop reasons. No percentages or simulated progress.
+4. Result: direction summary; six axes, where an unknown axis has no mark (it
+   is open, not a midpoint); motifs with clickable Qloo phrases (entity, field,
+   JSON position, request, fetch date, and MOTIF's reading kept separate);
+   verified materials with the supplier's own words, MOTIF's interpretation,
+   and the supplier link; the brief; and a provenance panel (Qloo vs MOTIF).
+5. Partial and error states: partial direction, no translation rule,
+   insufficient evidence, research stopped (partial result labelled
+   incomplete), not found, rate or budget caps, server error.
+
+**Verified materials (task T2, palette-0.3).** Seven materials now have
+properties checked against the supplier's full page on 2026-10-06, with URL,
+date, supporting text, and MOTIF's interpretation stored per property. The
+supplier text supports the descriptor; the mapping to an axis is MOTIF's
+design. ISO E SUPER (IFF) stays unverified because iff.com returned HTTP 403
+(bot protection) to the build environment; it is never used live.
+
+**LLM prose.** The brief's wording can be written by `claude-sonnet-5-5`
+(configurable, never switched silently). The model receives only the engine
+result (no raw Qloo bodies, IDs, or scores), cannot choose motifs, targets, or
+materials, and its text is validated against the result; otherwise the
+labelled template is shown. Stage-5 real calls: 3 (one model check; two MUJI
+briefs, the first from the command line and the second from the web interface:
+1,102 and 1,178 input tokens, 313 and 314 output tokens, estimated $0.0053 and
+$0.0055 at the listed $2 / $10 per million tokens). Both briefs passed
+validation on the first attempt.
+
+**Live check of the interface (2026-10-06).** 8 live Qloo requests in total:
+MUJI (search, own entry, related brands, related films) and Le Labo (search,
+then, after choosing the brand, own entry, related brands, related films; the
+search was not repeated).
+
 ## 3. Redacted request-to-result explanation
 
 Example from the full live run `live-20261006T103307Z-660d` (request `req 0011`; the credential is never stored):
@@ -211,9 +255,20 @@ Result:
 
 ## 4. Demo or screenshots
 
-A hosted demo is required by the official rules (section 0), so MOTIF will be
-deployed (`MOTIF_BUILD_SPEC.md`, section 15). The provider is chosen in stage 5.
-Screenshots: TBD (stage 6). They must contain no credential and no personal data.
+A hosted demo is required by the official rules (section 0). Stage 5 chose a
+Render free web service (`render.yaml`, README "Hosting"): it keeps keys
+server-side as environment variables and needs no paid plan. Deployment needs
+the owner's Render account; the URL is added here once it is live.
+
+Server variables (names only): `QLOO_API_KEY`, `MOTIF_ANTHROPIC_API_KEY`
+(optional), `MOTIF_LLM_MODEL`, `MOTIF_LLM_MAX_CALLS`,
+`MOTIF_QLOO_MAX_CALLS_PER_DAY`, `MOTIF_WEB_SESSIONS_PER_DAY`,
+`MOTIF_WEB_SESSIONS_PER_IP_HOUR`.
+
+Screenshots of the start, result, and partial screens were taken in the local
+preview. Result screenshots show recorded Qloo data, so they are not committed
+until data sharing is confirmed (section 6). They must contain no credential and
+no personal data.
 
 ## 5. Setup from a clean environment
 
@@ -225,7 +280,8 @@ python3 -m unittest                                   # offline tests; network b
 # with the hackathon key in the environment (QLOO_API_KEY, or a proxy-injected credential):
 python3 -m motif_spike check                          # must say READY
 python3 -m motif run --reference "MUJI" --type brand  # live research, at most 4 Qloo requests for a resolved brand
-# optional LLM prose: pip install anthropic; set MOTIF_LLM_PROVIDER=anthropic, MOTIF_LLM_MODEL=<model>, ANTHROPIC_API_KEY
+# optional LLM prose: pip install -r requirements.txt; set MOTIF_ANTHROPIC_API_KEY (model default claude-sonnet-5-5)
+python3 -m motif.web                                  # web interface on http://127.0.0.1:8000
 ```
 
 A clean clone has no recordings (`data/` is git-ignored), so `--recorded` needs
@@ -281,4 +337,15 @@ Known from the feasibility stage (`reports/feasibility.md`):
     public repository or demo is not addressed by the kit's `API_ACCESS.md`.
     Raw data stays private (`data/` is git-ignored); only small curated
     excerpts are committed. Organizer confirmation is pending.
-- Limitations of the final product: TBD (stages 5–6)
+- Stage 5 additions:
+  - **Post-hoc lexicon fixes.** Lexicon-0.3 (technique nouns in film and
+    artist tags; "lush" needs a design context; "precise" no longer counted as
+    common) was written after seeing the held-out brands. Le Labo and Patagonia
+    are therefore no longer independent validation; a new held-out set is needed.
+  - **One material unverified.** ISO E SUPER could not be read from iff.com
+    (HTTP 403, bot protection). Axis mappings of verified materials remain
+    MOTIF's design, not supplier claims.
+  - **Hosting limits.** On the free instance, sessions live in memory and are
+    lost when the service sleeps; daily caps restart with the process; the
+    per-IP limit trusts the first `X-Forwarded-For` entry (best effort).
+- Limitations of the final product: TBD (stage 6)

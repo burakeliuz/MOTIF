@@ -94,7 +94,7 @@ def cmd_run(args) -> int:
                "message": outcome.get("message")}
     brief = None
     if outcome.get("result") is not None and outcome["status"] == "completed":
-        llm = writer_from_env(os.environ)
+        llm = writer_from_env(os.environ, ledger_path=root / "llm_calls.jsonl")
         session["llm_status"] = llm["status"]
         prose = write_prose(outcome["resolution"].get("name") or args.reference, outcome["result"], llm["writer"])
         brief = build_brief(session, outcome["result"], prose)
@@ -222,6 +222,22 @@ def _compare_text(reference: str, r: Dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def cmd_llm_check(args) -> int:
+    """One real API call to confirm the configured model is available (counted in the call ledger)."""
+    root = data_root(args.data_dir)
+    llm = writer_from_env(os.environ, ledger_path=root / "llm_calls.jsonl")
+    if llm["writer"] is None:
+        print(llm["status"])
+        return 2
+    try:
+        info = llm["writer"].check_model()
+    except Exception as exc:
+        print(f"model check failed: {type(exc).__name__} (the model is NOT switched automatically)")
+        return 4
+    print(f"model available: {info['id']} ({info.get('display_name')}); calls today: {llm['writer'].ledger.calls_today()}")
+    return 0
+
+
 def main(argv: Optional[List[str]] = None) -> int:
     parser = argparse.ArgumentParser(prog="python3 -m motif", description="MOTIF engine: Qloo evidence to a perfumer brief.")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -239,7 +255,11 @@ def main(argv: Optional[List[str]] = None) -> int:
         if name == "run":
             p.add_argument("--resolve-conflict", action="append", help="AXIS=POLE or AXIS=open (answer to a conflict question)")
             p.add_argument("--max-requests", type=int, help="network attempt budget for a live session")
+    p = sub.add_parser("llm-check", help="one real API call: is the configured LLM model available?")
+    p.add_argument("--data-dir")
     args = parser.parse_args(argv)
+    if args.command == "llm-check":
+        return cmd_llm_check(args)
     try:
         return cmd_run(args) if args.command == "run" else cmd_compare(args)
     except ValueError as exc:

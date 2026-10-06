@@ -1,0 +1,29 @@
+# Render Blueprint for the MOTIF hosted demo: one free Python web service.
+# Fields checked against https://render.com/docs/blueprint-spec (2026-10-06).
+# No secret values belong here. Variables marked `sync: false` are asked for in
+# the Render Dashboard when the Blueprint is created; enter them there.
+services:
+  - type: web
+    name: motif
+    runtime: python
+    plan: free
+    branch: main
+    autoDeploy: false
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m motif.web --host 0.0.0.0 --port $PORT
+    healthCheckPath: /healthz
+    envVars:
+      - key: QLOO_API_KEY          # Qloo hackathon key (secret)
+        sync: false
+      - key: MOTIF_ANTHROPIC_API_KEY  # Anthropic key for brief prose (secret; optional)
+        sync: false
+      - key: MOTIF_LLM_MODEL
+        value: claude-sonnet-5-5
+      - key: MOTIF_LLM_MAX_CALLS     # LLM calls per UTC day; template prose after that
+        value: "40"
+      - key: MOTIF_QLOO_MAX_CALLS_PER_DAY
+        value: "200"
+      - key: MOTIF_WEB_SESSIONS_PER_DAY
+        value: "60"
+      - key: MOTIF_WEB_SESSIONS_PER_IP_HOUR
+        value: "8"

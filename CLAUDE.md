@@ -1,6 +1,6 @@
 # MOTIF working notes for Claude Code
 
-Current phase: **stage 4 done** (engine and research flow from the command line, `motif/`; spec accepted at rev 0.2 on 2026-10-06). Next: stage 5 (interface and hosting). Known blocker: material verification (T2).
+Current phase: **stage 5 done** (web interface `motif/web/`, palette-0.3 with 7 of 8 materials verified, lexicon-0.3, engine-0.3, LLM prose; spec rev 0.3 on 2026-10-06). Hosting files are ready for Render; the deploy needs the owner's account. Next: stage 6 (clean-environment test, demo, Devpost texts).
 Read `MOTIF_QLOO_FEASIBILITY.md` (rev 0.2) and `MOTIF_BUILD_SPEC.md` before
 changing anything. Then read `README.md`, `docs/QLOO_ACCESS_NOTES.md`,
 `reports/feasibility.md`, `reports/design_examples.md`, and `reports/holdout_t1.md`.
@@ -25,7 +25,7 @@ One Claude Code cloud session per stage; each stage ends with tests, a push to t
 2. Live Qloo test: pilot, then full plan after the owner's OK; `reports/feasibility.md`; a small curated evidence excerpt in `reports/`; `docs/SUBMISSION_NOTES.md` skeleton.
 3. Product decisions: `MOTIF_BUILD_SPEC.md` written (runtime LLM optional, Python stdlib web stack, hosted demo required by the official rules). The spike rules below end when the owner accepts this spec.
 4. Engine and agentic flow, end to end from the command line.
-5. Interface and hosting (the spec chose hosting: the official rules require a hosted demo).
+5. Interface and hosting: done (Render free web service prepared in `render.yaml`; deployed URL pending the owner's account).
 6. Clean-environment setup test, demo, and Devpost texts.
 
 Every stage adds to `docs/SUBMISSION_NOTES.md`, mapped to the six items of the kit's submission guide (see `docs/QLOO_ACCESS_NOTES.md`).
@@ -33,6 +33,7 @@ Every stage adds to `docs/SUBMISSION_NOTES.md`, mapped to the six items of the k
 ## Commands
 
 - `python3 -m unittest`: run before every commit.
+- `python3 -m motif.web [--recorded RUN_DIR ...]` (local preview: `--recorded` replays stored runs, labelled; never in the public demo) and `python3 -m motif llm-check` (one real Anthropic call)
 - `python3 -m motif run --reference NAME [--type brand|any] [--choose ID] [--recorded RUN] [--include-artist] [--allow-unverified-materials]` and `python3 -m motif compare --reference NAME --recorded RUN`
 - `python3 -m motif_spike check | plan --plan pilot | run --mode synthetic | run --mode live --plan pilot|full | renormalize --run latest-live | excerpt --run latest-live`
 
@@ -47,6 +48,8 @@ Every stage adds to `docs/SUBMISSION_NOTES.md`, mapped to the six items of the k
 - Scores are reported as returned: no percentages, no cross-request averaging, no "lift".
 - The spec was accepted for stage 4 (rev 0.2). Build in its order: interface and hosting in stage 5, without changing engine decisions in the UI. `motif_spike/` stays intact.
 - Research control is a deterministic state machine (`motif/agent.py`). The LLM writes validated prose only; giving it tool choice needs the owner's approval.
+- LLM: key only from `MOTIF_ANTHROPIC_API_KEY`; default `claude-sonnet-5-5`; never switch models silently; every real call goes through the ledger (`data/llm_calls.jsonl`). A failed call or invalid text shows the labelled template, never as LLM output.
+- Web: keys stay server-side; the UI never builds HTML from data; no fake progress; identical requests and answers must not repeat Qloo or LLM calls.
 - Live matching uses only material properties with `verified_full_page`; unverified ones appear only in the labelled design preview.
 - Held-out brands used once (T1: Le Labo, Patagonia) are no longer independent validation.
 - `config/motif_lexicon.json`, `config/material_palette.json`, and `config/draft_rules.json` are versioned design rules: change them only with a version bump and a written reason. Material profiles are MOTIF's creative mapping; supplier descriptors stay in `source` and are not verified in full until task T2.

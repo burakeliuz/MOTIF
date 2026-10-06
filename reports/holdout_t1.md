@@ -197,3 +197,29 @@ Each needs a new lexicon version and fresh held-out brands to evaluate:
    must be justified first.
 4. Re-compute commonness with a larger reference set; "clean lines" is a
    candidate common cue.
+
+## 3. Post-hoc re-run with lexicon-0.3 and palette-0.3 (stage 5; NOT independent validation)
+
+Sections 1 and 2 stay as written. After reading those results, stage 5 applied
+changes 1 and 2 of §2.5 as general rules (lexicon-0.3: technique nouns in film
+and artist tags are context, not cues; "lush" needs a design context such as
+costume, set, interior, or fabric) and verified seven palette materials
+(palette-0.3). Because the rules were changed after seeing these two brands,
+the numbers below show that the fixes do what they were written to do; they do
+not validate the lexicon. Fresh held-out brands are needed for that.
+
+Re-run on the same recorded T1 sessions (no new requests), engine-0.3:
+
+| Brand | Outcome | Targets (strength; relations only?) | Set aside by context rules | Materials |
+|---|---|---|---|---|
+| Le Labo (brand "Le Labo Fragrances", chosen) | `composed` | light (moderate; yes), polished (moderate; yes) | "Lush", "Handheld intimacy" | M02 top, M01 heart, M05 base (verified properties only) |
+| Patagonia | `partial_direction` | natural (moderate; no) | "Lush", "Minimalist framing", "Sparse interviewing", "Sparse lyrical editing" | none (one axis is below the two-axis threshold) |
+
+- The targets are the same as in the first evaluation; what changed is that
+  the misread phrases no longer count as support, and Le Labo now gets
+  materials because verified properties exist.
+- Changes 3 and 4 of §2.5 (cue groups for "neutral tones" and "functional";
+  re-computing commonness) are still not applied.
+- A live web run for "Le Labo" on 2026-10-06 (stage-5 interface check, 4
+  requests) gave the same choice question (two shops, one brand) and the same
+  result.

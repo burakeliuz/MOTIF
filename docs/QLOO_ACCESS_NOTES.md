@@ -220,3 +220,13 @@ The harness type list: `urn:entity:movie`, `tv_show`, `book`, `brand`, `artist`,
 `place`. MOTIF's candidate domains map to brand, movie, artist, book, person,
 and place. Whether each is available under the event credential is *open*
 until the pilot.
+
+## Stage 5: web server access (2026-10-06)
+
+- The web server (`motif/web/server.py`) uses the same direct transport and
+  `motif/qloo.py` wrapper as the CLI; there is no new integration.
+- On a host outside the Claude Code cloud environment (for example Render), the
+  key must be set as the server variable `QLOO_API_KEY`; nothing is carried over
+  from the build environment.
+- Stage-5 live use: 8 requests on 2026-10-06 (MUJI 4; Le Labo 4, where the
+  answer to the entity question reused the cached search).

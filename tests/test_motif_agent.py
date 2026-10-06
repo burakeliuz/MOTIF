@@ -208,9 +208,37 @@ class Prose(unittest.TestCase):
 
     def test_without_llm_configuration_the_template_is_used(self):
         self.assertIsNone(writer_from_env({})["writer"])
-        self.assertIn("MOTIF_LLM_MODEL", writer_from_env({"MOTIF_LLM_PROVIDER": "anthropic"})["status"])
-        self.assertIsNone(writer_from_env({"MOTIF_LLM_PROVIDER": "anthropic", "MOTIF_LLM_MODEL": "x"})["writer"])
+        # only MOTIF's own variable is read; the SDK's default variable is ignored
+        self.assertIsNone(writer_from_env({"ANTHROPIC_API_KEY": "x"})["writer"])
+        self.assertIsNone(writer_from_env({"MOTIF_ANTHROPIC_API_KEY": "x", "MOTIF_LLM_PROVIDER": "off"})["writer"])
 
+    def test_default_model_and_explicit_key(self):
+        try:
+            import anthropic  # noqa: F401
+        except ImportError:
+            self.skipTest("anthropic SDK not installed")
+        out = writer_from_env({"MOTIF_ANTHROPIC_API_KEY": "test-not-a-key"})
+        self.assertEqual(out["writer"].model, "claude-sonnet-5-5")
+        self.assertEqual(writer_from_env({"MOTIF_ANTHROPIC_API_KEY": "t", "MOTIF_LLM_MODEL": "m"})["writer"].model, "m")
+
+    def test_call_budget_and_api_errors_fall_back_to_labelled_template(self):
+        from motif.llm import AnthropicProseWriter, CallLedger
+
+        class FailingClient:
+            class messages:
+                @staticmethod
+                def create(**kw):
+                    raise ConnectionError("network down")
+
+        ledger = CallLedger(None, 1)
+        writer = AnthropicProseWriter("k", "claude-sonnet-5-5", client=FailingClient(), ledger=ledger)
+        out = write_prose("Synthbrand", self.result, writer)
+        self.assertEqual(out["author"], "template")
+        self.assertIn("call failed", out["note"])
+        self.assertEqual(ledger.calls_today(), 1)  # the failed call is still counted
+        out2 = write_prose("Synthbrand", self.result, writer)  # budget of 1 now exhausted: no call at all
+        self.assertEqual(out2["llm"]["attempts"][0]["error"], "BudgetExhausted")
+        self.assertEqual(ledger.calls_today(), 1)
 
 if __name__ == "__main__":
     unittest.main()

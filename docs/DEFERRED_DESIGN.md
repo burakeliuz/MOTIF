@@ -96,3 +96,15 @@ left open. Each states why and the smallest step that would unblock it.
 | Lexicon changes suggested by T1 | Proposed in `reports/holdout_t1.md` §2.5, not applied | Apply as lexicon-0.3 and evaluate on fresh held-out brands (T1 brands are no longer independent) |
 | Cross-session cache | In-session cache and explicit recorded replay only | Decide with hosting (stage 5): key by transport, base URL, and full request signature; label cached results with their fetch time |
 | Publishing recorded Qloo data | Unresolved: the kit's API_ACCESS.md does not address it | The owner asks the organizers; until then the public demo has no recorded mode |
+
+## Stage-5 status of deferred items (2026-10-06)
+
+| Item | Status | Smallest next step |
+|---|---|---|
+| T2 material verification | Done for 7 of 8 materials (palette-0.3). ISO E SUPER blocked: www.iff.com returned HTTP 403 (Cloudflare bot protection); not bypassed | The owner opens the IFF ISO E SUPER page by hand and records the supporting text, or the material stays unverified |
+| Lexicon changes 1 and 2 from T1 | Applied as lexicon-0.3 (general context rules) | Evaluate on fresh held-out brands; T1 brands are no longer independent |
+| Lexicon changes 3 and 4 from T1 | Not applied | Justify any motif for "neutral tones" or "functional" first; recompute commonness on a larger reference set |
+| Cross-session cache | Still in-session only; the web server dedupes identical requests for 30 minutes and answers reuse their parent's cache | Revisit only if the hosted demo hits the daily Qloo cap |
+| Publishing recorded Qloo data | Still unresolved; recorded mode is a local-preview flag only | The owner asks the organizers |
+| Bounded LLM tool selection | Still not implemented (the LLM writes prose only) | Owner decision |
+| Persistent web sessions | In memory; lost when the free instance sleeps | Only if judges need shareable result links |

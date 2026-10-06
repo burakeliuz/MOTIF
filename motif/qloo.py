@@ -135,21 +135,26 @@ class RecordedQloo(QlooAccess):
 
     label = "recorded"
 
-    def __init__(self, recording_dir: Path, session_dir: Optional[Path], max_requests: int):
+    def __init__(self, recording_dir, session_dir: Optional[Path], max_requests: int):
+        """`recording_dir` is one directory or a list of them (indexes are merged; the first one wins)."""
         super().__init__(session_dir, max_requests)
-        self.recording_dir = Path(recording_dir)
+        dirs = [Path(d) for d in (recording_dir if isinstance(recording_dir, (list, tuple)) else [recording_dir])]
+        self.recording_dir = dirs[0]
+        self.recording_dirs = dirs
         self.index: Dict[str, Dict[str, Any]] = {}
         meta_file = self.recording_dir / "run.json"
         self.recording_meta = read_json(meta_file) if meta_file.exists() else {}
-        root = self.recording_dir.parent.parent  # data/raw/<run> -> data
-        for row in read_jsonl(self.recording_dir / "requests.jsonl"):
-            if row.get("status") not in SUCCESS or not row.get("response_ref"):
-                continue
-            ref = row["response_ref"]
-            # motif_spike runs store paths relative to the data root; motif sessions relative to the session
-            path = (root / ref) if ref.startswith("raw/") else (self.recording_dir / ref)
-            self.index[row.get("replay_signature") or row["signature"]] = {"path": path, "request_id": row["request_id"],
-                                            "fetched_at": row.get("finished_at") or row.get("fetched_at")}
+        for rec_dir in dirs:
+            root = rec_dir.parent.parent  # data/raw/<run> -> data
+            for row in read_jsonl(rec_dir / "requests.jsonl"):
+                if row.get("status") not in SUCCESS or not row.get("response_ref"):
+                    continue
+                ref = row["response_ref"]
+                # motif_spike runs store paths relative to the data root; motif sessions relative to the session
+                path = (root / ref) if ref.startswith("raw/") else (rec_dir / ref)
+                self.index.setdefault(row.get("replay_signature") or row["signature"],
+                                      {"path": path, "request_id": row["request_id"], "run": rec_dir.name,
+                                       "fetched_at": row.get("finished_at") or row.get("fetched_at")})
 
     def cache_namespace(self) -> str:
         return "direct"  # recordings are keyed exactly like live direct-transport requests
@@ -162,8 +167,7 @@ class RecordedQloo(QlooAccess):
         body = json.loads(Path(hit["path"]).read_text(encoding="utf-8"))
         rec.update(status=classify(operation, _Replay(json.dumps(body))).status, body=body,
                    fetched_at=hit["fetched_at"], response_ref=str(hit["path"]),
-                   recorded_from={"run_id": self.recording_meta.get("run_id") or self.recording_dir.name,
-                                  "request_id": hit["request_id"]})
+                   recorded_from={"run_id": hit.get("run") or self.recording_dir.name, "request_id": hit["request_id"]})
 
 
 class _Replay:

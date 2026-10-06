@@ -1,5 +1,11 @@
 # MOTIF design examples (stage 3)
 
+> **Stage-5 note:** with palette-0.3 (verified properties only) and
+> lexicon-0.3, the live engine composes MUJI from Bergamot oil (top), HEDIONE
+> (heart), and HABANOLIDE (base), not ISO E SUPER, which stays unverified.
+> Ralph Lauren gets AMBROX SUPER and HABANOLIDE (base). The design-preview chains
+> below are kept as written for stage 3.
+
 > **Stage-4 note:** the engine (`motif/`, engine-0.2, lexicon-0.2) now
 > reproduces the MUJI and Ralph Lauren chains below in its labelled design
 > preview (`python3 -m motif run --reference MUJI --recorded

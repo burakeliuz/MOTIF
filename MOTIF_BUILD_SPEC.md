@@ -1,6 +1,6 @@
 # MOTIF build specification
 
-Revision 0.2 · 2026-10-06 · accepted by the owner for stage 4 with the changes in section 0 · Owner: Burak Eliuz
+Revision 0.3 · 2026-10-06 · rev 0.2 accepted by the owner for stage 4; rev 0.3 records the stage-5 decisions (section 0b) · Owner: Burak Eliuz
 
 This document turns the stage-2 findings (`reports/feasibility.md`,
 recommendation **narrow**) into a buildable MVP. It is the contract for
@@ -32,6 +32,22 @@ otherwise, this section wins.
 | Lexicon | lexicon-0.1 | lexicon-0.2: negation guard; the own-only route counts cue groups | Owner requirements: negations and synonym or duplicate inflation |
 | Entity question | Offers exact-name candidates | engine-0.2 also offers every returned candidate of the requested type | T1 defect: the "Le Labo" brand came back as "Le Labo Fragrances" |
 | Cross-session cache | 24 h | In-session only; recorded replay is explicit (`--recorded`) | Smallest safe behaviour; revisit for hosting (stage 5) |
+
+## 0b. Revision 0.3: stage-5 decisions
+
+Where a later section still says otherwise, this section wins.
+
+| Topic | Before | Rev 0.3 (implemented) | Why |
+|---|---|---|---|
+| Materials | palette-0.2, nothing verified | palette-0.3: 7 of 8 materials have properties checked on the supplier's full page (URL, date, supporting text, MOTIF interpretation per property). ISO E SUPER stays unverified (iff.com HTTP 403) | Task T2; only `verified_full_page` properties drive live matching |
+| Lexicon | lexicon-0.2 | lexicon-0.3: technique nouns in film and artist tags are excluded as context; "lush" counts only with a design context; "precise" removed from the common list | General fixes for T1 misreads, no brand-specific exceptions. Le Labo and Patagonia stop being independent validation |
+| Corroborating fetches | engine-0.2 skipped movies when no motif was "decisive" | engine-0.3: related films (and artists) are skipped only when no motif has anchored support below "strong", i.e. when the fetch provably cannot change the result | The earlier skip could hide a change of outcome (Nike: an anchored, weak "heritage") |
+| LLM | No implicit model; never called | Default `claude-sonnet-5-5`, overridable with `MOTIF_LLM_MODEL`, key read only from `MOTIF_ANTHROPIC_API_KEY`; `max_retries=0`, timeout 30 s, 1,500 output tokens; no server-side model fallback; every call logged with usage and estimated cost (`data/llm_calls.jsonl`) with a daily cap | Owner's stage-5 brief; no silent switch to a more expensive model |
+| Web API | `/api/session` (+ `/answer`) | `POST /api/sessions` with `{reference, type, choose?, parent?, resolve_conflict?}`; `GET /api/sessions/{id}`; `GET /api/sessions/{id}/brief.json`; `GET /api/config`; `GET /healthz`. An answer is a new session that reuses its parent's Qloo cache | One endpoint shape for every step; answers never repeat requests |
+| Screens | Type selector; trace with "agent decision" labels | Brand input only; steps read from the controller trace; evidence opens in a dialog with Qloo and MOTIF parts kept apart; unknown axes have no mark | Owner's MVP scope (brands only) |
+| Recorded mode | A button in the public demo | Local preview only (`--recorded` flag); off in the hosted demo until data sharing is confirmed | Owner: local recordings are not public demo data |
+| Hosting | Candidates | Render free web service (`render.yaml`, Python from `.python-version`), keys as Render environment variables | Free instance, secrets server-side, no paid plan |
+| Runtime | Python 3.11 container | Python 3.13 (matches the build environment); engine still stdlib-only, `anthropic==1.11.0` the only dependency | Fewer moving parts |
 
 ## 1. Decision
 
