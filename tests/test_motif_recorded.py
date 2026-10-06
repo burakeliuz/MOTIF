@@ -62,10 +62,13 @@ class ReferenceBrands(unittest.TestCase):
                 raw = resolve_pointer(bodies[item["request_id"]], item["json_pointer"])
                 self.assertEqual(raw["name"], item["tag_name"])
 
-    def test_muji_without_verified_materials_proposes_none(self):
+    def test_muji_verified_only_uses_verified_properties_and_flags_extras(self):
         out, _ = run(STAGE2, "MUJI")
-        self.assertEqual(out["result"]["outcome"], "no_verified_materials")
-        self.assertEqual(out["result"]["materials"]["selected"], [])
+        mats = out["result"]["materials"]
+        self.assertEqual(mats["verification_mode"], "verified_only")
+        self.assertEqual([(m["slot"], m["material_id"]) for m in mats["selected"]], [("top", "M02"), ("heart", "M01"), ("base", "M05")])
+        extras = {m["material_id"]: [u["pole"] for u in m["unrequested_properties"]] for m in mats["selected"]}
+        self.assertEqual(extras, {"M02": ["sweet"], "M01": ["projecting"], "M05": ["warm"]})
 
     def test_ralph_lauren_dense_is_flagged_relations_only(self):
         out, _ = run(STAGE2, "Ralph Lauren", allow_unverified=True)
@@ -84,7 +87,8 @@ class ReferenceBrands(unittest.TestCase):
         self.assertEqual(a24["unmapped_active_motifs"], ["provocative"])
         nike, _ = run(STAGE2, "Nike")
         self.assertEqual(nike["result"]["outcome"], "insufficient_evidence")
-        self.assertEqual(next(t for t in nike["trace"] if t["action"] == "fetch_related:movie")["decision"], "skip")
+        # heritage has anchored (brand) support below strong, so movies are fetched, not skipped
+        self.assertEqual(next(t for t in nike["trace"] if t["action"] == "fetch_related:movie")["decision"], "fetched")
 
 
 class HeldOutBrands(unittest.TestCase):
@@ -109,6 +113,11 @@ class HeldOutBrands(unittest.TestCase):
         out, _ = run(rec, "Patagonia", allow_unverified=True)
         self.assertEqual(out["result"]["outcome"], "partial_direction")
         self.assertEqual(targets(out["result"]), {"natural_synthetic": "natural"})
+        # lexicon-0.3: the T1 misreads no longer count as support (post-hoc fix; not independent validation)
+        evidence = {e["evidence_id"]: e["tag_name"] for e in out["result"]["evidence"]}
+        motifs = out["result"]["motifs"]
+        supported = {evidence[i] for m in ("opulent", "restrained") if m in motifs for i in motifs[m]["support_evidence_ids"]}
+        self.assertFalse({"Lush", "Sparse interviewing", "Sparse lyrical editing"} & supported)
 
 
 if __name__ == "__main__":

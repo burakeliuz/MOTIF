@@ -1,6 +1,6 @@
 {
-  "lexicon_version": "lexicon-0.2",
-  "status": "frozen_for_t1",
+  "lexicon_version": "lexicon-0.3",
+  "status": "active",
   "provenance_category": "design_rule (classification rule, human-authored)",
   "notice": "Authored in stage 3 after reading the five stage-2 seeds; it is therefore tuned on them and must be checked on held-out brands (MOTIF_BUILD_SPEC.md, stage-4 task T1). Cue words are classification rules, not Qloo labels. Weights and thresholds are design parameters, not validated statistics.",
   "match": {
@@ -52,7 +52,66 @@
       "anti",
       "never"
     ],
-    "negation_window_tokens": 2
+    "negation_window_tokens": 2,
+    "context_rules": {
+      "note": "General context rules (lexicon-0.3). They never name a brand. A cue that cannot be read safely is recorded as excluded_context with its reason and never counts.",
+      "technique_nouns": {
+        "sources": [
+          "movie",
+          "artist"
+        ],
+        "nouns": [
+          "editing",
+          "edit",
+          "edits",
+          "interviewing",
+          "interview",
+          "interviews",
+          "framing",
+          "camera",
+          "camerawork",
+          "cinematography",
+          "take",
+          "takes",
+          "montage",
+          "cuts",
+          "cutting",
+          "pacing",
+          "choreography",
+          "shot",
+          "shots",
+          "close up",
+          "close ups",
+          "handheld",
+          "narration",
+          "sound design",
+          "mixing",
+          "voiceover"
+        ]
+      },
+      "ambiguous_cues": {
+        "lush": {
+          "requires_any": [
+            "costume",
+            "costumes",
+            "production design",
+            "set",
+            "sets",
+            "interior",
+            "interiors",
+            "decor",
+            "fabric",
+            "fabrics",
+            "textile",
+            "textiles",
+            "ornament",
+            "ornaments",
+            "wardrobe"
+          ],
+          "why": "'lush' describes vegetation and landscapes as often as richness; without a design context it cannot be read safely"
+        }
+      }
+    }
   },
   "cue_groups": {
     "restrained": [
@@ -376,10 +435,14 @@
     "common_cue_groups_in_reference_set": [
       "intimate",
       "minimalist",
-      "playful",
-      "precise"
+      "playful"
     ],
-    "note": "Frozen per lexicon version so that a single user query is scored against a fixed reference, not against itself."
+    "note": "Frozen per lexicon version so that a single user query is scored against a fixed reference, not against itself.",
+    "recomputed": {
+      "lexicon": "lexicon-0.3",
+      "date": "2026-10-06",
+      "note": "'precise' is no longer common: its matches for Nike and Ralph Lauren were technique phrases ('Precision choreography', 'Precision editing') that lexicon-0.3 excludes."
+    }
   },
   "support": {
     "source_kinds": [
@@ -422,6 +485,17 @@
         "Own-only route to 'moderate' counts distinct cue groups instead of distinct tag IDs, so the same cue word in two own tags (for example 'Classic Tailoring' and 'Classic') is not counted twice."
       ],
       "effect_on_stage3_examples": "No sensory target changes for the five reference seeds; Ralph Lauren seed-only 'heritage' (an unmapped motif) drops from moderate to weak."
+    },
+    {
+      "version": "lexicon-0.3",
+      "date": "2026-10-06",
+      "before_t1": false,
+      "changes": [
+        "Technique rule: in movie and artist style tags, a cue does not count when the tag names a production technique (editing, interviewing, framing, takes, choreography, close ups, ...).",
+        "Ambiguity rule: the cue 'lush' counts only with a design context (costume, set, interior, ...).",
+        "Commonness recomputed on the same five reference seeds under these rules (see commonness)."
+      ],
+      "trigger": "Misreads seen on the T1 held-out brand Patagonia ('Lush' mountain films, 'Sparse interviewing'). Le Labo and Patagonia are therefore not independent validation of lexicon-0.3."
     }
   ]
 }

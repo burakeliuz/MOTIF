@@ -61,14 +61,25 @@ class ControllerFlow(unittest.TestCase):
         targets = {a: v["value"] for a, v in out["result"]["axes"].items() if v["state"] == "target"}
         self.assertEqual(targets, {"light_dense": "light", "raw_polished": "polished", "natural_synthetic": "natural"})
 
-    def test_corroborating_domain_is_skipped_when_it_cannot_change_the_result(self):
-        own = entities_body(SEED, "Synthbrand", [("Provocative", TONE), ("Edgy", TONE)])  # only an unmapped motif
+    def test_corroborating_domain_is_skipped_only_when_provably_useless(self):
+        own = entities_body(SEED, "Synthbrand", [("Typewriter Font", AESTHETIC)])  # no cue at all
         transport = FakeTransport(routes(own=own, brand=insights_body([])))
         out = Controller(live(transport), CONFIG, "Synthbrand").run()
         movie_step = next(t for t in out["trace"] if t["action"] == "fetch_related:movie")
         self.assertEqual(movie_step["decision"], "skip")
+        self.assertIn("cannot change", movie_step["reason"])
         self.assertFalse(any("urn:entity:movie" in c for c in transport.calls))
-        self.assertEqual(out["outcome"], "no_translation_rule")  # data exists, rule missing
+
+    def test_unmapped_anchored_motif_still_justifies_the_fetch(self):
+        # An unmapped motif with anchored support can change the outcome, so movies must be fetched.
+        own = entities_body(SEED, "Synthbrand", [("Classic", TONE)])
+        movie = insights_body([("SYN-M1", "SYN Film", [("Timeless", STYLE)])])
+        transport = FakeTransport(routes(own=own, brand=insights_body([]), movie=movie))
+        out = Controller(live(transport), CONFIG, "Synthbrand").run()
+        movie_step = next(t for t in out["trace"] if t["action"] == "fetch_related:movie")
+        self.assertEqual(movie_step["decision"], "fetched")
+        self.assertEqual(out["result"]["motifs"]["heritage"]["strength"], "moderate")
+        self.assertEqual(out["outcome"], "no_translation_rule")  # would have been insufficient_evidence if skipped
 
     def test_ambiguous_name_asks_and_offers_requested_type_candidates(self):
         search = search_body([("SYN-P1", "Synthbrand", "urn:entity:place"), ("SYN-P2", "Synthbrand", "urn:entity:place"),

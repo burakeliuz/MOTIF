@@ -30,6 +30,12 @@ class Lexicon:
         self.negators = set(match.get("negators", []))
         self.negation_window = int(match.get("negation_window_tokens", 0))
         self.common = set(lexicon["commonness"]["common_cue_groups_in_reference_set"])
+        context = match.get("context_rules", {})
+        technique = context.get("technique_nouns", {})
+        self.technique_sources = set(technique.get("sources", []))
+        self.technique_nouns = {tuple(n.split()) for n in technique.get("nouns", [])}
+        self.ambiguous = {cue: {tuple(w.split()) for w in rule["requires_any"]}
+                          for cue, rule in context.get("ambiguous_cues", {}).items()}
         self.params = lexicon["support"]["parameters"]
         # (motif, cue_id, variant tokens), longest variants first so that a phrase wins over its parts
         entries: List[Tuple[str, str, Tuple[str, ...]]] = []
@@ -38,6 +44,26 @@ class Lexicon:
                 for variant in group["variants"]:
                     entries.append((motif, group["cue_id"], tuple(variant.split())))
         self.entries = sorted(entries, key=lambda e: (-len(e[2]), e[0], e[1], e[2]))
+
+    @staticmethod
+    def _contains(tokens: List[str], phrases) -> List[str]:
+        hits = []
+        for phrase in phrases:
+            n = len(phrase)
+            if any(tuple(tokens[i:i + n]) == phrase for i in range(len(tokens) - n + 1)):
+                hits.append(" ".join(phrase))
+        return sorted(hits)
+
+    def context_exclusion(self, tag_name: str, source_kind: str, cue_id: str) -> str:
+        """Reason a matched cue cannot be read safely in this tag, or '' when it can."""
+        tokens = normalize_text(tag_name)
+        if source_kind in self.technique_sources:
+            nouns = self._contains(tokens, self.technique_nouns)
+            if nouns:
+                return f"describes production technique ({', '.join(nouns)}), not the look or tone"
+        if cue_id in self.ambiguous and not self._contains(tokens, self.ambiguous[cue_id]):
+            return f"'{cue_id}' is ambiguous here (no design context such as costume, set, or interior)"
+        return ""
 
     def match(self, tag_name: str) -> Dict[str, Any]:
         """Return {'status': ..., 'matches': [(motif, cue_id, negated)]} for one tag name."""
@@ -75,8 +101,11 @@ def classify(evidence: Sequence[Dict[str, Any]], lexicon: Lexicon) -> Dict[str, 
             unmatched += 1
             continue
         for motif, cue_id, negated in result["matches"]:
+            excluded = lexicon.context_exclusion(item["tag_name"], item["source_kind"], cue_id)
             if negated:
                 role = "negated"
+            elif excluded:
+                role = "excluded_context"
             elif cue_id in lexicon.common:
                 role = "context_common_cue"
             else:
@@ -93,6 +122,7 @@ def classify(evidence: Sequence[Dict[str, Any]], lexicon: Lexicon) -> Dict[str, 
                 "source_kind": item["source_kind"],
                 "entity_id": item["entity_id"],
                 "tag_id": item["tag_id"],
+                **({"reason": excluded} if role == "excluded_context" else {}),
             })
     annotations.sort(key=lambda a: (a["motif"], SOURCE_ORDER.index(a["source_kind"]), a["evidence_id"]))
 
@@ -130,5 +160,7 @@ def classify(evidence: Sequence[Dict[str, Any]], lexicon: Lexicon) -> Dict[str, 
             "support_evidence_ids": sorted({a["evidence_id"] for a in support}),
             "context_evidence_ids": sorted({a["evidence_id"] for a in rows if a["role"] == "context_common_cue"}),
             "negated_evidence_ids": sorted({a["evidence_id"] for a in rows if a["role"] == "negated"}),
+            "excluded_evidence": sorted(({"evidence_id": a["evidence_id"], "reason": a["reason"]}
+                                         for a in rows if a["role"] == "excluded_context"), key=lambda x: x["evidence_id"]),
         }
     return {"annotations": annotations, "motifs": motifs, "unmatched_items": unmatched}

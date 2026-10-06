@@ -44,6 +44,24 @@ class Matching(unittest.TestCase):
         # a prefix inside a word is not a negation
         self.assertEqual(LEX.match("Unpretentious")["matches"], [("restrained", "unpretentious", False)])
 
+    def test_technique_phrases_in_media_tags_do_not_count(self):
+        evidence = [ev("own", "S", "Muted", AESTHETIC), ev("movie", "M1", "Sparse interviewing", STYLE),
+                    ev("movie", "M2", "Precision editing", STYLE), ev("movie", "M3", "Restrained long takes", STYLE)]
+        result = run_engine(evidence, CONFIG)
+        info = result["motifs"]["restrained"]
+        self.assertEqual(info["source_kinds"], ["own"])  # none of the technique phrases supports
+        reasons = " ".join(x["reason"] for x in info["excluded_evidence"])
+        self.assertIn("interviewing", reasons)
+        self.assertIn("takes", reasons)
+        # the same word on a brand's aesthetic tag is not a film technique
+        self.assertEqual(LEX.context_exclusion("Sparse Interiors", "brand", "sparse"), "")
+
+    def test_ambiguous_lush_needs_a_design_context(self):
+        self.assertIn("ambiguous", LEX.context_exclusion("Lush", "movie", "lush"))
+        self.assertIn("ambiguous", LEX.context_exclusion("Lush", "brand", "lush"))
+        self.assertEqual(LEX.context_exclusion("Lush costume design", "movie", "lush"), "")
+        self.assertEqual(LEX.context_exclusion("Opulent production design", "movie", "opulent"), "")
+
     def test_genre_names_bare_poles_and_null_are_not_forced(self):
         self.assertEqual(LEX.match("Baroque Pop")["status"], "excluded_pattern")
         self.assertEqual(LEX.match("Raw")["status"], "bare_pole_word")
@@ -120,9 +138,18 @@ class AxesAndOutcomes(unittest.TestCase):
 
 class Materials(unittest.TestCase):
     def test_unverified_properties_are_not_used_by_default(self):
-        result = run_engine(THREE_AXES, CONFIG)
+        nothing_verified = verified_palette(CONFIG, set())
+        result = run_engine(THREE_AXES, nothing_verified)
         self.assertEqual(result["outcome"], "no_verified_materials")
         self.assertEqual(result["materials"]["verification_mode"], "verified_only")
+        preview = run_engine(THREE_AXES, nothing_verified, allow_unverified=True)
+        self.assertEqual(preview["materials"]["verification_mode"], "design_preview_unverified")
+
+    def test_the_live_palette_never_uses_the_unverified_iso_e_super(self):
+        result = run_engine(THREE_AXES, CONFIG)
+        ids = [m["material_id"] for m in result["materials"]["selected"] + result["materials"]["ranked"]]
+        self.assertNotIn("M03", ids)
+        self.assertIn("M03", [m["material_id"] for m in result["materials"]["excluded"]])
 
     def test_only_verified_properties_count(self):
         # verify Hedione's light property only: its unverified 'polished' must neither score nor appear
@@ -130,17 +157,19 @@ class Materials(unittest.TestCase):
         result = run_engine(THREE_AXES, config)
         hedione = next(m for m in result["materials"]["ranked"] if m["material_id"] == "M01")
         self.assertEqual(hedione["usable_profile"], {"light_dense": "light"})
-        self.assertEqual(hedione["unverified_properties"], ["raw_polished"])
+        self.assertEqual(hedione["unverified_properties"], ["intimate_projecting", "raw_polished"])
         self.assertEqual(hedione["matches"], ["light_dense"])
 
     def test_a_partial_match_cannot_outscore_a_full_match(self):
-        result = run_engine(THREE_AXES, CONFIG, allow_unverified=True)
+        result = run_engine(THREE_AXES, CONFIG)
         scores = {m["material_id"]: m["score"] for m in result["materials"]["ranked"]}
-        self.assertGreater(scores["M01"], scores["M03"])  # light+polished beats polished only
-        self.assertEqual([s["material_id"] for s in result["materials"]["selected"]], ["M02", "M01", "M03"])
+        self.assertGreater(scores["M01"], scores["M05"])  # light+polished beats polished only
+        self.assertGreater(scores["M02"], scores["M08"])  # light+natural beats natural only
+        # M05 and M08 tie at 0.2 here; the tie goes to the one adding fewer unrequested properties (M08)
+        self.assertEqual([s["material_id"] for s in result["materials"]["selected"]], ["M02", "M01", "M08"])
 
     def test_extra_character_is_labelled_a_creative_choice(self):
-        evidence = [ev("own", "S", "Baroque Prints", AESTHETIC), ev("brand", "B", "Lush", AESTHETIC),
+        evidence = [ev("own", "S", "Baroque Prints", AESTHETIC), ev("brand", "B", "Ornate", AESTHETIC),
                     ev("own", "S", "Tailored", AESTHETIC), ev("brand", "B", "Structured", AESTHETIC)]
         result = run_engine(evidence, CONFIG, allow_unverified=True)
         picked = {m["material_id"]: m for m in result["materials"]["selected"]}

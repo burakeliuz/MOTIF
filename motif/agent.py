@@ -186,16 +186,25 @@ class Controller:
                                                                   "question": question})
 
     def _worth_fetching(self, domain: str, result: Dict[str, Any]) -> (bool, str):
+        """Fetch unless it is provable that the domain cannot change the engine result.
+
+        "Result" here is the outcome, which motifs are active, every anchored motif's
+        strength, the axis targets and their weights, and the materials. A corroborating
+        source (movie, artist) cannot create an anchor, so it can change that result only
+        through a motif that already has anchored support and is not yet strong, mapped or
+        not (an unmapped motif turning moderate changes the outcome from
+        insufficient_evidence to no_translation_rule). If no such motif exists, the skip
+        is safe. Weak, unanchored motifs it could add are display-only and do not count.
+        """
         if domain in ANCHOR_DOMAINS:
             return True, "related brands are an anchor source: they can create or corroborate motifs"
-        mapped = {r["motif"] for r in self.config.rules["rules"]}
         open_motifs = sorted(m for m, info in result["motifs"].items()
-                             if m in mapped and info["anchored"] and info["strength"] in ("weak", "moderate"))
+                             if info["anchored"] and info["strength"] in ("weak", "moderate"))
         if open_motifs:
-            return True, (f"{domain} can only corroborate; mapped motifs with anchored support that could still change: "
-                          + ", ".join(open_motifs))
-        return False, (f"{domain} can only corroborate, and no mapped motif has anchored support below 'strong'; "
-                       "the request could not change targets or weights")
+            return True, (f"{domain} can corroborate motifs with anchored support below 'strong': "
+                          + ", ".join(open_motifs) + " (their strength, the outcome, or the targets may change)")
+        return False, (f"skipped safely: {domain} is a corroborating source and no motif has anchored support "
+                       "below 'strong', so it cannot change the outcome, active motifs, strengths, targets, or materials")
 
     def _question_for(self, result: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         if result["outcome"] == "conflicted":

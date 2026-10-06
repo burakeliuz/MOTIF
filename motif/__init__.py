@@ -14,4 +14,4 @@ Around it:
   cli.py        command line
 """
 
-ENGINE_VERSION = "engine-0.2"  # 0.2: entity questions also offer candidates of the requested type (T1 finding)
+ENGINE_VERSION = "engine-0.3"  # 0.3: corroborating fetches are skipped only when provably unable to change the result; context exclusions

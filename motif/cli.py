@@ -141,7 +141,7 @@ def _print_human(session, outcome, brief, session_dir) -> None:
         for name, info in sorted(result["motifs"].items()):
             sup = "; ".join(f"{k}: {v['entities']} entities {v['cue_groups']}" for k, v in info["support_by_source"].items())
             print(f"  {name:12} {info['strength']:12} {sup or 'no non-common support'}"
-                  f" | context {len(info['context_evidence_ids'])}, negated {len(info['negated_evidence_ids'])}")
+                  f" | context {len(info['context_evidence_ids'])}, negated {len(info['negated_evidence_ids'])}, excluded {len(info.get('excluded_evidence', []))}")
         print("Axes:")
         for axis in AXES:
             v = result["axes"][axis]

@@ -1,7 +1,7 @@
 {
-  "palette_version": "palette-0.2",
-  "status": "draft_for_stage4",
-  "notice": "Starting palette for the MVP, not a catalogue. Eight entries are enough to exercise rules R1, R3, R4 and R5; no entry is mapped to the 'intimate' pole (R2), so an intimate target stays unmatched. 'source' holds what the supplier says; 'motif_profile' is MOTIF's creative mapping (design_rule) and is not a supplier claim. Not a formula: no dosage, no safety or regulatory assessment (IFRA limits are out of scope and must be checked by the perfumer).",
+  "palette_version": "palette-0.3",
+  "status": "active_verified_subset",
+  "notice": "Starting palette for the MVP, not a catalogue. Each property records the supplier's own words (supporting_text) separately from MOTIF's reading of them (motif_interpretation, a design_rule). A supplier's qualitative description does not scientifically validate MOTIF's axis mapping or any engine score: profiles, weights, and scores are design parameters. No dosage, safety, or regulatory assessment is given; concentration ranges in supplier sheets are deliberately not copied.",
   "verification": {
     "status_values": {
       "unverified_excerpt": "Supplier page located by web search; the descriptor comes from a search excerpt. Not usable in live matching.",
@@ -11,8 +11,15 @@
     "live_matching_rule": "The engine uses only properties whose verification status is verified_full_page. Unverified properties are used only in the explicitly labelled design preview (--allow-unverified-materials).",
     "t2_attempt": {
       "date": "2026-10-06",
-      "result": "blocked",
-      "detail": "www.iff.com, www.givaudan.com, www.firmenich.com and studio.dsm-firmenich.com refused by the environment's network policy (curl and web fetch)."
+      "result": "7 of 8 materials verified from full supplier pages",
+      "blocked": [
+        {
+          "url": "https://www.iff.com/scent/ingredients-compendium/iso-e-super/",
+          "http_status": 403,
+          "cause": "site bot protection (Cloudflare); the environment proxy established the connection"
+        }
+      ],
+      "intermittent": "studio.dsm-firmenich.com answered 403 (Imperva bot protection); the equivalent firmenich.com technical sheets were used instead (one sheet needed a single plain retry)."
     }
   },
   "profile_rules": {
@@ -26,7 +33,49 @@
     ],
     "values": "Each axis is a pole name or absent. Absent means MOTIF makes no claim about the material on that axis, never neutral.",
     "basis": "A pole is assigned only when a supplier descriptor term points to it (listed in 'basis_terms'); conflicting descriptors leave the axis absent and are listed under 'uncertainties'.",
-    "natural_synthetic_note": "The axis is an aesthetic impression, not ingredient origin; 'origin' is recorded separately."
+    "natural_synthetic_note": "The axis is an aesthetic impression, not ingredient origin; 'origin' is recorded separately.",
+    "basis_vocabulary": {
+      "note": "MOTIF's design reading of supplier words (design_rule, not supplier claims). Applied consistently across materials; an explicit contrast in the source (for example 'rough ... but also round') leaves the axis absent.",
+      "light": [
+        "transparent",
+        "bright",
+        "sparkling",
+        "top note"
+      ],
+      "dense": [
+        "powerful",
+        "body"
+      ],
+      "polished": [
+        "elegant",
+        "smooth",
+        "smoothness",
+        "sleek",
+        "velvet"
+      ],
+      "raw": [
+        "smoky",
+        "rough"
+      ],
+      "natural": [
+        "naturalness",
+        "earthy"
+      ],
+      "projecting": [
+        "diffusion",
+        "diffusive",
+        "presence"
+      ],
+      "warm": [
+        "warm"
+      ],
+      "sweet": [
+        "sweet"
+      ],
+      "dry": [
+        "dry"
+      ]
+    }
   },
   "materials": [
     {
@@ -38,42 +87,56 @@
       "supplier": "dsm-firmenich",
       "source": {
         "urls": [
-          "https://www.firmenich.com/sites/default/files/uploads/files/ingredients/marketing-sheet/perfumery/HEDIONE_964898.pdf",
-          "https://studio.dsm-firmenich.com/product/hedioner-pe-964898"
+          "https://www.firmenich.com/sites/default/files/uploads/files/ingredients/marketing-sheet/perfumery/HEDIONE_964898.pdf"
         ],
-        "status": "unverified_excerpt",
-        "descriptor_excerpt": "elegant, transparent floral, jasmine note with citrus freshness; natural white flower effect; luminosity and silkiness"
+        "status": "verified_full_page",
+        "document": "dsm-firmenich technical sheet HEDIONE 964898",
+        "descriptor_excerpt": "An elegant, transparent floral, jasmine note with citrus freshness. HEDIONE develops a beautiful natural smoothness and radiance ... does bestow presence, noticeability, and diffusion."
       },
       "motif_profile": {
         "light_dense": "light",
-        "raw_polished": "polished"
+        "raw_polished": "polished",
+        "intimate_projecting": "projecting"
       },
       "basis_terms": {
         "light_dense": [
-          "transparent",
-          "luminosity"
+          "transparent"
         ],
         "raw_polished": [
           "elegant",
-          "silkiness"
+          "smoothness"
+        ],
+        "intimate_projecting": [
+          "presence",
+          "diffusion"
         ]
       },
       "composition_role": "heart",
       "uncertainties": [
-        "Supplier also writes 'natural white flower effect'; natural_synthetic left absent because the term describes a floral effect, not an overall impression."
+        "The sheet also calls the material 'by itself quietly understated'; projection is read from its stated effect in a perfume.",
+        "The sheet says 'natural smoothness'; natural_synthetic is left absent because the phrase qualifies smoothness, not the overall impression."
       ],
       "property_verification": {
         "light_dense": {
-          "status": "unverified_excerpt",
-          "source_url": null,
-          "accessed": null,
-          "supporting_text": null
+          "status": "verified_full_page",
+          "source_url": "https://www.firmenich.com/sites/default/files/uploads/files/ingredients/marketing-sheet/perfumery/HEDIONE_964898.pdf",
+          "accessed": "2026-10-06",
+          "supporting_text": "An elegant, transparent floral, jasmine note with citrus freshness.",
+          "motif_interpretation": "'transparent' read as light (design)"
         },
         "raw_polished": {
-          "status": "unverified_excerpt",
-          "source_url": null,
-          "accessed": null,
-          "supporting_text": null
+          "status": "verified_full_page",
+          "source_url": "https://www.firmenich.com/sites/default/files/uploads/files/ingredients/marketing-sheet/perfumery/HEDIONE_964898.pdf",
+          "accessed": "2026-10-06",
+          "supporting_text": "An elegant, transparent floral ... develops a beautiful natural smoothness and radiance",
+          "motif_interpretation": "'elegant', 'smoothness' read as polished (design)"
+        },
+        "intimate_projecting": {
+          "status": "verified_full_page",
+          "source_url": "https://www.firmenich.com/sites/default/files/uploads/files/ingredients/marketing-sheet/perfumery/HEDIONE_964898.pdf",
+          "accessed": "2026-10-06",
+          "supporting_text": "It does not necessarily increase strength, but does bestow presence, noticeability, and diffusion.",
+          "motif_interpretation": "'presence ... diffusion' read as projecting (design)"
         }
       }
     },
@@ -83,18 +146,19 @@
       "kind": "natural extract (essential oil)",
       "identity": "Citrus bergamia peel oil; grades differ by supplier and treatment (for example bergapten-reduced)",
       "origin": "natural",
-      "supplier": "Givaudan (Bergamot Oil Italy); IFF LMR (Bergamot Oil CP Italy)",
+      "supplier": "Givaudan (Bergamot Oil Italy, cold-pressed, CAS 8007-75-8)",
       "source": {
         "urls": [
-          "https://www.givaudan.com/fragrance-beauty/fragrance-ingredients-business/natural-ingredients/bergamot-oil-italy",
-          "https://www.iff.com/scent/lmr-compendium/bergamot-oil-cp-italy-org-fcr-csm/"
+          "https://www.givaudan.com/fragrance-beauty/fragrance-ingredients-business/natural-ingredients/bergamot-oil-italy"
         ],
-        "status": "unverified_excerpt",
-        "descriptor_excerpt": "zesty, fresh citrus with floral and herbal undertones; bright and sparkling; used as a top note to bring freshness and naturalness"
+        "status": "verified_full_page",
+        "document": "Givaudan product page Bergamot Oil Italy",
+        "descriptor_excerpt": "CITRUS · Fresh, Zesty, Lavender-like. With its extremely rich, sweet and fruity top note ... brings a beautifully bright and sparkling citrus facet ... to bring freshness and naturalness."
       },
       "motif_profile": {
         "light_dense": "light",
-        "natural_synthetic": "natural"
+        "natural_synthetic": "natural",
+        "sweet_dry": "sweet"
       },
       "basis_terms": {
         "light_dense": [
@@ -104,25 +168,38 @@
         ],
         "natural_synthetic": [
           "naturalness"
+        ],
+        "sweet_dry": [
+          "sweet"
         ]
       },
       "composition_role": "top",
       "uncertainties": [
-        "One excerpt also calls the top note 'rich, sweet and fruity'; sweet_dry left absent.",
-        "The grade (and its regulatory restrictions) must be chosen by the perfumer."
+        "The same page lists 'Fresh, Zesty'; sweetness is one facet, not the whole impression.",
+        "'extremely rich' could suggest weight; 'rich' is not in the basis vocabulary, so light rests on 'bright', 'sparkling' and top-note use.",
+        "Grade and phototoxicity restrictions are the perfumer's decision; not assessed here."
       ],
       "property_verification": {
         "light_dense": {
-          "status": "unverified_excerpt",
-          "source_url": null,
-          "accessed": null,
-          "supporting_text": null
+          "status": "verified_full_page",
+          "source_url": "https://www.givaudan.com/fragrance-beauty/fragrance-ingredients-business/natural-ingredients/bergamot-oil-italy",
+          "accessed": "2026-10-06",
+          "supporting_text": "this oil brings a beautifully bright and sparkling citrus facet to fragrances ... used in floral top notes",
+          "motif_interpretation": "'bright', 'sparkling', top-note use read as light (design)"
         },
         "natural_synthetic": {
-          "status": "unverified_excerpt",
-          "source_url": null,
-          "accessed": null,
-          "supporting_text": null
+          "status": "verified_full_page",
+          "source_url": "https://www.givaudan.com/fragrance-beauty/fragrance-ingredients-business/natural-ingredients/bergamot-oil-italy",
+          "accessed": "2026-10-06",
+          "supporting_text": "bergamot has been used in all types of perfume to bring freshness and naturalness to the fragrance",
+          "motif_interpretation": "'naturalness' read as a natural impression (design; not a claim about ingredient origin)"
+        },
+        "sweet_dry": {
+          "status": "verified_full_page",
+          "source_url": "https://www.givaudan.com/fragrance-beauty/fragrance-ingredients-business/natural-ingredients/bergamot-oil-italy",
+          "accessed": "2026-10-06",
+          "supporting_text": "With its extremely rich, sweet and fruity top note",
+          "motif_interpretation": "'sweet' read as sweet (design)"
         }
       }
     },
@@ -156,9 +233,10 @@
       "property_verification": {
         "raw_polished": {
           "status": "unverified_excerpt",
-          "source_url": null,
-          "accessed": null,
-          "supporting_text": null
+          "source_url": "https://www.iff.com/scent/ingredients-compendium/iso-e-super/",
+          "accessed": "2026-10-06",
+          "supporting_text": null,
+          "blocked": "HTTP 403 from the supplier site's Cloudflare bot protection on 2026-10-06"
         }
       }
     },
@@ -173,39 +251,53 @@
         "urls": [
           "https://www.firmenich.com/sites/default/files/uploads/files/ingredients/marketing-sheet/perfumery/AMBROX_SUPER_909158.pdf"
         ],
-        "status": "unverified_excerpt",
-        "descriptor_excerpt": "extremely powerful and elegant ambery odor with a musky, woody tonality; highly diffusive; ambery effect from top notes to dry down"
+        "status": "verified_full_page",
+        "document": "dsm-firmenich technical sheet AMBROX SUPER 909158",
+        "descriptor_excerpt": "Extremely powerful and elegant ambery odor with a musky, woody tonality ... promises of sleek elegance and powerful iconic ambery signature ... highly diffusive and brings a unique ambery effect from top notes to dry down."
       },
       "motif_profile": {
         "light_dense": "dense",
+        "raw_polished": "polished",
         "intimate_projecting": "projecting"
       },
       "basis_terms": {
         "light_dense": [
-          "extremely powerful",
-          "ambery"
+          "powerful"
+        ],
+        "raw_polished": [
+          "elegant",
+          "sleek"
         ],
         "intimate_projecting": [
-          "highly diffusive"
+          "diffusive"
         ]
       },
       "composition_role": "base",
       "uncertainties": [
-        "'elegant' could support polished; left absent to avoid double use of a single adjective.",
-        "Projection is a property the cultural evidence does not ask for unless R2 or a projecting target exists."
+        "'Powerful' is about intensity; reading it as density is MOTIF's creative mapping.",
+        "The sheet calls the profile 'more natural, more animalic' than CETALOX; this relative statement is not used."
       ],
       "property_verification": {
         "light_dense": {
-          "status": "unverified_excerpt",
-          "source_url": null,
-          "accessed": null,
-          "supporting_text": null
+          "status": "verified_full_page",
+          "source_url": "https://www.firmenich.com/sites/default/files/uploads/files/ingredients/marketing-sheet/perfumery/AMBROX_SUPER_909158.pdf",
+          "accessed": "2026-10-06",
+          "supporting_text": "Extremely powerful and elegant ambery odor with a musky, woody tonality.",
+          "motif_interpretation": "'extremely powerful' read as dense (design; the sheet describes strength, MOTIF reads it as perceived weight)"
+        },
+        "raw_polished": {
+          "status": "verified_full_page",
+          "source_url": "https://www.firmenich.com/sites/default/files/uploads/files/ingredients/marketing-sheet/perfumery/AMBROX_SUPER_909158.pdf",
+          "accessed": "2026-10-06",
+          "supporting_text": "delivers all the promises of sleek elegance and powerful iconic ambery signature",
+          "motif_interpretation": "'elegant', 'sleek elegance' read as polished (design)"
         },
         "intimate_projecting": {
-          "status": "unverified_excerpt",
-          "source_url": null,
-          "accessed": null,
-          "supporting_text": null
+          "status": "verified_full_page",
+          "source_url": "https://www.firmenich.com/sites/default/files/uploads/files/ingredients/marketing-sheet/perfumery/AMBROX_SUPER_909158.pdf",
+          "accessed": "2026-10-06",
+          "supporting_text": "AMBROX SUPER is highly diffusive and brings a unique ambery effect from top notes to dry down.",
+          "motif_interpretation": "'highly diffusive' read as projecting (design)"
         }
       }
     },
@@ -218,11 +310,11 @@
       "supplier": "dsm-firmenich",
       "source": {
         "urls": [
-          "https://www.firmenich.com/sites/default/files/uploads/files/ingredients/marketing-sheet/perfumery/HABANOLIDE_947303.pdf",
-          "https://studio.dsm-firmenich.com/product/habanolider-pe-947303"
+          "https://www.firmenich.com/sites/default/files/uploads/files/ingredients/marketing-sheet/perfumery/HABANOLIDE_947303.pdf"
         ],
-        "status": "unverified_excerpt",
-        "descriptor_excerpt": "extremely elegant and substantive musk note, typical of macrocyclic musks, with a warm and slightly woody undertone; very powerful"
+        "status": "verified_full_page",
+        "document": "dsm-firmenich technical sheet HABANOLIDE 947303",
+        "descriptor_excerpt": "An extremely elegant and substantive musk note ... warm and slightly woody undertone ... combines the strength and tenacity of the aromatic musks with the pleasantness and elegance of the macrocyclic musks."
       },
       "motif_profile": {
         "raw_polished": "polished",
@@ -230,7 +322,7 @@
       },
       "basis_terms": {
         "raw_polished": [
-          "extremely elegant"
+          "elegant"
         ],
         "warm_cool": [
           "warm"
@@ -238,20 +330,22 @@
       },
       "composition_role": "base",
       "uncertainties": [
-        "Musks are often used for skin-close effects, but the supplier calls it 'very powerful'; intimate_projecting left absent."
+        "The sheet stresses 'strength and tenacity'; intimate_projecting is left absent (no basis-vocabulary term)."
       ],
       "property_verification": {
         "raw_polished": {
-          "status": "unverified_excerpt",
-          "source_url": null,
-          "accessed": null,
-          "supporting_text": null
+          "status": "verified_full_page",
+          "source_url": "https://www.firmenich.com/sites/default/files/uploads/files/ingredients/marketing-sheet/perfumery/HABANOLIDE_947303.pdf",
+          "accessed": "2026-10-06",
+          "supporting_text": "An extremely elegant and substantive musk note.",
+          "motif_interpretation": "'extremely elegant' read as polished (design)"
         },
         "warm_cool": {
-          "status": "unverified_excerpt",
-          "source_url": null,
-          "accessed": null,
-          "supporting_text": null
+          "status": "verified_full_page",
+          "source_url": "https://www.firmenich.com/sites/default/files/uploads/files/ingredients/marketing-sheet/perfumery/HABANOLIDE_947303.pdf",
+          "accessed": "2026-10-06",
+          "supporting_text": "warm and slightly woody undertone",
+          "motif_interpretation": "'warm' read as warm (design)"
         }
       }
     },
@@ -261,14 +355,14 @@
       "kind": "natural extract (essential oil)",
       "identity": "Chrysopogon zizanioides root oil, Haitian origin; grades differ by supplier",
       "origin": "natural",
-      "supplier": "Givaudan; IFF LMR; dsm-firmenich",
+      "supplier": "Givaudan (Vetiver Oil Haiti, CAS 8016-96-4)",
       "source": {
         "urls": [
-          "https://www.givaudan.com/fragrance-beauty/fragrance-ingredients-business/natural-ingredients/vetiver-oil-haiti",
-          "https://www.iff.com/scent/lmr-compendium/vetiver-oil-haiti/"
+          "https://www.givaudan.com/fragrance-beauty/fragrance-ingredients-business/natural-ingredients/vetiver-oil-haiti"
         ],
-        "status": "unverified_excerpt",
-        "descriptor_excerpt": "dry and woody with earthy, smoky and nutty accents; fresh bitterness and a touch of grapefruit"
+        "status": "verified_full_page",
+        "document": "Givaudan product page Vetiver Oil Haiti",
+        "descriptor_excerpt": "WOODY · Woody, Earthy, Spicy, Dry. Vetiver oil from Haiti is dry and woody with earthy, smoky and nutty accents ... sparkling citrus notes and fresh bitterness."
       },
       "motif_profile": {
         "natural_synthetic": "natural",
@@ -280,8 +374,7 @@
           "earthy"
         ],
         "raw_polished": [
-          "smoky",
-          "earthy"
+          "smoky"
         ],
         "sweet_dry": [
           "dry"
@@ -289,43 +382,46 @@
       },
       "composition_role": "base",
       "uncertainties": [
-        "'raw' is MOTIF's reading of 'earthy, smoky'; the supplier does not use the word."
+        "The page also notes 'sparkling citrus notes', which are not used."
       ],
       "property_verification": {
         "natural_synthetic": {
-          "status": "unverified_excerpt",
-          "source_url": null,
-          "accessed": null,
-          "supporting_text": null
+          "status": "verified_full_page",
+          "source_url": "https://www.givaudan.com/fragrance-beauty/fragrance-ingredients-business/natural-ingredients/vetiver-oil-haiti",
+          "accessed": "2026-10-06",
+          "supporting_text": "dry and woody with earthy, smoky and nutty accents",
+          "motif_interpretation": "'earthy' read as a natural impression (design)"
         },
         "raw_polished": {
-          "status": "unverified_excerpt",
-          "source_url": null,
-          "accessed": null,
-          "supporting_text": null
+          "status": "verified_full_page",
+          "source_url": "https://www.givaudan.com/fragrance-beauty/fragrance-ingredients-business/natural-ingredients/vetiver-oil-haiti",
+          "accessed": "2026-10-06",
+          "supporting_text": "dry and woody with earthy, smoky and nutty accents",
+          "motif_interpretation": "'smoky' read as raw (design)"
         },
         "sweet_dry": {
-          "status": "unverified_excerpt",
-          "source_url": null,
-          "accessed": null,
-          "supporting_text": null
+          "status": "verified_full_page",
+          "source_url": "https://www.givaudan.com/fragrance-beauty/fragrance-ingredients-business/natural-ingredients/vetiver-oil-haiti",
+          "accessed": "2026-10-06",
+          "supporting_text": "Woody, Earthy, Spicy, Dry. Vetiver oil from Haiti is dry and woody",
+          "motif_interpretation": "'dry' read as dry (design)"
         }
       }
     },
     {
       "material_id": "M07",
-      "name": "Labdanum absolute",
+      "name": "Labdanum Absolute Spain Clear",
       "kind": "natural extract (absolute)",
-      "identity": "Cistus ladaniferus resin absolute; grades differ by supplier (for example dsm-firmenich 953418, Givaudan Spain Clear)",
+      "identity": "Givaudan Labdanum Absolute Spain Clear (Cistus ladaniferus var. beta maculata, CAS 8016-26-0); one specific grade",
       "origin": "natural",
-      "supplier": "dsm-firmenich; Givaudan; IFF LMR",
+      "supplier": "Givaudan",
       "source": {
         "urls": [
-          "https://www.firmenich.com/sites/default/files/uploads/files/ingredients/marketing-sheet/perfumery/LABDANUM_ABS_953418.pdf",
           "https://www.givaudan.com/fragrance-beauty/fragrance-ingredients-business/natural-ingredients/labdanum-absolute-spain-clear"
         ],
-        "status": "unverified_excerpt",
-        "descriptor_excerpt": "powerful amber note, balsamic and resinous, with smoky, leathery and animalic facets; warm and structured; adds roundness and body"
+        "status": "verified_full_page",
+        "document": "Givaudan product page Labdanum Absolute Spain Clear",
+        "descriptor_excerpt": "AMBERY · Balsamic, Woody, Animal-like ... the warm and structured leathery, woody and ambery scent ... adds roundness and body to chypre and oriental accords."
       },
       "motif_profile": {
         "light_dense": "dense",
@@ -333,7 +429,6 @@
       },
       "basis_terms": {
         "light_dense": [
-          "powerful",
           "body"
         ],
         "warm_cool": [
@@ -342,56 +437,60 @@
       },
       "composition_role": "base",
       "uncertainties": [
-        "One grade is described as 'clean and refined', others as 'leathery, animalic'; raw_polished left absent.",
-        "Facets differ strongly between grades."
+        "Other labdanum grades differ (the dsm-firmenich LABDANUM ABS 953418 sheet adds 'sweet' and 'animalic'); the profile applies to this grade only."
       ],
       "property_verification": {
         "light_dense": {
-          "status": "unverified_excerpt",
-          "source_url": null,
-          "accessed": null,
-          "supporting_text": null
+          "status": "verified_full_page",
+          "source_url": "https://www.givaudan.com/fragrance-beauty/fragrance-ingredients-business/natural-ingredients/labdanum-absolute-spain-clear",
+          "accessed": "2026-10-06",
+          "supporting_text": "It adds roundness and body to chypre and oriental accords.",
+          "motif_interpretation": "'body' read as dense (design)"
         },
         "warm_cool": {
-          "status": "unverified_excerpt",
-          "source_url": null,
-          "accessed": null,
-          "supporting_text": null
+          "status": "verified_full_page",
+          "source_url": "https://www.givaudan.com/fragrance-beauty/fragrance-ingredients-business/natural-ingredients/labdanum-absolute-spain-clear",
+          "accessed": "2026-10-06",
+          "supporting_text": "intertwined with the warm and structured leathery, woody and ambery scent",
+          "motif_interpretation": "'warm' read as warm (design)"
         }
       }
     },
     {
       "material_id": "M08",
-      "name": "Orris butter (orris concrete)",
+      "name": "Orris Pallida Butter 8% irones France",
       "kind": "natural extract (concrete)",
       "identity": "Iris pallida rhizome distillate, irone content varies by grade (for example Givaudan 8% irones France)",
       "origin": "natural",
-      "supplier": "Givaudan; dsm-firmenich",
+      "supplier": "Givaudan (Orris pallida, CAS 8002-73-1)",
       "source": {
         "urls": [
           "https://www.givaudan.com/fragrance-beauty/fragrance-ingredients-business/natural-ingredients/orris-pallida-butter-8-irones-france"
         ],
-        "status": "unverified_excerpt",
-        "descriptor_excerpt": "powdery, floral, green, woody, violet-like; rough in its earthy side but round like a musk; natural powdery and violet effects"
+        "status": "verified_full_page",
+        "document": "Givaudan product page Orris Pallida Butter 8% irones France",
+        "descriptor_excerpt": "FLORAL · Floral, Powdery. Orris is a contrasting duality, rough in its earthy side, but also round like a musk with omnipresent powdery notes ... Its earthy facets are also fully expressed in woody and amber bases."
       },
       "motif_profile": {
         "natural_synthetic": "natural"
       },
       "basis_terms": {
         "natural_synthetic": [
-          "natural powdery"
+          "earthy"
         ]
       },
       "composition_role": "heart",
       "uncertainties": [
-        "'rough' and 'round' conflict; raw_polished left absent."
+        "The stage-3 excerpt term 'natural powdery' is not on the full page; corrected.",
+        "raw_polished left absent: the source states an explicit contrast ('rough ... but also round')."
       ],
       "property_verification": {
         "natural_synthetic": {
-          "status": "unverified_excerpt",
-          "source_url": null,
-          "accessed": null,
-          "supporting_text": null
+          "status": "verified_full_page",
+          "source_url": "https://www.givaudan.com/fragrance-beauty/fragrance-ingredients-business/natural-ingredients/orris-pallida-butter-8-irones-france",
+          "accessed": "2026-10-06",
+          "supporting_text": "Orris is a contrasting duality, rough in its earthy side ... Its earthy facets are also fully expressed in woody and amber bases.",
+          "motif_interpretation": "'earthy' read as a natural impression (design)"
         }
       }
     }
@@ -402,6 +501,15 @@
       "date": "2026-10-06",
       "changes": [
         "Per-property verification records added; profiles unchanged. All properties remain unverified because supplier domains could not be opened from the build environment (stage-4 task T2 blocked)."
+      ]
+    },
+    {
+      "version": "palette-0.3",
+      "date": "2026-10-06",
+      "changes": [
+        "Full supplier pages read for 7 of 8 materials (dsm-firmenich technical sheets, Givaudan product pages); those properties are verified_full_page with URL, date, and a short supporting quote.",
+        "ISO E SUPER stays unverified: www.iff.com answered HTTP 403 from its Cloudflare bot protection (not the environment proxy); no attempt was made to bypass it.",
+        "Profile corrections from the full sources: HEDIONE adds projecting ('presence, noticeability, and diffusion'); Bergamot adds sweet ('rich, sweet and fruity top note'); AMBROX SUPER adds polished ('sleek elegance', consistent with HEDIONE's 'elegant'); Labdanum is pinned to one grade (Givaudan Labdanum Absolute Spain Clear); Orris 'natural' now rests on 'earthy side' because the stage-3 excerpt term 'natural powdery' does not appear on the full page."
       ]
     }
   ]

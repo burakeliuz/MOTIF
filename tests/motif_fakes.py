@@ -69,12 +69,12 @@ class FakeTransport:
 
 
 def verified_palette(config, verify):
-    """A copy of the palette where the listed (material_id, axis) properties are marked verified (test only)."""
+    """A copy of the palette where ONLY the listed (material_id, axis) properties are verified (test only)."""
     palette = json.loads(json.dumps(config.palette))
     for m in palette["materials"]:
-        for axis in m["property_verification"]:
-            if (m["material_id"], axis) in verify or (m["material_id"], "*") in verify:
-                m["property_verification"][axis]["status"] = "verified_full_page"
+        for axis in m["motif_profile"]:
+            ok = (m["material_id"], axis) in verify or (m["material_id"], "*") in verify
+            m.setdefault("property_verification", {})[axis] = {"status": "verified_full_page" if ok else "unverified_excerpt"}
     return type(config)(config.lexicon, config.rules, palette, config.params)
 
 
