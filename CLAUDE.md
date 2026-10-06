@@ -1,6 +1,6 @@
 # MOTIF working notes for Claude Code
 
-Current phase: **Qloo feasibility spike** (roadmap stage 1 done offline; stage 2 = live run).
+Current phase: **Qloo feasibility spike** (stage 2 live run done 2026-10-06, recommendation `narrow`; stage 3 = product decisions).
 Read `MOTIF_QLOO_FEASIBILITY.md` (rev 0.2) before changing anything. Then read
 `README.md`, `docs/QLOO_ACCESS_NOTES.md`, and `reports/feasibility.md`.
 
@@ -32,7 +32,7 @@ Every stage adds to `docs/SUBMISSION_NOTES.md`, mapped to the six items of the k
 ## Commands
 
 - `python3 -m unittest`: run before every commit.
-- `python3 -m motif_spike check | plan --plan pilot | run --mode synthetic | run --mode live --plan pilot|full | renormalize --run latest-live`
+- `python3 -m motif_spike check | plan --plan pilot | run --mode synthetic | run --mode live --plan pilot|full | renormalize --run latest-live | excerpt --run latest-live`
 
 ## Non-negotiables
 
@@ -52,9 +52,11 @@ Every stage adds to `docs/SUBMISSION_NOTES.md`, mapped to the six items of the k
 - Tests block all network access (`tests/__init__.py`); never weaken that.
 - Help channel: Discord `#qloo-hackathon`.
 
-## When live output first arrives
+## Live output
 
-`adapter.PARSER_STATUS` is `unverified`. Compare `data/raw/<run>/responses/*.json`
-with `adapter.locate_items` / `item_view`. Fix the parsers if shapes differ,
-re-run `renormalize`, and only then set the status to `verified`. Live data
-stays in git-ignored `data/`. The curated judgments go in `reports/feasibility.md`.
+`adapter.PARSER_STATUS` is `verified` for direct-transport bodies (pilot of
+2026-10-06). If a new response shape appears (`unrecognized_shape`), fix the
+parsers, re-run `renormalize`, and re-check before trusting it. Live data stays
+in git-ignored `data/`; a new session has none until it re-runs the plans.
+Curated judgments are in `reports/feasibility.md`; the committable literal
+excerpt is regenerated with `python3 -m motif_spike excerpt --run latest-live`.

@@ -183,6 +183,9 @@ class DirectEndToEnd(LocalServer):
             observations = read_jsonl(paths.normalized_dir / "observations.jsonl")
             run = read_json(paths.run_record)
             facts = (paths.normalized_dir / "facts.md").read_text(encoding="utf-8")
+            with contextlib.redirect_stdout(io.StringIO()):
+                excerpt_code = cli.main(["excerpt", "--data-dir", tmp, "--out", str(root / "excerpt.md")])
+            excerpt = (root / "excerpt.md").read_text(encoding="utf-8")
             for obs in observations:
                 raw = json.loads((root / obs["raw_ref"]["file"]).read_text(encoding="utf-8"))
                 self.assertEqual(resolve_pointer(raw, obs["raw_ref"]["pointer"]).get(obs["qloo_id_field"]), obs["qloo_id"])
@@ -196,6 +199,10 @@ class DirectEndToEnd(LocalServer):
         movie = next(o for o in observations if o["kind"] == "related_entity")
         self.assertEqual(movie["tags"][0]["id"], "local:tag:k1")
         self.assertIn("Transport | direct", facts)
+        self.assertEqual(excerpt_code, 0)
+        self.assertIn("## Seed `a24` (A24)", excerpt)
+        self.assertIn("| req 0003 | related_entities movie | `/v2/insights` |", excerpt)
+        self.assertNotIn("proxy-injected", excerpt)
 
 
 if __name__ == "__main__":

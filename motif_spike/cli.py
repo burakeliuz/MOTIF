@@ -10,6 +10,7 @@ from typing import List, Optional
 
 from . import adapter
 from .compare import compare
+from .excerpt import render_excerpt
 from .facts import render_facts
 from .manifest import build_plan, harness_environment, live_environment, load_manifest
 from .normalize import normalize_run
@@ -181,6 +182,17 @@ def cmd_renormalize(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_excerpt(args: argparse.Namespace) -> int:
+    root = data_root(args.data_dir)
+    paths = RunPaths(root, _resolve_run_id(root, args.run))
+    text = render_excerpt(paths)
+    out = Path(args.out)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(text, encoding="utf-8")
+    print(f"Evidence excerpt of {paths.run_id} written to {out} ({len(text.encode('utf-8'))} bytes; no requests sent).")
+    return 0
+
+
 def main(argv: Optional[List[str]] = None) -> int:
     parser = argparse.ArgumentParser(prog="python3 -m motif_spike", description="MOTIF Qloo feasibility spike (evidence playground).")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -209,8 +221,13 @@ def main(argv: Optional[List[str]] = None) -> int:
     p_ren.add_argument("--run", default="latest", help="run id, latest, latest-live, or latest-synthetic")
     p_ren.add_argument("--data-dir")
 
+    p_exc = sub.add_parser("excerpt", help="write a small, committable evidence excerpt of a live run (literal values with pointers)")
+    p_exc.add_argument("--run", default="latest-live", help="live run id or latest-live")
+    p_exc.add_argument("--out", default="reports/evidence_excerpt.md")
+    p_exc.add_argument("--data-dir")
+
     args = parser.parse_args(argv)
-    handlers = {"check": cmd_check, "plan": cmd_plan, "run": cmd_run, "renormalize": cmd_renormalize}
+    handlers = {"check": cmd_check, "plan": cmd_plan, "run": cmd_run, "renormalize": cmd_renormalize, "excerpt": cmd_excerpt}
     try:
         return handlers[args.command](args)
     except ValueError as exc:

@@ -150,6 +150,30 @@ Consequences for MOTIF:
 - The harness itself does not retry `qloo api` calls. MOTIF retries rate-limit,
   5xx, timeout, and harness-flagged retryable failures at most twice (3 s, then 10 s).
 
+## Live observations (2026-10-06)
+
+Pilot `live-20261006T102530Z-61e1` and full run `live-20261006T103307Z-660d`
+(direct transport, 45 requests sent, all HTTP 200, no rate limit hit). These
+resolve several *open* items below. Details: `reports/feasibility.md`.
+
+- All six candidate entity types (brand, movie, artist, book, person, place)
+  return results under the hackathon key.
+- Body shapes: `/search` and `/entities` → `{"results": [entity]}` (entity tags
+  use `tag_id`); `/v2/insights` → `{"success", "results": {"entities"|"tags": [...]},
+  "query": {"explainability"}}` (entity tags use `id`). Recorded in
+  `motif_spike/adapter.py`; `PARSER_STATUS` is `verified` for these bodies.
+- Entities carry descriptive namespaces not shown in the docs examples:
+  `urn:tag:aesthetic_property:qloo`, `emotional_tone`, `personal_style`,
+  `urn:tag:style:qloo`, and properties such as `aesthetic_properties`,
+  `style_description`, and `adjectives_for_music`. How they are produced is
+  undocumented in what we could read.
+- `query.affinity` observed between 0.824 and 0.988 on related entities, and
+  between 0.998 and 1 on tag insights.
+- With one seed as the only signal, explainability attributes every result to
+  that seed (score 1; aggregate `avg_score` 1), as expected.
+- Unscoped tag insights (`filter.type=urn:tag`) return mostly place tags
+  (payments, hotel ratings, dishes) at affinity ≈ 1.
+
 ## Data semantics from documentation
 
 - Response shapes (docs examples): insight entities carry `entity_id`, `name`,

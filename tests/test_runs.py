@@ -148,6 +148,11 @@ class SyntheticRun(unittest.TestCase):
         beta_tags = {row["tag_id"] for row in movie["per_seed"]["beta"]}
         self.assertNotIn("synthetic:tag:streaming_service:media:fx_s1", beta_tags)
 
+    def test_evidence_excerpt_refuses_synthetic_runs(self):
+        from motif_spike.excerpt import render_excerpt
+        with self.assertRaises(ValueError):
+            render_excerpt(self.paths)
+
     def test_renormalize_is_deterministic(self):
         before = (self.paths.normalized_dir / "observations.jsonl").read_text(encoding="utf-8")
         normalize_run(self.paths)

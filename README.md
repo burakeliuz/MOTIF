@@ -10,20 +10,24 @@ It is **not** the product: no frontend, motif classifier, sensory scoring,
 material matching, or brief generation. The project frame is
 [`MOTIF_QLOO_FEASIBILITY.md`](MOTIF_QLOO_FEASIBILITY.md) (rev 0.2).
 
-**Status:** offline playground complete; **live Qloo feasibility not yet evaluated**
-(no event credential configured). See [`reports/feasibility.md`](reports/feasibility.md).
+**Status:** live feasibility evaluated on 2026-10-06 (5 seeds × 6 domains, all
+requests HTTP 200). Recommendation: **narrow**. See
+[`reports/feasibility.md`](reports/feasibility.md) and the literal evidence excerpt
+[`reports/evidence_excerpt.md`](reports/evidence_excerpt.md). Submission notes:
+[`docs/SUBMISSION_NOTES.md`](docs/SUBMISSION_NOTES.md).
 
 ## Requirements
 
 - Python 3.9+ (standard library only; no install step). Tests pass on 3.9–3.13 under Linux; Windows is untested.
-- For live runs: Node.js ≥ 22.19.0 and the official event harness
-  `npm install --global @qloo/qloo-harness` (≥ 0.1.26)
+- Live runs use the built-in direct HTTPS client by default (no extra install).
+  Only `--transport harness` needs Node.js ≥ 22.19.0 and
+  `npm install --global @qloo/qloo-harness` (≥ 0.1.26).
 
 ## Quick start (offline, no credential)
 
 ```sh
 python3 -m motif_spike run --mode synthetic    # invented fixtures, no network
-python3 -m unittest                            # 40 focused checks
+python3 -m unittest                            # 63 focused checks
 python3 -m motif_spike plan --plan pilot       # commands a live pilot would send (nothing runs)
 python3 -m motif_spike check                   # live readiness (presence only)
 ```
@@ -76,7 +80,9 @@ python3 -m motif_spike run --mode live --plan full    # 5 seeds x 6 domains, bud
 `--seeds a24,muji`, `--domains movie,brand`, `--max-requests N` and
 `--no-reuse` narrow or adjust a run. Identical successful live requests from
 earlier runs are reused, not re-sent. `renormalize --run latest-live` rebuilds
-normalized output from saved raw files after a parser fix.
+normalized output from saved raw files after a parser fix. `excerpt --run latest-live`
+writes a small, committable evidence excerpt (`reports/evidence_excerpt.md`) with
+literal values, request IDs, and JSON Pointers.
 
 ## What a run does
 
