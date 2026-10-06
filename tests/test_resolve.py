@@ -1,5 +1,9 @@
 """Seed resolution never selects a similar-but-different entity."""
 
+try:
+    from . import _netguard  # noqa: F401
+except ImportError:  # started as a top-level module (discover -s tests)
+    import _netguard  # noqa: F401
 import unittest
 
 from motif_spike.manifest import Seed

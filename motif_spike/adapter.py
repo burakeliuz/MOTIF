@@ -138,9 +138,10 @@ def _param_value(value: Any) -> str:
 def http_request(argv: Sequence[str]) -> Tuple[str, Dict[str, str]]:
     """The Qloo HTTP request (path, query params) an adapter command stands for.
 
-    Used by the direct transport. Parameters mirror what the harness sends
-    (checked with `--dry-run` against harness 0.1.26), so both transports ask
-    the same question.
+    Used by the direct transport. Parameters mirror what the harness sends:
+    search, entity and insights were checked with `--dry-run` against harness
+    0.1.26; entity_tags (no dry-run) follows the harness source, minus the
+    identifier lookup the harness adds first.
     """
     argv = [a for a in argv if a != "--dry-run"]
     command = tuple(argv[:2])
@@ -220,6 +221,23 @@ def error_status(code: str, message: str, retryable_hint: Optional[bool] = None)
     msg = (message or "").lower()
     if code_u == "SYNTHETIC_FIXTURE_MISSING":
         return "fixture_missing"
+    if code_u == "NETWORK_ERROR":
+        return "network_error"
+    if code_u.startswith("HTTP_") and code_u[5:].isdigit():
+        status = int(code_u[5:])
+        if status == 401:
+            return "auth_error"
+        if status == 403:
+            return "forbidden"
+        if status == 404:
+            return "not_found"
+        if status == 429:
+            return "rate_limited"
+        if status >= 500:
+            return "server_error"
+        if 400 <= status < 500:
+            return "rejected_request"
+        return "api_error"
     if code_u == "AUTH_FAILED" or "AUTH" in code_u or re.search(r"\b401\b", msg) or "unauthorized" in msg:
         return "auth_error"
     if re.search(r"\b403\b", msg) or "forbidden" in msg:

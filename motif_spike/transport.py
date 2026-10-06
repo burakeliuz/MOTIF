@@ -11,6 +11,7 @@
 
 from __future__ import annotations
 
+import http.client
 import json
 import os
 import shlex
@@ -65,7 +66,11 @@ def direct_api_key(env: Optional[Mapping[str, str]] = None) -> Optional[str]:
     """The key the direct transport sends, or None to let the environment inject it."""
     env = os.environ if env is None else env
     value = (env.get("QLOO_API_KEY") or "").strip()
-    return None if not value or value == PROXY_KEY_PLACEHOLDER else value
+    if not value or value == PROXY_KEY_PLACEHOLDER:
+        return None
+    if not all(33 <= ord(ch) <= 126 for ch in value):
+        raise ValueError("QLOO_API_KEY contains whitespace or non-printable characters (value not shown)")
+    return value
 
 
 def validate_base_url(base_url: str) -> str:
@@ -77,9 +82,18 @@ def validate_base_url(base_url: str) -> str:
     return base_url.rstrip("/")
 
 
-def _api_error(message: str, exit_code: int = 5) -> str:
+def _api_error(message: str, code: str = "API_ERROR") -> str:
     # Same structure the harness prints, so adapter.classify treats both alike.
-    return json.dumps({"error": True, "code": "API_ERROR", "message": message})
+    # Direct errors carry a structured code (HTTP_<status> / NETWORK_ERROR) so
+    # classification never depends on server-supplied text.
+    return json.dumps({"error": True, "code": code, "message": message})
+
+
+class _NoRedirect(urllib.request.HTTPRedirectHandler):
+    """Never follow redirects: a 3xx comes back as an error and the key goes nowhere else."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
 
 
 class DirectTransport:
@@ -98,7 +112,7 @@ class DirectTransport:
         self._api_key = api_key
         self.timeout_s = timeout_s
         host = urllib.parse.urlparse(self.base_url).hostname
-        handlers = [urllib.request.ProxyHandler({})] if host in _LOOPBACK else []
+        handlers = [_NoRedirect()] + ([urllib.request.ProxyHandler({})] if host in _LOOPBACK else [])
         self._opener = urllib.request.build_opener(*handlers)
 
     def supports_preview(self, operation: str) -> bool:
@@ -134,16 +148,21 @@ class DirectTransport:
                 payload = json.loads(exc.read().decode("utf-8", errors="replace") or "null")
                 if isinstance(payload, dict):
                     detail = str(payload.get("message") or payload.get("error") or "")
-            except (ValueError, OSError):
+            except (ValueError, OSError, http.client.HTTPException):
                 pass
             message = f"API request failed: {exc.code} {exc.reason}" + (f" ({detail[:300]})" if detail else "")
-            return ProcessResult(5, _api_error(message), "", elapsed())
+            return ProcessResult(5, _api_error(message, code=f"HTTP_{exc.code}"), "", elapsed())
         except (socket.timeout, TimeoutError):
             return ProcessResult(None, "", "", elapsed(), timed_out=True)
         except urllib.error.URLError as exc:
             if isinstance(exc.reason, (socket.timeout, TimeoutError)):
                 return ProcessResult(None, "", "", elapsed(), timed_out=True)
-            return ProcessResult(5, _api_error(f"network error: {exc.reason}"), "", elapsed())
+            # Includes a proxy refusing the tunnel ("Tunnel connection failed: 403"):
+            # a network problem, not a credential one.
+            return ProcessResult(5, _api_error(f"network error: {exc.reason}", code="NETWORK_ERROR"), "", elapsed())
+        except (http.client.HTTPException, OSError) as exc:
+            # Connection dropped before headers or during the body.
+            return ProcessResult(5, _api_error(f"network error: {type(exc).__name__}", code="NETWORK_ERROR"), "", elapsed())
 
 
 class HarnessTransport:

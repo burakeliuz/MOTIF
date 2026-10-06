@@ -83,7 +83,10 @@ def check_readiness(
     except (ValueError, AttributeError):
         detail = status.stderr or status.stdout or "no output"
         report.status_check_error = truncate(redact(detail, env=env), 300)
-    if not report.credential_configured:
+    if (env.get("QLOO_API_KEY") or "").strip() == PROXY_KEY_PLACEHOLDER:
+        report.credential_configured = False
+        report.reasons.append("QLOO_API_KEY is the proxy placeholder; the harness would send it as the key. Use --transport direct")
+    elif not report.credential_configured:
         report.reasons.append("no Qloo credential configured for the harness: run `qloo setup --qloo` (keep the key outside this folder)")
 
     report.live_ready = bool(report.harness_found and report.harness_version_ok and report.credential_configured)

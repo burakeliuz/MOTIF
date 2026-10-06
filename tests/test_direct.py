@@ -1,5 +1,9 @@
 """Direct HTTPS transport: request mapping, key handling, errors, end to end."""
 
+try:
+    from . import _netguard  # noqa: F401
+except ImportError:  # started as a top-level module (discover -s tests)
+    import _netguard  # noqa: F401
 import contextlib
 import io
 import json
@@ -36,8 +40,19 @@ RESPONSES = {
 class FakeQloo(BaseHTTPRequestHandler):
     seen = []
     status = 200
+    mode = "normal"
 
     def do_GET(self):
+        if FakeQloo.mode == "drop":
+            self.close_connection = True
+            self.connection.close()
+            return
+        if FakeQloo.mode == "redirect":
+            FakeQloo.seen.append({"path": self.path, "api_key": self.headers.get("X-Api-Key")})
+            self.send_response(302)
+            self.send_header("Location", "http://127.0.0.1:9/elsewhere")
+            self.end_headers()
+            return
         url = urlparse(self.path)
         params = {k: v[0] for k, v in parse_qs(url.query).items()}
         FakeQloo.seen.append({"path": url.path, "params": params, "api_key": self.headers.get("X-Api-Key")})
@@ -72,6 +87,7 @@ class LocalServer(unittest.TestCase):
     def setUp(self):
         FakeQloo.seen = []
         FakeQloo.status = 200
+        FakeQloo.mode = "normal"
 
 
 class RequestMapping(unittest.TestCase):
@@ -100,8 +116,20 @@ class RequestMapping(unittest.TestCase):
         self.assertEqual((len(items), shape, items[0][0]), (1, "results.tags", "/results/tags/0"))
 
     def test_tests_cannot_reach_the_network(self):
-        result = DirectTransport("https://hackathon.api.qloo.com").execute(adapter.search_argv("A24", 1), 5)
+        import socket
+        self.assertEqual(socket.create_connection.__name__, "_guarded_create_connection")
+        result = DirectTransport("https://qloo.invalid").execute(adapter.search_argv("A24", 1), 5)
         self.assertEqual(classify(adapter.OP_SEARCH, result).status, "network_error")
+
+    def test_invalid_key_characters_are_refused_without_echo(self):
+        with self.assertRaises(ValueError) as ctx:
+            direct_api_key({"QLOO_API_KEY": "hack_bad\r\nX-Evil: 1"})
+        self.assertNotIn("hack_bad", str(ctx.exception))
+
+    def test_status_comes_from_the_http_code_not_the_message(self):
+        self.assertEqual(adapter.error_status("HTTP_400", "API request failed: 400 (take must be between 1 and 500)"), "rejected_request")
+        self.assertEqual(adapter.error_status("HTTP_404", "API request failed: 404 (Unauthorized entity)"), "not_found")
+        self.assertEqual(adapter.error_status("NETWORK_ERROR", "network error: Tunnel connection failed: 403 Forbidden"), "network_error")
 
 
 class DirectTransportBehaviour(LocalServer):
@@ -125,6 +153,19 @@ class DirectTransportBehaviour(LocalServer):
             FakeQloo.status = status
             result = DirectTransport(self.base).execute(adapter.search_argv("A24", 2))
             self.assertEqual(classify(adapter.OP_SEARCH, result).status, expected, status)
+
+
+class DirectFailureModes(LocalServer):
+    def test_dropped_connection_is_a_network_error_not_a_crash(self):
+        FakeQloo.mode = "drop"
+        result = DirectTransport(self.base).execute(adapter.search_argv("A24", 2), 5)
+        self.assertEqual(classify(adapter.OP_SEARCH, result).status, "network_error")
+
+    def test_redirects_are_not_followed(self):
+        FakeQloo.mode = "redirect"
+        result = DirectTransport(self.base, api_key=SECRET).execute(adapter.search_argv("A24", 2), 5)
+        self.assertEqual(len(FakeQloo.seen), 1)
+        self.assertNotEqual(classify(adapter.OP_SEARCH, result).status, "ok")
 
 
 class DirectEndToEnd(LocalServer):

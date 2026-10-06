@@ -70,7 +70,7 @@ def render_facts(normalized: Dict[str, Any], comparison: Dict[str, Any]) -> str:
         ["Started / finished (UTC)", f"{run.get('started_at')} / {run.get('finished_at')}"],
         ["Transport", versions.get("transport")],
         ["Harness version", versions.get("harness")],
-        ["Harness base URL", base_url or ("not applicable" if synthetic else "harness default")],
+        ["Base URL", base_url or ("not applicable" if synthetic else "harness default")],
         ["Adapter / parser status", f"{versions.get('adapter')} / {versions.get('parser_status')}"],
         ["Manifest version", versions.get("manifest")],
         ["Draft rule registry", f"{versions.get('draft_rule_registry')} (inactive draft; not applied by the spike)"],
@@ -107,7 +107,8 @@ def render_facts(normalized: Dict[str, Any], comparison: Dict[str, Any]) -> str:
     lines += _table(["Status", "Count", "Meaning"], [[s, n, STATUS_MEANINGS.get(s, "")] for s, n in sorted(counts.items())])
     reused = sum(1 for r in records if r.get("reused_from"))
     invocations = run.get("counts", {}).get("harness_invocations")
-    answered_by = "local fixtures (nothing reached Qloo)" if synthetic else "the Qloo harness"
+    answered_by = ("local fixtures (nothing reached Qloo)" if synthetic else
+                   "the Qloo API (direct HTTPS client)" if versions.get("transport") == "direct" else "the Qloo harness")
     lines += ["", f"Invocations answered by {answered_by}, including retries and excluding dry-run previews: {invocations}. "
               f"Responses reused from earlier identical live requests: {reused}.", ""]
     not_ok = normalized["coverage"]["not_ok_requests"]
@@ -146,7 +147,8 @@ def render_facts(normalized: Dict[str, Any], comparison: Dict[str, Any]) -> str:
 
     # 4. examples ----------------------------------------------------------
     lines += ["## 4. Returned examples with provenance", "",
-              "Literal values as returned. `raw` points to the saved harness output and the JSON Pointer of the item.", ""]
+              "Literal values as returned. `raw` points to the saved response (full HTTP body for the direct transport, "
+              "harness output otherwise) and the JSON Pointer of the item.", ""]
     by_seed: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
     for obs in normalized["observations"]:
         by_seed[obs["query_context"]["seed_key"]].append(obs)
@@ -161,7 +163,7 @@ def render_facts(normalized: Dict[str, Any], comparison: Dict[str, Any]) -> str:
                              f"{', '.join(obs.get('description_fields') or []) or 'none'}. raw {_ref(obs)}")
         tag_obs = [o for o in observations if o["query_context"]["operation"] == OP_SEED_TAGS]
         if tag_obs:
-            shown = "; ".join(f"{_cell(o.get('name'), 40)} [{(o.get('types') or {}).get('type') or 'no type'}] affinity={_cell(_affinity(o))}"
+            shown = "; ".join(f"{_cell(o.get('name'), 40)} [{(o.get('types') or {}).get('type') or (o.get('types') or {}).get('subtype') or 'no type'}] affinity={_cell(_affinity(o))}"
                               for o in tag_obs[:10])
             lines.append(f"- Tag insights (top {min(10, len(tag_obs))} of {len(tag_obs)}): {shown}. raw `{tag_obs[0]['raw_ref']['file']}`")
         related = [o for o in observations if o["query_context"]["operation"] == OP_RELATED]
@@ -242,7 +244,7 @@ def render_facts(normalized: Dict[str, Any], comparison: Dict[str, Any]) -> str:
         lines.append("No numeric score fields returned.")
     lines += ["", "## 9. Notes", ""] + [f"- {n}" for n in comparison["notes"]]
     lines += [
-        "- This sheet establishes what the harness returned for these requests. It does not establish shared aesthetics, "
+        "- This sheet establishes what Qloo returned for these requests. It does not establish shared aesthetics, "
         "audience preferences, motif labels, or fragrance suitability.",
         "",
     ]

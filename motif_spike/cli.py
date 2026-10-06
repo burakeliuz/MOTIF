@@ -143,7 +143,8 @@ def cmd_run(args: argparse.Namespace) -> int:
 
     run_id = new_run_id(args.mode)
     paths = RunPaths(root, run_id)
-    reuse = build_reuse_index(root, exclude_run=run_id) if args.mode == "live" and not args.no_reuse else {}
+    reuse = (build_reuse_index(root, exclude_run=run_id, transport=getattr(transport, "name", None))
+             if args.mode == "live" and not args.no_reuse else {})
     runner = Runner(plan, transport, paths, scenario=args.scenario if args.mode == "synthetic" else None,
                     readiness=readiness, harness_version=harness_version, registry_version=_registry_version(),
                     reuse_index=reuse, sleep=sleep, log=print)

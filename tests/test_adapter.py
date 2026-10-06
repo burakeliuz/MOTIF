@@ -1,5 +1,9 @@
 """Outcome classification, shape detection, field coverage, and redaction."""
 
+try:
+    from . import _netguard  # noqa: F401
+except ImportError:  # started as a top-level module (discover -s tests)
+    import _netguard  # noqa: F401
 import json
 import os
 import unittest

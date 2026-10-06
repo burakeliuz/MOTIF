@@ -1,4 +1,4 @@
-# MOTIF Qloo spike: run facts `synthetic-20261005T073752Z-bcdb`
+# MOTIF Qloo spike: run facts `synthetic-20261006T090636Z-8c5e`
 
 > **SYNTHETIC FIXTURE RUN: NOT QLOO DATA.** Every entity, tag, score, and ID below was invented locally to exercise the pipeline. It is not evidence about Qloo, the seed identities, or MOTIF feasibility.
 
@@ -9,9 +9,10 @@
 | Run status | completed |
 | Live execution status | not_live |
 | Abort reason | — |
-| Started / finished (UTC) | 2026-10-05T07:37:52Z / 2026-10-05T07:37:52Z |
+| Started / finished (UTC) | 2026-10-06T09:06:36Z / 2026-10-06T09:06:36Z |
+| Transport | fixture |
 | Harness version | — |
-| Harness base URL | not applicable |
+| Base URL | not applicable |
 | Adapter / parser status | 0.1.0 / unverified |
 | Manifest version | synthetic-1 |
 | Draft rule registry | draft-0.2 (inactive draft; not applied by the spike) |
@@ -81,31 +82,31 @@ Missing expected fields (count of items): local:req:0001: properties×1, tags×1
 
 ## 4. Returned examples with provenance
 
-Literal values as returned. `raw` points to the saved harness output and the JSON Pointer of the item.
+Literal values as returned. `raw` points to the saved response (full HTTP body for the direct transport, harness output otherwise) and the JSON Pointer of the item.
 
 ### `alpha`
 
-- Seed entity **Synthetic Seed Alpha**: Fixture Style ST1 [synthetic:tag:style]; Fixture Brand Keyword B1 [synthetic:tag:keyword:brand]. Description fields: properties.description, properties.short_description. raw `raw/synthetic-20261005T073752Z-bcdb/responses/0002.json#`
-- Tag insights (top 4 of 4): Fixture Style ST1 [synthetic:tag:style] affinity=0.97; Fixture Keyword K1 [synthetic:tag:keyword:media] affinity=0.9; Fixture Quiet [synthetic:tag:genre:music] affinity=0.85; Fixture Brand Keyword B1 [synthetic:tag:keyword:brand] affinity=—. raw `raw/synthetic-20261005T073752Z-bcdb/responses/0006.json`
+- Seed entity **Synthetic Seed Alpha**: Fixture Style ST1 [synthetic:tag:style]; Fixture Brand Keyword B1 [synthetic:tag:keyword:brand]. Description fields: properties.description, properties.short_description. raw `raw/synthetic-20261006T090636Z-8c5e/responses/0002.json#`
+- Tag insights (top 4 of 4): Fixture Style ST1 [synthetic:tag:style] affinity=0.97; Fixture Keyword K1 [synthetic:tag:keyword:media] affinity=0.9; Fixture Quiet [synthetic:tag:genre:music] affinity=0.85; Fixture Brand Keyword B1 [synthetic:tag:keyword:brand] affinity=—. raw `raw/synthetic-20261006T090636Z-8c5e/responses/0006.json`
 - Related **movie** (5 returned):
-  - #1 Fixture Film 101 (`SYNTHETIC-ENT-M101`) affinity=0.95, popularity=0.9; tags: Fixture Keyword K1 [synthetic:tag:keyword:media]; Fixture Genre G1 [synthetic:tag:genre:media]; Fixture Streaming S1 [synthetic:tag:streaming_service:media]; Fixture Quiet [synthetic:tag:keyword:media]. raw `raw/synthetic-20261005T073752Z-bcdb/responses/0003.json#/0`
-  - #2 Fixture Film 102 (`SYNTHETIC-ENT-M102`) affinity=0.91, popularity=0.7; tags: Fixture Keyword K2 [synthetic:tag:keyword:media]; Fixture Genre G1 [synthetic:tag:genre:media]. raw `raw/synthetic-20261005T073752Z-bcdb/responses/0003.json#/1`
-  - #3 Fixture Film 103 (`SYNTHETIC-ENT-M103`) affinity=0.88, popularity=0.5; tags: Fixture Keyword K1 [synthetic:tag:keyword:media]; Fixture Streaming S1 [synthetic:tag:streaming_service:media]. raw `raw/synthetic-20261005T073752Z-bcdb/responses/0003.json#/2`
+  - #1 Fixture Film 101 (`SYNTHETIC-ENT-M101`) affinity=0.95, popularity=0.9; tags: Fixture Keyword K1 [synthetic:tag:keyword:media]; Fixture Genre G1 [synthetic:tag:genre:media]; Fixture Streaming S1 [synthetic:tag:streaming_service:media]; Fixture Quiet [synthetic:tag:keyword:media]. raw `raw/synthetic-20261006T090636Z-8c5e/responses/0003.json#/0`
+  - #2 Fixture Film 102 (`SYNTHETIC-ENT-M102`) affinity=0.91, popularity=0.7; tags: Fixture Keyword K2 [synthetic:tag:keyword:media]; Fixture Genre G1 [synthetic:tag:genre:media]. raw `raw/synthetic-20261006T090636Z-8c5e/responses/0003.json#/1`
+  - #3 Fixture Film 103 (`SYNTHETIC-ENT-M103`) affinity=0.88, popularity=0.5; tags: Fixture Keyword K1 [synthetic:tag:keyword:media]; Fixture Streaming S1 [synthetic:tag:streaming_service:media]. raw `raw/synthetic-20261006T090636Z-8c5e/responses/0003.json#/2`
 - Related **artist** (4 returned):
-  - #1 Fixture Artist 101 (`SYNTHETIC-ENT-R101`) affinity=0.92, popularity=0.7; tags: Fixture Music Genre M1 [synthetic:tag:genre:music]; Fixture Keyword K1 [synthetic:tag:keyword:media]; Fixture Quiet [synthetic:tag:genre:music]. raw `raw/synthetic-20261005T073752Z-bcdb/responses/0004.json#/0`
-  - #2 Fixture Artist 102 (`SYNTHETIC-ENT-R102`) affinity=0.89, popularity=0.6; tags: Fixture Music Genre M1 [synthetic:tag:genre:music]. raw `raw/synthetic-20261005T073752Z-bcdb/responses/0004.json#/1`
-  - #3 Fixture Artist 103 (`SYNTHETIC-ENT-R103`) affinity=0.84, popularity=0.4; tags: no tags returned. raw `raw/synthetic-20261005T073752Z-bcdb/responses/0004.json#/2`
+  - #1 Fixture Artist 101 (`SYNTHETIC-ENT-R101`) affinity=0.92, popularity=0.7; tags: Fixture Music Genre M1 [synthetic:tag:genre:music]; Fixture Keyword K1 [synthetic:tag:keyword:media]; Fixture Quiet [synthetic:tag:genre:music]. raw `raw/synthetic-20261006T090636Z-8c5e/responses/0004.json#/0`
+  - #2 Fixture Artist 102 (`SYNTHETIC-ENT-R102`) affinity=0.89, popularity=0.6; tags: Fixture Music Genre M1 [synthetic:tag:genre:music]. raw `raw/synthetic-20261006T090636Z-8c5e/responses/0004.json#/1`
+  - #3 Fixture Artist 103 (`SYNTHETIC-ENT-R103`) affinity=0.84, popularity=0.4; tags: no tags returned. raw `raw/synthetic-20261006T090636Z-8c5e/responses/0004.json#/2`
 - Related **book** (3 returned):
-  - #1 Fixture Book 101 (`SYNTHETIC-ENT-K101`) affinity=0.9, popularity=0.45; tags: Fixture Keyword K1 [synthetic:tag:keyword:media]; Fixture Book Genre BK1 [synthetic:tag:genre:book]. raw `raw/synthetic-20261005T073752Z-bcdb/responses/0005.json#/0`
-  - #2 Fixture Book 102 (`SYNTHETIC-ENT-K102`) affinity=0.86, popularity=0.3; tags: Fixture Book Genre BK1 [synthetic:tag:genre:book]. raw `raw/synthetic-20261005T073752Z-bcdb/responses/0005.json#/1`
-  - #3 Fixture Book 103 (`SYNTHETIC-ENT-K103`) affinity=0.82, popularity=0.28; tags: Fixture Book Genre BK2 [synthetic:tag:genre:book]. raw `raw/synthetic-20261005T073752Z-bcdb/responses/0005.json#/2`
+  - #1 Fixture Book 101 (`SYNTHETIC-ENT-K101`) affinity=0.9, popularity=0.45; tags: Fixture Keyword K1 [synthetic:tag:keyword:media]; Fixture Book Genre BK1 [synthetic:tag:genre:book]. raw `raw/synthetic-20261006T090636Z-8c5e/responses/0005.json#/0`
+  - #2 Fixture Book 102 (`SYNTHETIC-ENT-K102`) affinity=0.86, popularity=0.3; tags: Fixture Book Genre BK1 [synthetic:tag:genre:book]. raw `raw/synthetic-20261006T090636Z-8c5e/responses/0005.json#/1`
+  - #3 Fixture Book 103 (`SYNTHETIC-ENT-K103`) affinity=0.82, popularity=0.28; tags: Fixture Book Genre BK2 [synthetic:tag:genre:book]. raw `raw/synthetic-20261006T090636Z-8c5e/responses/0005.json#/2`
 
 ### `beta`
 
 - Related **movie** (5 returned):
-  - #1 Fixture Film 101 (`SYNTHETIC-ENT-M101`) affinity=0.93, popularity=0.9; tags: Fixture Keyword K1 [synthetic:tag:keyword:media]; Fixture Genre G1 [synthetic:tag:genre:media]. raw `raw/synthetic-20261005T073752Z-bcdb/responses/0009.json#/0`
-  - #2 Fixture Film 103 (`SYNTHETIC-ENT-M103`) affinity=0.9, popularity=0.5; tags: Fixture Keyword K1 [synthetic:tag:keyword:media]. raw `raw/synthetic-20261005T073752Z-bcdb/responses/0009.json#/1`
-  - #3 Fixture Film 201 (`SYNTHETIC-ENT-M201`) affinity=0.87, popularity=0.3; tags: Fixture Keyword K2 [synthetic:tag:keyword:media]. raw `raw/synthetic-20261005T073752Z-bcdb/responses/0009.json#/2`
+  - #1 Fixture Film 101 (`SYNTHETIC-ENT-M101`) affinity=0.93, popularity=0.9; tags: Fixture Keyword K1 [synthetic:tag:keyword:media]; Fixture Genre G1 [synthetic:tag:genre:media]. raw `raw/synthetic-20261006T090636Z-8c5e/responses/0009.json#/0`
+  - #2 Fixture Film 103 (`SYNTHETIC-ENT-M103`) affinity=0.9, popularity=0.5; tags: Fixture Keyword K1 [synthetic:tag:keyword:media]. raw `raw/synthetic-20261006T090636Z-8c5e/responses/0009.json#/1`
+  - #3 Fixture Film 201 (`SYNTHETIC-ENT-M201`) affinity=0.87, popularity=0.3; tags: Fixture Keyword K2 [synthetic:tag:keyword:media]. raw `raw/synthetic-20261006T090636Z-8c5e/responses/0009.json#/2`
 
 ### `gamma`
 
@@ -182,4 +183,4 @@ k/n = seed's results carrying the tag; K/N = pooled results of all seeds in the 
 - Only requests with identical comparability parameters (operation, entity type, take, explainability or limit) are compared.
 - Affinity and popularity are reported as returned; they are not percentages of people, confidence, or scent suitability, and are not averaged across requests.
 - Sample shares compare tag frequency inside the retrieved top-N results of seeds in the same comparable group. They are not lift: there is no population denominator.
-- This sheet establishes what the harness returned for these requests. It does not establish shared aesthetics, audience preferences, motif labels, or fragrance suitability.
+- This sheet establishes what Qloo returned for these requests. It does not establish shared aesthetics, audience preferences, motif labels, or fragrance suitability.

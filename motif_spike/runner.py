@@ -34,11 +34,13 @@ from .transport import ProcessResult
 from .util import RunPaths, append_jsonl, iso, read_json, read_jsonl, request_id, utc_now, write_json
 
 
-def signature(argv: Sequence[str]) -> str:
-    return "sha256:" + hashlib.sha256(json.dumps(list(argv)).encode("utf-8")).hexdigest()
+def signature(argv: Sequence[str], transport: str = "harness") -> str:
+    # The transport is part of the identity: harness output is a projection,
+    # direct output is the full body, so they must never be reused for each other.
+    return "sha256:" + hashlib.sha256(json.dumps([transport] + list(argv)).encode("utf-8")).hexdigest()
 
 
-def build_reuse_index(root: Path, exclude_run: Optional[str] = None) -> Dict[str, Dict[str, Any]]:
+def build_reuse_index(root: Path, exclude_run: Optional[str] = None, transport: Optional[str] = None) -> Dict[str, Dict[str, Any]]:
     """Successful live responses from earlier runs, keyed by command signature."""
     index: Dict[str, Dict[str, Any]] = {}
     raw = root / "raw"
@@ -50,6 +52,8 @@ def build_reuse_index(root: Path, exclude_run: Optional[str] = None) -> Dict[str
             continue
         run = read_json(run_file)
         if run.get("mode") != "live" or run.get("synthetic"):
+            continue
+        if transport is not None and ((run.get("versions") or {}).get("transport") or "harness") != transport:
             continue
         for rec in read_jsonl(run_dir / "requests.jsonl"):
             if rec.get("status") in ("ok", "ok_empty") and rec.get("response_ref") and not rec.get("reused_from"):
@@ -98,6 +102,7 @@ class Runner:
         self.abort_reason: Optional[str] = None
         self.records: List[Dict[str, Any]] = []
         self.started_at = iso(utc_now())
+        self.transport_name = getattr(transport, "name", "harness")
 
     # -- public ---------------------------------------------------------------
 
@@ -203,7 +208,8 @@ class Runner:
                  entity_id: Optional[str] = None) -> Tuple[Dict[str, Any], Optional[Outcome]]:
         rec = self._base_record(operation, seed, domain, entity_id)
         rec["harness_command"] = adapter.display_command(argv)
-        rec["signature"] = signature(argv)
+        rec["signature"] = signature(argv, self.transport_name)
+        rec["transport"] = self.transport_name
 
         if self.abort_reason:
             rec.update(status="skipped_after_auth_error", skip_reason=self.abort_reason, finished_at=rec["started_at"])
@@ -293,7 +299,7 @@ class Runner:
         outcome = classify(operation, ProcessResult(0, text, "", 0))
         rec.update(
             status=outcome.status, finished_at=iso(utc_now()), output_shape=outcome.shape, result_count=outcome.item_count,
-            reused_from={k: source[k] for k in ("run_id", "request_id", "executed_at")},
+            reused_from={**{k: source[k] for k in ("run_id", "request_id", "executed_at")}, "transport": self.transport_name},
             api_request_preview=source.get("api_request_preview"),
             preview_source=source.get("preview_source") or "not captured for the reused response",
         )
@@ -349,7 +355,7 @@ class Runner:
                 "manifest": self.plan.manifest_version,
                 "draft_rule_registry": self.registry_version,
                 "harness": self.harness_version,
-                "transport": getattr(self.transport, "name", None),
+                "transport": self.transport_name,
             },
             "readiness": self.readiness,
             "plan": self.plan.snapshot(),

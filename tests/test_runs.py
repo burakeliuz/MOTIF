@@ -1,5 +1,9 @@
 """End-to-end checks: synthetic isolation, provenance, error states, live guards."""
 
+try:
+    from . import _netguard  # noqa: F401
+except ImportError:  # started as a top-level module (discover -s tests)
+    import _netguard  # noqa: F401
 import contextlib
 import io
 import json
@@ -222,6 +226,14 @@ class LiveGuards(unittest.TestCase):
         self.assertTrue(all(r["reused_from"] and r["status"] == "ok" for r in records))
         third, _ = self.live_run(reuse=False)
         self.assertEqual(len(self.calls()), 2 * sent_first)
+
+    def test_reuse_never_crosses_transports(self):
+        from motif_spike.runner import signature
+        self.live_run()
+        argv = ["api", "search", "--query", "A24", "--take", "10", "--json"]
+        self.assertNotEqual(signature(argv, "harness"), signature(argv, "direct"))
+        self.assertTrue(build_reuse_index(self.root, transport="harness"))
+        self.assertEqual(build_reuse_index(self.root, transport="direct"), {})
 
     def test_two_seeds_resolving_to_one_entity_share_requests(self):
         # The fake search returns the same entity ID for every query.
