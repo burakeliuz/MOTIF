@@ -17,7 +17,19 @@ HTTP body (read from harness 0.1.26 source, see docs/QLOO_ACCESS_NOTES.md):
 The direct transport saves the full HTTP body instead. The parsers below
 accept both kinds of documented shapes, record the shape actually
 seen, and report anything else as `unrecognized_shape` instead of guessing.
-They have not been checked against live output yet.
+They were checked against the direct transport's live bodies on 2026-10-06
+(pilot run `live-20261006T102530Z-61e1`):
+
+* `/search`      -> `{"results": [entity, ...]}`; entity tags use `tag_id`
+* `/entities`    -> `{"results": [entity]}` (not a bare object)
+* `/v2/insights` entity types -> `{"success", "results": {"entities": [...]},
+  "query": {"explainability": {...}}}`; entity tags use `id`; each entity has
+  `query.affinity`, `query.measurements`, `query.explainability`
+* `/v2/insights` `filter.type=urn:tag` -> `{"success", "results": {"tags": [...]}}`;
+  each tag has `tag_id`, `name`, `types` (parent entity types), `subtype`
+  (tag namespace), `tag_value`, `popularity`, `query.affinity`
+
+The harness-output branches remain documented-only (not live-checked).
 """
 
 from __future__ import annotations
@@ -30,12 +42,12 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 from .util import get_path, has_path, is_number, join_pointer
 
-ADAPTER_VERSION = "0.1.0"
-# Flip to "verified" only after comparing these parsers with real harness output.
-PARSER_STATUS = "unverified"
+ADAPTER_VERSION = "0.2.0"
+# "verified" covers the direct transport's HTTP bodies (see module docstring).
+PARSER_STATUS = "verified"
 PARSER_BASIS = (
-    "Qloo docs-public reference and @qloo/qloo-harness 0.1.26 source, read 2026-10-04; "
-    "no live harness output inspected yet"
+    "direct-transport HTTP bodies of live pilot run live-20261006T102530Z-61e1 (2026-10-06), "
+    "compared with locate_items/item_view; harness-output shapes remain documentation-based"
 )
 MIN_HARNESS_VERSION = (0, 1, 26)
 
@@ -362,7 +374,7 @@ EXPECTED_FIELDS: Dict[str, List[Tuple[str, List[Tuple[str, ...]]]]] = {
 EXPECTED_FIELDS["seed_entity"] = EXPECTED_FIELDS["search_candidate"]
 
 DESCRIPTION_PATHS = (("properties", "description"), ("properties", "short_description"), ("properties", "short_descriptions"))
-SCORE_PATHS = (("query", "affinity"), ("affinity",), ("popularity",))
+SCORE_PATHS = (("query", "affinity"), ("affinity",), ("popularity",), ("query", "measurements", "audience_growth"))
 
 
 def _first_present(item: Dict[str, Any], paths: Sequence[Tuple[str, ...]]) -> Optional[Tuple[str, ...]]:
@@ -414,6 +426,8 @@ def item_view(kind: str, item: Any, pointer: str) -> Dict[str, Any]:
         ],
     }
     if kind == "tag_insight":
+        if "tag_value" in item:
+            view["tag_value"] = item["tag_value"]
         return view
 
     properties = item.get("properties")

@@ -87,6 +87,44 @@ class ShapesAndFields(unittest.TestCase):
         self.assertEqual(view["tags"][0]["type"], "urn:tag:keyword:media")
 
 
+class LiveBodyShapes(unittest.TestCase):
+    """Shapes seen in direct-transport bodies on 2026-10-06; values here are invented."""
+
+    def test_entities_endpoint_wraps_the_entity_in_results(self):
+        doc = {"results": [{"entity_id": "E1", "name": "N", "types": ["urn:entity:brand"],
+                            "tags": [{"tag_id": "urn:tag:x:qloo:y", "name": "Y", "type": "urn:tag:x:qloo"}]}]}
+        items, shape = locate_items(adapter.OP_SEED_DETAIL, doc)
+        self.assertEqual((shape, [p for p, _ in items]), ("results", ["/results/0"]))
+        view = item_view("seed_entity", items[0][1], items[0][0])
+        self.assertEqual(view["tags"][0]["id"], "urn:tag:x:qloo:y")
+
+    def test_insights_entities_keep_measurements_and_explainability(self):
+        doc = {"success": True, "results": {"entities": [{
+            "entity_id": "E2", "name": "N", "type": "urn:entity", "subtype": "urn:entity:movie",
+            "tags": [{"id": "urn:tag:style:qloo:a", "name": "A", "type": "urn:tag:style:qloo"}],
+            "query": {"affinity": 0.5, "measurements": {"audience_growth": 0},
+                      "explainability": {"signal.interests.entities": [{"entity_id": "E1", "score": 1}]}}}]},
+            "query": {"explainability": {}}}
+        outcome = classify(adapter.OP_RELATED, ProcessResult(0, json.dumps(doc), "", 1))
+        self.assertEqual((outcome.status, outcome.shape), ("ok", "results.entities"))
+        view = item_view("related_entity", doc["results"]["entities"][0], "/results/entities/0")
+        self.assertIn({"field": "query.measurements.audience_growth", "value": 0,
+                       "pointer": "/results/entities/0/query/measurements/audience_growth"}, view["scores"])
+        self.assertEqual(view["explanation"]["pointer"], "/results/entities/0/query/explainability")
+
+    def test_tag_insights_keep_namespace_and_tag_value(self):
+        doc = {"success": True, "results": {"tags": [{
+            "tag_id": "urn:tag:genre:place:bar", "name": "Bar", "types": ["urn:entity:place"],
+            "subtype": "urn:tag:genre:place", "tag_value": "urn:tag:genre:place:bar",
+            "popularity": 0.9, "query": {"affinity": 1}}]}}
+        outcome = classify(adapter.OP_SEED_TAGS, ProcessResult(0, json.dumps(doc), "", 1))
+        self.assertEqual((outcome.status, outcome.shape), ("ok", "results.tags"))
+        view = item_view("tag_insight", doc["results"]["tags"][0], "/results/tags/0")
+        self.assertEqual(view["types"]["subtype"], "urn:tag:genre:place")
+        self.assertEqual(view["tag_value"], "urn:tag:genre:place:bar")
+        self.assertEqual(field_coverage("tag_insight", doc["results"]["tags"][0]), ([], []))
+
+
 class Redaction(unittest.TestCase):
     def test_secret_value_and_header_patterns_are_removed(self):
         with mock.patch.dict(os.environ, {"QLOO_API_KEY": "sk-test-SHOULD-NOT-APPEAR"}):

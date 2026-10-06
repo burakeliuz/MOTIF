@@ -192,6 +192,8 @@ def normalize_run(paths: RunPaths) -> Dict[str, Any]:
     observations: List[Dict[str, Any]] = []
     shape_notes = []
     harness_resolution_checks = []
+    # Response-level fields outside the located items (direct transport bodies only).
+    response_level = []
     for rec in records:
         doc = load_doc(paths, rec)
         if doc is None:
@@ -201,6 +203,16 @@ def normalize_run(paths: RunPaths) -> Dict[str, Any]:
         if shape == "unrecognized":
             keys = sorted(doc) if isinstance(doc, dict) else type(doc).__name__
             shape_notes.append({"request_id": rec["request_id"], "operation": rec["operation"], "top_level": keys})
+        aggregate = get_path(doc, ("query", "explainability")) if isinstance(doc, dict) else None
+        if aggregate is not None:
+            response_level.append({
+                "request_id": rec["request_id"],
+                "seed_key": rec.get("seed_key"),
+                "domain_key": rec.get("domain_key"),
+                "field": "query.explainability",
+                "value": aggregate,
+                "raw_ref": {"file": rec["response_ref"], "pointer": "/query/explainability"},
+            })
         if rec["operation"] == OP_SEED_TAGS and isinstance(doc, dict):
             interpreted = get_path(doc, ("interpretation", "entities"))
             ids = [e.get("entityId") for e in interpreted] if isinstance(interpreted, list) else None
@@ -248,7 +260,7 @@ def normalize_run(paths: RunPaths) -> Dict[str, Any]:
 
     coverage = _coverage(records, observations)
     coverage.update(run_id=run_id, synthetic=synthetic, unrecognized_shapes=shape_notes,
-                    harness_resolution_checks=harness_resolution_checks)
+                    harness_resolution_checks=harness_resolution_checks, response_level_fields=response_level)
 
     normalized_run = dict(run)
     normalized_run["normalization"] = {
