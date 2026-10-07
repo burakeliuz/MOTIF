@@ -65,9 +65,10 @@ def _list(words: List[str]) -> str:
     return words[0] if len(words) == 1 else ", ".join(words[:-1]) + " and " + words[-1]
 
 
-def template_prose(seed_name: str, result: Dict[str, Any], intent: Optional[str] = None) -> str:
+def template_prose(seed_name: str, result: Dict[str, Any]) -> str:
     """Plain-language brief written by a fixed template (no LLM). It opens with the same lead as the
-    result page (`narrative.headline`); rule codes and scores stay in the JSON."""
+    result page (`narrative.headline`); rule codes and scores stay in the JSON. The application
+    context is not repeated here: the web page and the PDF show it once, on its own line."""
     from .narrative import headline  # local: keeps this module importable on its own
     lead = headline(seed_name, result)
     lines = [f"{seed_name}: a direction, not a formula.", lead["title"]] + list(lead["lines"])
@@ -75,20 +76,15 @@ def template_prose(seed_name: str, result: Dict[str, Any], intent: Optional[str]
     if mats["status"] == "composed":
         where = {"top": "at the top", "heart": "in the heart", "base": "at the base"}
         lines.append("Suggested starting materials: " + _list([f"{m['name']} {where[m['slot']]}" for m in mats["selected"]]) + ".")
-        extras = [f"{m['name']} also brings {NOUN.get(u['pole'], u['pole'])}" for m in mats["selected"] for u in m["unrequested_properties"]]
-        if extras:
-            lines.append(_list(extras) + ": supplier-described properties on dimensions the evidence leaves open, kept as creative choices.")
         if mats.get("empty_slots"):
-            lines.append("No verified material for: " + ", ".join(mats["empty_slots"]) + ".")
+            lines.append("No verified material for: " + ", ".join(mats["empty_slots"]) + " (left open).")
         if mats["verification_mode"] != "verified_only":
             lines.append("DESIGN PREVIEW: material properties are not verified against full supplier pages.")
     else:
         lines.append("No material composition is proposed.")
     open_list = [AXIS_LABELS[a] for a in open_axes(result)]
     if open_list:
-        lines.append("Left open by the evidence: " + ", ".join(open_list) + ".")
-    if intent:
-        lines.append(f"Application context: {intent.rstrip('.')}.")
+        lines.append("Open to the perfumer: " + ", ".join(open_list) + ".")
     return " ".join(lines)
 
 

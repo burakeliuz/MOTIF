@@ -125,7 +125,6 @@ function renderStart() {
       h("label", { class: "kicker", for: "intent", text: "Application context (optional)" }), intent,
       quickPicks("For example", CONTEXT_PICKS, intent),
       h("p", { class: "hint", id: "intent-hint", text: "Used to frame the final brief around its intended setting; cultural evidence and scent direction remain unchanged." })));
-  const llm = config && config.llm === "configured";
   const notice = config && !config.live_available
     ? h("p", { class: "notice", role: "status", text: "Live Qloo access is not configured on this server, so searches cannot run. Nothing is replaced with sample data." }) : null;
   swap(h("section", { class: "hero" },
@@ -139,9 +138,8 @@ function renderStart() {
           h("span", { text: "How Qloo describes the brand, and the brands and films it relates to it." })),
         h("li", {}, h("b", { text: "02" }), h("span", { class: "st" }, src("MOTIF"), " Scent direction"),
           h("span", { text: "Repeated motifs, translated by visible rules into a direction and verified starting materials." })),
-        h("li", {}, h("b", { text: "03" }), h("span", { class: "st" }, llm ? src("Claude") : src("MOTIF"), " Brief"),
-          h("span", { text: llm ? "Claude writes the brief from the result; MOTIF checks it against the result."
-            : "MOTIF writes the brief from the result with a fixed template." })))));
+        h("li", {}, h("b", { text: "03" }), h("span", { class: "st" }, src("MOTIF"), " Brief"),
+          h("span", { text: "A one-page brief for a perfumer, every line traceable to the evidence." })))));
   window.scrollTo({ top: 0 });
 }
 
@@ -262,10 +260,7 @@ function materialDetail(m, brand) {
     h("h4", { text: "Why MOTIF chose it" }),
     h("p", { text: "It fits " + brand + "'s proposed direction on " + m.fits.map((f) => f.toLowerCase()).join(" and ")
       + ". A starting point for the perfumer, not a tested formula." }),
-    asked.length ? [h("h4", { text: "Supplier's description (verified on the supplier's page)" }), asked.map(quote)] : null,
-    other.length ? [h("h4", { text: "Also described by the supplier" }),
-      h("p", { class: "mute small", text: "On dimensions still open in this direction: creative choices, not evidence about " + brand + "." }),
-      other.map(quote)] : null,
+    m.props.length ? [h("h4", { text: "Supplier's description" }), asked.map(quote), other.map(quote)] : null,
     m.props.some((p) => p.interpretation) ? [h("h4", { text: "MOTIF's reading" }),
       h("ul", { class: "reading" }, m.props.filter((p) => p.interpretation).map((p) => h("li", { text: p.interpretation })))] : null,
     h("p", { class: "patnote", text: MotifStrips.NOTE }));
@@ -310,7 +305,7 @@ function materialsBlock(r, brand) {
     if (i >= 0) { buttons[i].setAttribute("aria-expanded", "true"); detailHost.append(materialDetail(mats.selected[i], brand)); }
   }
   return [h("p", { class: "intro", text: mats.status_text + " Select a strip for why and the supplier's own words." }), grid, detailHost,
-    mats.empty_slots && mats.empty_slots.length ? h("p", { class: "mute small", text: "No verified material for: " + mats.empty_slots.join(", ") + ". MOTIF leaves it empty rather than inventing one." }) : null];
+    mats.empty_slots && mats.empty_slots.length ? h("p", { class: "mute small", text: "No verified material for: " + mats.empty_slots.join(", ") + "; left open to the perfumer." }) : null];
 }
 
 function phraseButtons(items, motif) {
@@ -321,7 +316,7 @@ function phraseButtons(items, motif) {
 function profileBlock(r, brand) {
   if (!r.profile.length) return h("p", { class: "intro", text: r.headline.lines.join(" ") || r.outcome_text });
   const byMotif = Object.fromEntries(r.motifs.map((m) => [m.motif, m]));
-  return [h("p", { class: "intro", text: "Motifs MOTIF found in the descriptors Qloo returned, strongest evidence first. Motifs from " + brand + "'s own entry lead." }),
+  return [h("p", { class: "intro" }, h("b", { text: "Cultural evidence sourced from Qloo." }), " The motifs MOTIF reads in it, strongest evidence first; motifs from " + brand + "'s own entry lead."),
     h("ul", { class: "basis" }, r.profile.map((p) => h("li", {},
       h("div", { class: "ax" }, p.label, h("small", { text: p.strength_label + " · " + p.source_short.join(", ") })),
       h("div", {},
@@ -333,17 +328,10 @@ function profileBlock(r, brand) {
 function briefBlock(s) {
   const b = s.brief;
   if (!b) return h("p", { class: "intro", text: "No brief is written for a stopped or incomplete result." });
-  const note = b.note || "";
-  const byline = b.author === "llm"
-    ? ["Written by ", src("Claude"), " " + b.model + " from the result, then checked against it. It chose no motif, direction, or material."]
-    : [src("MOTIF"), " " + (/paused/.test(note) ? "Written by MOTIF's fixed template."
-        : /budget/.test(note) ? "The LLM call budget is used up, so this is MOTIF's fixed template."
-        : /failed validation/.test(note) ? "The LLM's text did not pass MOTIF's checks, so this is MOTIF's fixed template."
-        : /failed/.test(note) ? "The LLM call did not succeed, so this is MOTIF's fixed template, not LLM output."
-        : "Written by MOTIF's fixed template; no LLM is configured on this server.")];
   return h("div", { class: "brief" },
-    s.intent ? h("p", { class: "intentline", text: "Application context: “" + s.intent + "”. " + (s.intent_effect || "") }) : null,
-    h("p", { class: "text", text: b.text }), h("p", { class: "byline" }, byline),
+    s.intent ? h("p", { class: "intentline", text: "Application context: “" + s.intent + "”" }) : null,
+    h("p", { class: "text", text: b.text }),
+    b.author === "llm" ? h("p", { class: "byline" }, "Prose drafted by ", src("Claude"), " from this result and checked against it.") : null,
     h("div", { class: "actions" },
       h("a", { class: "btn", href: "/brief/" + encodeURIComponent(s.id), target: "_blank", rel: "noopener", text: "Print or save as PDF" }),
       h("a", { class: "btn ghost", href: "/api/sessions/" + encodeURIComponent(s.id) + "/brief.json", download: "motif-brief.json", text: "Technical JSON" })));
@@ -354,9 +342,9 @@ function sourcesList(r) {
   return h("div", { class: "sources" },
     h("h3", { class: "kicker", text: "Sources" }),
     h("ul", {},
-      h("li", {}, h("b", { text: q.api }), " · fetched " + q.dates.join(", ") + " · "
-        + q.requests.map((x) => x.what.toLowerCase() + " (" + x.path + ", " + x.request_id.replace("local:req:", "request ") + ")").join("; ")
-        + ". No public page exists for an API response; the literal values are in the technical JSON."),
+      h("li", {}, h("b", { text: "Cultural evidence sourced from Qloo" }), " · fetched " + q.dates.join(", ") + " · "
+        + [...new Set(q.requests.map((x) => x.what.toLowerCase()))].join(", ")
+        + ". Each phrase above opens its source; the full trail is in the technical JSON."),
       r.sources.suppliers.map((x) => h("li", {}, h("b", { text: x.supplier }), " · " + x.material + " · ",
         h("a", { href: x.url, target: "_blank", rel: "noopener noreferrer", text: x.document || x.url }), x.accessed ? " · read " + x.accessed : ""))));
 }
@@ -368,19 +356,17 @@ function howBlock(s, r, brand) {
     h("div", {}, h("h3", { text: m.label }), h("div", { class: "sp", text: m.strength_label + (m.active ? " · used" : " · not used") + " · " + m.sources.join(", ") })),
     h("div", {},
       h("div", {}, src("Qloo"), " ", phraseButtons(m.evidence.slice(0, 8), m), m.evidence.some((e) => e.common_in_sample) ? h("span", { class: "tag-common", text: "some common in sample" }) : null),
-      h("div", { class: "rl" }, src("MOTIF"), " ", m.rule ? "Draft rule: " + m.label.toLowerCase() + " → " + m.rule.text.toLowerCase() + ". " + m.rule.rationale + "." : "No scent rule for this motif."),
+      h("div", { class: "rl" }, src("MOTIF"), " ", m.rule ? "Translated as " + m.rule.text.toLowerCase() + "." : "Not translated into a scent dimension."),
       m.excluded.length ? h("div", { class: "rl mute", text: "Set aside by context rules: " + m.excluded.map((e) => e.tag).join(", ") }) : null));
   const res = s.resolution || {};
   return h("details", { class: "fold", id: "how" },
     h("summary", {}, "How it was made", h("small", { text: "Motifs, rules, and sources; technical records inside" })),
-    h("p", { class: "intro", text: "Qloo supplied the literal descriptors. MOTIF grouped them into motifs with a versioned lexicon and translated motifs into directions with draft rules. A motif repeated across references is a pattern, not proof of an aesthetic; descriptors marked common appear for at least four of the seven brands in MOTIF's reference sample." }),
+    h("p", { class: "intro", text: "Qloo supplied the descriptors, quoted here literally. MOTIF groups them into motifs and translates the motifs into a direction. A motif repeated across references is a pattern, not proof of an aesthetic; descriptors marked common appear for at least four of the seven brands in MOTIF's reference sample." }),
     active.length ? active.map(motifRow) : h("p", { text: "No motif reached the threshold for use." }),
     rest.length ? h("details", { class: "tech" }, h("summary", { text: "Seen but not used (" + rest.length + ")" }), rest.map(motifRow)) : null,
     sourcesList(r),
-    h("details", { class: "tech" }, h("summary", { text: "Technical record" }),
+    h("details", { class: "tech" }, h("summary", { text: "Full trace" }),
       h("p", { text: "Qloo entity: " + (res.name || brand) + (s.fetched ? " · fetched " + when(s.fetched[0]) : "") }),
-      h("p", { text: "Versions: engine " + r.versions.engine + " · lexicon " + r.versions.lexicon + " · rules " + r.versions.rules + " · palette " + r.versions.palette + " · params " + r.versions.params }),
-      h("p", { text: "Steps: " + s.steps.map((x) => x.label + " (" + x.status + ")").join(" · ") }),
       h("p", {}, "Every phrase above opens its entity, field, request, and date. Full trail: ", h("a", { href: "/api/sessions/" + encodeURIComponent(s.id) + "/brief.json", download: "motif-brief.json", text: "technical JSON" }), ".")));
 }
 
@@ -392,11 +378,11 @@ function directionBlock(r, brand) {
       const d = r.direction.find((x) => x.key === a.key);
       return [h("dt", { text: a.name + " (" + a.poles[0] + " / " + a.poles[1] + ")" }),
         h("dd", { text: d ? d.word + " · " + (d.basis ? d.basis.text : "")
-          : a.state === "conflicted" ? "Open: the evidence points both ways." : "Open: not decided by the evidence; not a midpoint." })];
+          : a.state === "conflicted" ? "Open to the perfumer: the evidence points both ways." : "Open to the perfumer: the evidence does not decide it." })];
     })));
   return h("div", { class: "dir" },
     words.length ? h("div", { class: "char" }, words) : h("p", { class: "none", text: "None yet." }),
-    r.still_open.length ? h("p", { class: "stillopen", text: "Still open: " + r.still_open.map((a) => a.axis.toLowerCase()).join(", ") + "." }) : null,
+    r.still_open.length ? h("p", { class: "stillopen", text: "Open to the perfumer: " + r.still_open.map((a) => a.axis.toLowerCase()).join(", ") + "." }) : null,
     axes);
 }
 
@@ -445,13 +431,13 @@ function openEvidence(item, motif, kind, opener) {
     h("div", { class: "ev-part" }, h("h3", {}, src("MOTIF"), " MOTIF's reading, not from Qloo"),
       h("dl", { class: "kv" },
         h("dt", { text: "Motif" }), h("dd", { text: motif.label + " · " + motif.strength_label }),
-        h("dt", { text: "Rule" }), h("dd", { text: motif.rule ? "Draft: " + motif.rule.text : "No scent rule for this motif" }))),
+        h("dt", { text: "Translation" }), h("dd", { text: motif.rule ? motif.rule.text : "Not translated into a scent dimension" }))),
     h("details", { class: "tech" }, h("summary", { text: "Technical record" }),
       h("dl", { class: "kv" },
         h("dt", { text: "Field" }), h("dd", {}, h("code", { text: item.tag_type })),
         h("dt", { text: "Position" }), h("dd", {}, h("code", { text: item.json_pointer })),
         h("dt", { text: "Request" }), h("dd", {}, h("code", { text: "GET " + item.request_path + (params ? "?" + params : "") })),
-        h("dt", { text: "Lexicon cue" }), h("dd", { text: item.cue || "" })))].filter(Boolean));
+        h("dt", { text: "Matched cue" }), h("dd", { text: item.cue || "" })))].filter(Boolean));
   dialog._opener = opener || null;
   dialog.showModal();
 }

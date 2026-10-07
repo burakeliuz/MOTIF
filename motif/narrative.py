@@ -127,13 +127,13 @@ def headline(name: str, result: Dict[str, Any]) -> Dict[str, Any]:
         if rest:
             one = len(rest) == 1
             lines.append(_join([r["label"] for r in rest]).capitalize() + (" is" if one else " are") + " also in "
-                         + poss(name) + " own descriptors; MOTIF does not yet translate " + ("it" if one else "them")
-                         + " into scent, so how to express " + ("it" if one else "them") + " is the next creative decision.")
+                         + poss(name) + " own descriptors; how to express " + ("it" if one else "them")
+                         + " in scent is open to the perfumer.")
         if rel_targets:
             lines.append("MOTIF also proposes " + _join([POLE_PHRASES[result["axes"][a]["value"]] for a in rel_targets])
                          + ", drawn only from references Qloo relates to " + name + ".")
         if not composed and len(lines) < 2:
-            lines.append("One supported direction is not enough for a composition; the other dimensions are open creative decisions."
+            lines.append("One supported direction is not enough for a composition; the other dimensions are open to the perfumer."
                          if result["outcome"] == "partial_direction" else
                          "No verified starting materials are proposed for this direction yet.")
         label = "Scent direction" if composed else "Partial direction"
@@ -147,15 +147,14 @@ def headline(name: str, result: Dict[str, Any]) -> Dict[str, Any]:
         labels = [r["label"] for r in lead]
         title = "A profile led by " + _join(labels) + "."
         if all(r["state"] == "no_rule" for r in lead):
-            lines.append("MOTIF does not yet translate " + _or(labels) + " into scent; how to express "
-                         + ("it" if one else "them") + " is the next creative decision.")
+            lines.append("How to express " + _or(labels) + " in scent is open to the perfumer.")
         elif all(r["state"] == "set_aside" for r in lead):
             lines.append("You chose the other pole on " + _join(sorted({AXIS_NAMES[r["axis"]].lower() for r in lead}))
                          + ", so " + _join(labels) + " sets no direction here; how else to express "
-                         + ("it" if one else "them") + " is the next creative decision.")
+                         + ("it" if one else "them") + " is open to the perfumer.")
         else:
-            lines.append("MOTIF sets no direction for " + _or(labels) + " here; how to express "
-                         + ("it" if one else "them") + " is the next creative decision.")
+            lines.append(_or(labels).capitalize() + (" sets" if one else " set") + " no direction here; how to express "
+                         + ("it" if one else "them") + " is open to the perfumer.")
         lines.append(_so_far(name, result, targets) if targets else "No scent direction is proposed yet.")
         label = "Partial direction" if targets else "No direction yet"
     elif targets:
@@ -168,7 +167,7 @@ def headline(name: str, result: Dict[str, Any]) -> Dict[str, Any]:
         rel = [r for r in rows if r["state"] == "no_rule"]
         if rel:
             lines.append("References Qloo relates to " + name + " point to " + _join([r["label"] for r in rel])
-                         + ", which MOTIF does not yet translate into scent.")
+                         + "; how to express " + ("it" if len(rel) == 1 else "them") + " in scent is open to the perfumer.")
         elif result["outcome"] == "no_descriptive_data":
             lines.append("Qloo returned no descriptors MOTIF can read for " + name + ".")
         else:

@@ -43,16 +43,13 @@
       const strip = h("div", { class: "strip" });
       strip.append(MotifStrips.svg(m.props));
       const asked = m.props.filter((p) => p.requested);
-      const other = m.props.filter((p) => !p.requested);
       const first = asked.find((p) => p.supplier_text) || asked[0];
       return h("div", { class: "mat" }, strip, h("div", {},
         h("div", { class: "s", text: m.slot }), h("div", { class: "rl", text: "suggested starting role" }),
         h("div", { class: "n" }, m.name, h("span", { class: "sc", text: " · " + (m.scent || "") })),
         h("div", { class: "x", text: "Why: fits " + brand + "'s " + m.fits.map((f) => f.toLowerCase()).join(" and ") + "." }),
         first && first.supplier_text ? h("div", { class: "q" }, "“" + short(first.supplier_text, 90) + "” ",
-          first.source_url ? link(first.source_url, m.source ? m.source.supplier : "supplier page") : null) : null,
-        other.length ? h("div", { class: "x" }, h("b", { text: "Also" }), " supplier-described: "
-          + other.map((p) => p.word + " (" + p.axis.toLowerCase() + " is open)").join(", ") + ".") : null));
+          first.source_url ? link(first.source_url, m.source ? m.source.supplier : "supplier page") : null) : null));
     }));
   }
 
@@ -66,9 +63,9 @@
   function sources(r) {
     const q = r.sources.qloo;
     return h("ul", { class: "src" },
-      h("li", {}, h("b", { text: q.api }), " · fetched " + q.dates.join(", ") + " · "
-        + q.requests.map((x) => x.what.toLowerCase() + " (" + x.path + ", " + x.request_id.replace("local:req:", "request ") + ")").join("; ")
-        + ". API responses have no public page; literal values are in the technical JSON."),
+      h("li", {}, h("b", { text: "Cultural evidence sourced from Qloo" }), " · fetched " + q.dates.join(", ") + " · "
+        + [...new Set(q.requests.map((x) => x.what.toLowerCase()))].join(", ")
+        + ". The full trail of every phrase is in the technical JSON."),
       r.sources.suppliers.map((x) => h("li", {}, h("b", { text: x.supplier }), " · " + x.material + " · ",
         link(x.url, x.document || x.url), x.accessed ? " · read " + x.accessed : "")));
   }
@@ -85,24 +82,22 @@
     sheet.replaceChildren(...[
       h("div", { class: "hd" }, h("span", { class: "lg", text: "MOTIF" }),
         h("span", { class: "m" }, "Perfumer brief · scent direction", h("br"),
-          (s.data_label === "recorded" ? "Recorded preview · " : "") + "Qloo data" + (date ? " fetched " + date : ""))),
+          (s.data_label === "recorded" ? "Recorded preview · " : "") + "Cultural evidence sourced from Qloo" + (date ? " · " + date : ""))),
       h("h1", { text: brand }),
       h("p", { class: "lbl", text: r.headline.label }),
       h("p", { class: "idea", text: r.headline.title }),
       r.headline.lines.map((line) => h("p", { class: "line", text: line })),
       section(num(), "Cultural profile", profile(r)),
       section(num(), "MOTIF's proposed direction", h("p", { class: "dirl" }, dir.length ? dir.join(" · ") : "None yet",
-        r.still_open.length ? ". Still open: " + r.still_open.map((a) => a.axis.toLowerCase()).join(", ") + "." : ".")),
+        r.still_open.length ? ". Open to the perfumer: " + r.still_open.map((a) => a.axis.toLowerCase()).join(", ") + "." : ".")),
       section(num(), "Starting materials", materials(r, brand)),
       section(num(), "Evidence", sources(r)),
       b ? section(num(), "The brief",
         s.intent ? h("p", { class: "note", text: "Application context: “" + s.intent + "”" }) : null,
         h("p", { class: "prose", text: b.text.replace(/\n\s*\n+/g, "\n").trim() }),
-        h("p", { class: "note", text: b.author === "llm" ? "Written by Claude (" + b.model + ") from the result and checked against it; it chose nothing."
-          : "Written by MOTIF's fixed template." })) : null,
+        b.author === "llm" ? h("p", { class: "note", text: "Prose drafted by Claude from this result and checked against it." }) : null) : null,
       h("div", { class: "ft" },
-        h("span", { text: "A creative direction, not a formula: not smelled or balanced, no proportions, no prediction of who will like it. "
-          + "MOTIF " + r.versions.engine + " · " + r.versions.lexicon + " · rules " + r.versions.rules + " · " + r.versions.palette + "." }),
+        h("span", { text: "A creative direction, not a formula: not smelled or balanced, no proportions, no prediction of who will like it." }),
         h("span", { text: "1 / 1" }))].flat(Infinity).filter(Boolean));
     (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(fit);  // measure with the real fonts
   }

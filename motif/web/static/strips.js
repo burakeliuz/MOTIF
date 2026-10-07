@@ -54,7 +54,7 @@ const MotifStrips = (() => {
     return root;
   }
 
-  const NOTE = "The texture is MOTIF's visual shorthand for the supplier-described properties: darker for the dimensions this direction asks for, lighter for supplier-described properties on dimensions the evidence leaves open. It is an interpretation, not a measurement.";
+  const NOTE = "The strip is MOTIF's visual shorthand for the supplier's description: darker where it matches this direction, lighter on dimensions left open. An interpretation, not a measurement.";
 
   return { svg, NOTE };
 })();

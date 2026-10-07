@@ -52,7 +52,7 @@ OUTCOME_COPY = {
     "insufficient_eligible_materials": ("A scent direction, but too few verified materials fit it for a composition.", None),
     "partial_direction": ("Only one sensory direction is supported, so no composition is proposed.",
                           "MOTIF needs at least two supported directions before it suggests materials (a design threshold)."),
-    "no_translation_rule": ("Qloo describes this brand, but MOTIF has no scent rule for what it found.",
+    "no_translation_rule": ("Qloo describes this brand; how to express the motifs it supports is open to the perfumer.",
                             "The supported motifs are listed below; MOTIF does not invent a translation for them."),
     "insufficient_evidence": ("Qloo returned descriptions, but none reached MOTIF's threshold.",
                               "Weak signals are listed below; they are not used for scent decisions."),
@@ -61,7 +61,7 @@ OUTCOME_COPY = {
 }
 MATERIAL_STATUS_COPY = {
     "composed": "Suggested starting materials. Each matches a direction on a property verified on the supplier's own page.",
-    "gated_insufficient_axes": "No composition: MOTIF suggests materials only when at least two directions are supported (a design threshold).",
+    "gated_insufficient_axes": "No composition: one supported direction is not enough for a material proposal.",
     "no_verified_materials": "No verified palette material fits these directions, so none is suggested.",
     "insufficient_eligible_materials": "Fewer than two verified materials fit these directions, so no composition is proposed.",
     "no_targets": "No direction is supported, so no materials are suggested.",
@@ -240,9 +240,9 @@ def profile_view(name: str, result: Dict[str, Any], ev: Dict[str, Any], ann: Dic
                 picks.append(evidence_view(ev[i], ann.get((row["motif"], i))))
         rule = rule_by_motif.get(row["motif"])
         if row["state"] == "direction":
-            translation = f"MOTIF's draft rule: {AXIS_NAMES[row['axis']].lower()} → {row['word']}."
+            translation = f"Translated as {AXIS_NAMES[row['axis']].lower()} → {row['word']}."
         elif row["state"] == "no_rule":
-            translation = "MOTIF has no scent rule for it yet: an open design question."
+            translation = "Not translated into a scent dimension: open to the perfumer."
         elif row["state"] == "set_aside":
             translation = f"You chose the other pole on {AXIS_NAMES[row['axis']].lower()}, so it sets no direction here."
         else:

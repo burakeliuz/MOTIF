@@ -56,7 +56,7 @@ class Lead(unittest.TestCase):
         h = headline("Synthsupreme", r)
         self.assertEqual(h["title"], "A profile led by provocation.")
         self.assertEqual(h["label"], "Partial direction")
-        self.assertIn("next creative decision", h["lines"][0])
+        self.assertIn("open to the perfumer", h["lines"][0])
         self.assertIn("drawn only from references Qloo relates to Synthsupreme", h["lines"][1])
         self.assertNotIn("light", h["title"])
         self.assertNotIn("no scent rule", h["title"])

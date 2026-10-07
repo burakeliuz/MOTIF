@@ -95,6 +95,14 @@ class StartResultAndBrief(unittest.TestCase):
                          ["Cultural profile", "MOTIF's proposed direction", "Starting materials", "Evidence", "The brief"])
         self.assertEqual(self.c["pdf_pages"], 1)
 
+    def test_no_internal_wording_and_the_context_appears_once(self):
+        self.assertIsNone(self.c["result_internal"])
+        self.assertIsNone(self.c["pdf_internal"])
+        self.assertEqual(self.c["result_context_count"], 1)
+        self.assertEqual(self.c["pdf_context_count"], 1)
+        self.assertGreaterEqual(self.c["result_qloo_line"], 1)
+        self.assertGreaterEqual(self.c["pdf_qloo_line"], 1)
+
     def test_the_brief_page_sends_no_request_and_nothing_leaves_the_machine(self):
         self.assertEqual(self.c["posts_after_pdf"], self.c["posts_after_result"])
         self.assertEqual(calls(self.hub), 4)  # search, own entry, related brands, related films: one research only

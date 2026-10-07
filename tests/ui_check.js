@@ -23,6 +23,9 @@ const { chromium } = require(MODULE);
   const overflow = (p) => p.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   const text = (p) => p.evaluate(() => document.body.innerText);
   const banned = /open decisions|suggested interpretation|unread here|claude is paused|only smelling can decide|how should .* be expressed/i;
+  // internal wording that stays in the technical JSON only
+  const internal = /fixed template|draft rule|no scent rule|does not yet translate|supplier-described|engine-\d|lexicon-\d|draft-\d|palette-\d|params-\d|local:req|request \d|\bR[1-6]\b|llm is configured|llm call|paused/i;
+  const count = (t, s) => t.split(s).length - 1;
 
   for (const [w, h, tag] of [[1440, 900, "desktop"], [390, 844, "mobile"]]) {
     const p = await page(w, h);
@@ -63,6 +66,9 @@ const { chromium } = require(MODULE);
   await p.waitForTimeout(300);
   const resultText = await text(p);
   out.checks.result_banned = (resultText.match(banned) || [null])[0];
+  out.checks.result_internal = (resultText.match(internal) || [null])[0];
+  out.checks.result_context_count = count(resultText, "A scent for a private gallery opening");
+  out.checks.result_qloo_line = count(resultText, "Cultural evidence sourced from Qloo");
   out.checks.result_has_suggest_block = !!(await p.$("#suggest"));
   out.checks.result_sections = await p.$$eval(".sec > h2", (hs) => hs.map((x) => x.textContent));
   out.checks.result_context_line = await p.textContent(".intentline").catch(() => null);
@@ -80,6 +86,9 @@ const { chromium } = require(MODULE);
   await pr.goto(BASE + "/brief/" + id); await pr.waitForSelector(".grid"); await pr.waitForTimeout(800);
   const pdfText = await text(pr);
   out.checks.pdf_banned = (pdfText.match(banned) || [null])[0];
+  out.checks.pdf_internal = (pdfText.match(internal) || [null])[0];
+  out.checks.pdf_context_count = count(pdfText, "A scent for a private gallery opening");
+  out.checks.pdf_qloo_line = count(pdfText, "Cultural evidence sourced from Qloo");
   out.checks.pdf_sections = await pr.$$eval(".grid h2", (hs) => hs.map((x) => x.textContent));
   await pr.emulateMedia({ media: "print" });
   const pdf = await pr.pdf({ format: "A4", printBackground: true, preferCSSPageSize: true, path: SHOTS ? `${SHOTS}/brief.pdf` : undefined });
