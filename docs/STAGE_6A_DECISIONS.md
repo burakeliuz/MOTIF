@@ -31,6 +31,8 @@ the committed curated excerpt (`reports/evidence_excerpt.md`,
 
 ### 0.1 Decision package awaiting approval: one rule and one material
 
+Superseded by §0.3 (measured on 13 brands, with the material checked).
+
 Measured offline on the nine recorded brands (no new request; configs unchanged):
 
 | Candidate | Rationale | Effect on the recorded brands | Risk |
@@ -43,6 +45,123 @@ Lavender (cool) and benzoin (sweet/warm) stay out: no rule can target cool, swee
 ### 0.2 Correction: competition access
 
 The 6A text below said a demo behind private access "does not appear to qualify". The owner read the full official rules on 2026-10-06: their Testing section accepts login details in the testing instructions for private sites, while the hackathon homepage carries wording against private access, and the rules say the official rules prevail in a conflict. MOTIF therefore keeps the review gate; whether a password-protected demo is accepted, and whether the testing-instructions field is visible only to judges, must be confirmed with the organizers. The build environment could not open `qloo.devpost.com` (egress blocked), so this rests on the owner's reading.
+
+### 0.3 Decision 1 (revised 2026-10-07): the R6 rule and one material, not applied
+
+Status: **not applied**; the live default stays rules draft-0.2 and palette-0.3.
+The exact candidate text is in `config/candidates/r6_and_olibanum.json`, which the
+engine never loads. Measured offline on 13 brands: the nine recorded ones and the
+four fresh brands of the second trial (`reports/trial_6b.md` §3), whose responses
+R6 had never seen.
+
+**Why R6 is meaningful.** Provocation is the motif MOTIF meets most often without a
+rule: it is supported by the brand's own Qloo entry for A24, Comme des Garçons,
+Supreme, Gucci, and Balenciaga (5 of 13). "Edgy", "Rebellious", and "Subversive"
+describe a refusal of polish, and raw texture is the one pole of MOTIF's six
+dimensions that reads as unpolished. One verified raw material exists (vetiver).
+
+**When it is wrong or narrowing.**
+
+- Provocation staged with polish: in Gucci, Balenciaga, and Comme des Garçons, R6
+  pits provocation (raw) against precision (polished) and turns texture into a
+  conflict instead of a direction. On the fresh brands it touched (2 of 2), R6
+  produced only conflicts.
+- With one verified raw material, every provocative brand that composes gets
+  vetiver (Supreme: bergamot and vetiver). A composition appearing is not success.
+- It maps an attitude to a surface texture; provocation in a scent may rather be
+  a contrast, an unexpected pairing, or a deliberate dissonance.
+
+**Why other ways to express provocation fall outside the current engine.** A rule
+maps one motif to one pole of one dimension, and the composition step picks
+materials that match the poles; nothing picks materials to clash, so contrast or
+dissonance cannot be stated. Single-pole alternatives exist but do not help:
+provocation → synthetic has no verified synthetic material (Comme des Garçons
+would still "compose" with HEDIONE, AMBROX SUPER, and HABANOLIDE, matching only
+polished); provocation → projecting reuses HEDIONE and AMBROX SUPER, the same
+materials as the calm brands. The engine also treats any two active motifs in a
+conflict as equals: it does not let the brand's own evidence outrank related
+references, or strong outrank moderate. Changing that is a separate engine
+decision, not proposed here.
+
+**Effect, kept apart (baseline → +R6; the material alone changes nothing)**
+
+| Brand | Set | Untranslated motifs | Directions | Conflicts | Materials | +olibanum |
+|---|---|---|---|---|---|---|
+| MUJI | recorded | none | light, polished, natural | none | bergamot, HEDIONE, HABANOLIDE | no change |
+| A24 | recorded | provocation → none | none → **raw** (one direction, no composition) | none | none (reference: vetiver) | no change |
+| Comme des Garçons | recorded | experimentation, provocation → experimentation | polished (related only) → none | none → **texture** | none | no change |
+| Nike | recorded | none | none | none | none | no change |
+| Ralph Lauren | recorded | heritage | dense (related only), polished | none | AMBROX SUPER, HABANOLIDE | no change |
+| Le Labo | recorded | none | light, polished (both related only) | none | bergamot, HEDIONE, HABANOLIDE | no change |
+| Patagonia | recorded | none | natural | none | none | no change |
+| Aesop | recorded | none | light (related only), polished, natural | none | bergamot, HEDIONE, HABANOLIDE | no change |
+| Supreme | recorded | provocation → none | light (related only) → light, **raw** | none | none → **bergamot, vetiver** | no change |
+| Gucci | fresh | provocation → none | dense, polished (both related only) → dense | none → **texture** | AMBROX SUPER, HABANOLIDE → none | no change |
+| Harley-Davidson | fresh | heritage | none | none | none | no change |
+| Sanrio | fresh | playfulness | none | none | none | no change |
+| Balenciaga | fresh | provocation, experimentation, industrial, romance → without provocation | polished → none | weight (left open) → weight, **texture** | none | no change |
+
+R6 changes 5 of 13 brands: one new partial direction (A24), one new composition
+(Supreme), three new conflicts (Comme des Garçons, Gucci, Balenciaga). "Both"
+equals "+R6" for every brand.
+
+**The material.** "Incense" is a family (frankincense, myrrh, elemi …), not one
+raw material. The specific grade checked is Givaudan's **Frankincense Oil Somalia
+FairWild** (Boswellia carterii, essential oil), full page read 2026-10-07:
+"Woody, Spicy, Balsamic, Terpenic … frankincense develops a powerful spicy and
+citrus profile, wrapped in a resinous warmth. These notes evolve into a warmer,
+spicy, persistent character with ambery and woody-balsamic notes." The supplier's
+words support **warm** only; nothing supports raw or dry (Givaudan's resinoid page
+carries the same text). dsm-firmenich lists OLIBANUM EO, RES, SFE, and the
+pyrogenated RES VULCAIN (described as leathery and smoky in search-index text),
+but its pages refuse automated access from this environment (bot protection,
+HTTP 403), so nothing there is verified. With warm only, the material changes
+none of the 13 results, because no rule targets warm.
+
+**Recommendation.** Do not adopt R6 or the material now. Provocation stays a named
+open design question, which the result now puts in its headline. If the owner
+still wants R6 before judging, the effects above are what it does; applying it
+means copying the candidate rule into `config/draft_rules.json` as draft-0.3 with
+a written reason, and the 13 brands then stop being independent checks.
+
+### 0.4 Decision 2 (2026-10-07): paid persistence for the spending counters
+
+The hosted demo runs on a Render free web service. Its filesystem is lost on every
+redeploy, restart, and idle spin-down (after 15 minutes without traffic), and a
+free service cannot attach a disk ([Render: free instances](https://render.com/docs/free)).
+MOTIF's counters (`web_usage.json`, `llm_calls.jsonl`) live in the data directory,
+`MOTIF_DATA_DIR` or `./data` (on Render `/opt/render/project/src/data`, inside the
+ephemeral deploy). Checked in code and tests:
+
+| Case | Behaviour |
+|---|---|
+| file missing (fresh instance) | counts start at zero: the daily caps reset with the instance |
+| file corrupt or unwritable | fail-closed: no new research (503), template brief (no LLM call) |
+| concurrent requests | file lock plus atomic replace; the cap holds within one instance and across processes on one disk |
+| restart, redeploy, spin-down | everything above resets; a password holder could exceed the daily LLM cap across restarts |
+
+What this round changed (code, reviewable): `MOTIF_LLM_BUDGET_GUARD` (default
+`auto`). On Render, Claude is used only when `MOTIF_DATA_DIR` sits on its own
+persistent mount; otherwise Claude is **paused**: briefs come from MOTIF's labelled
+template and interpretation suggestions are unavailable, with a short message.
+Qloo calls keep their per-instance counters (hackathon requests carry no price).
+Demo impact on the free plan: no Claude text and no suggestions; everything else
+works.
+
+Options for the owner (nothing has been created):
+
+| Option | Monthly cost (list prices, read 2026-10-06) | What to set | Effect |
+|---|---|---|---|
+| A. Keep free; Claude paused | $0 | nothing (default `auto`) | fail-closed; template briefs |
+| B. Keep free; provider-side cap | $0 plus the capped Claude spend | in the Claude Console (Settings → Workspaces), create a workspace for MOTIF (organization admins only), set its monthly cap on the workspace's **Spend limits** tab (limits cannot be set on the Default Workspace and cannot exceed the organization's), create the API key in that workspace, put it in `MOTIF_ANTHROPIC_API_KEY` on Render, set `MOTIF_LLM_BUDGET_GUARD=provider` ([Anthropic: workspaces](https://platform.claude.com/docs/en/manage-claude/workspaces)) | Claude works; Anthropic enforces the hard cap; MOTIF's own counters stay best-effort |
+| C. Paid persistence | ≈ $7.25: Starter web service $7 plus a 1 GB disk at $0.25/GB ([pricing](https://render.com/pricing)) | plan Starter, disk mounted at `/var/data`, `MOTIF_DATA_DIR=/var/data` (see the comment at the end of `render.yaml`) | counters and ledger survive restarts and deploys; deploys lose zero-downtime and the service stays single-instance ([disks](https://render.com/docs/disks)) |
+
+A plan upgrade alone gives no persistence: the counters must live on the disk's
+mount path. A Postgres Basic database ($6/month) could hold the counters for a
+free web service, but it needs new code and a dependency, and a free Postgres
+expires after 30 days, before judging ends; not recommended. Recommended: **B**,
+because it is free, the cap is enforced by Anthropic, and MOTIF changes nothing
+but one variable; **C** if the owner wants MOTIF's own daily caps to hold too.
 
 ## 1. Competition basis (search-index text, not full pages)
 

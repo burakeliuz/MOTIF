@@ -239,6 +239,32 @@ until the owner approves them; no engine or deployment change was made.
   more practical on first read but untraceable and outside the verified palette.
   No human rating was made; no arm is called better.
 
+## 2f. After 6B (2026-10-07): lead, retry, spending guard, second trial
+
+- **Result lead:** a cultural profile ranks motifs by evidence, the brand's own
+  Qloo entry first; the headline names the leading motifs and MOTIF's proposed
+  direction. A direction drawn only from related references never leads; an
+  untranslated leading motif stays in the headline with "the next creative
+  decision" (Supreme, Gucci: "A profile led by provocation.").
+- **Live product:** no recorded-mode wording on a live server (`--recorded` is
+  refused on Render); one controlled retry after a failed Qloo request, within a
+  reserved budget and behind the gate; source labels appear only for stages that
+  ran.
+- **Printed brief:** the same headline, reference list, and sources as the web
+  page; clickable supplier links; Qloo cited by request ID and date; always one
+  A4 page.
+- **Spending:** `MOTIF_LLM_BUDGET_GUARD` (see section 6).
+- **Second trial** (`reports/trial_6b.md` §3, pre-registered; Gucci,
+  Harley-Davidson, Sanrio, Balenciaga; 20 live Qloo requests and 11 Claude calls
+  in total, about $0.085): relations lifted each brand's own leading motif to the
+  threshold, but MOTIF translated only one of the four (Balenciaga's precision).
+  A Claude-only brief agreed with the brands' own Qloo entries and was more
+  specific, without traceability. No arm is called better.
+- **Decision package** (`docs/STAGE_6A_DECISIONS.md` §0.3): the candidate rule R6
+  (provocation → raw) changes 5 of 13 brands and creates conflicts on the fresh
+  luxury brands; the checked frankincense oil supports "warm" only and changes
+  nothing. Neither is applied.
+
 ## 3. Redacted request-to-result explanation
 
 Example from the full live run `live-20261006T103307Z-660d` (request `req 0011`; the credential is never stored):
@@ -316,13 +342,14 @@ password placeholder: `docs/DEVPOST_SUBMISSION.md`.
 
 Server variables (names only): `QLOO_API_KEY`, `MOTIF_ACCESS_PROTECTION`,
 `MOTIF_ACCESS_PASSWORD`, `MOTIF_ANTHROPIC_API_KEY` (optional), `MOTIF_LLM_MODEL`, `MOTIF_LLM_MAX_CALLS`,
+`MOTIF_LLM_BUDGET_GUARD` (after deployment; `auto`, `provider`, or `off`),
 `MOTIF_QLOO_MAX_CALLS_PER_DAY`, `MOTIF_WEB_SESSIONS_PER_DAY`,
 `MOTIF_WEB_SESSIONS_PER_IP_HOUR`.
 
-Screenshots of the start, result, and partial screens were taken in the local
-preview. Result screenshots show recorded Qloo data, so they are not committed
-until data sharing is confirmed (section 6). They must contain no credential and
-no personal data.
+Gallery images (2026-10-07) come from real live sessions with the final
+interface (MUJI, Gucci, Harley-Davidson); they show Qloo descriptors, so they are
+handed to the owner as a private package and not committed until data sharing is
+confirmed (section 6). They contain no credential and no personal data.
 
 ## 5. Setup from a clean environment
 
@@ -346,17 +373,21 @@ a live run first.
 ## 6. Known limitations
 
 - Stage 6B additions:
-  - **Low specificity among minimal brands:** MUJI, Le Labo, and Aesop all receive
-    light/polished/natural and the same three materials. Five rules and seven
-    verified materials cannot separate them; what makes each distinct sits in
-    descriptors MOTIF does not translate (for example Aesop's "Architectural Store
-    Interiors"). The suggestion layer shows such descriptors but changes nothing.
+  - **Low specificity among minimal brands** (corrected 2026-10-07): MUJI and Aesop
+    receive light/polished/natural and the same three materials; Le Labo receives
+    light and polished, both only from related references, and the same three
+    materials. Five rules and seven verified materials cannot separate them; what
+    makes each distinct sits in descriptors MOTIF does not read (Aesop's own
+    "Amber Glass Bottles", "Typography-Driven Design", "Intellectual"; MUJI's
+    "Unbranded Packaging", "Practical", "scandinavian-inspired"). The suggestion
+    layer shows such descriptors but changes nothing. Full reasoning:
+    `reports/trial_6b.md` §3.7.
   - **Counters on the free host:** daily counters and the LLM ledger live on the
-    instance's disk, which a free Render instance resets on restart or redeploy;
-    within one instance they hold across concurrent requests. Provider-side
-    limits (Anthropic workspace spend limit, the Qloo key's quota) remain the
-    outer guard. A persistent store would need a paid disk or an external
-    service (not set up; owner decision).
+    instance's disk, which a free Render instance resets on restart, redeploy, or
+    idle spin-down; within one instance they hold across concurrent requests. From
+    2026-10-07 (after deployment) `MOTIF_LLM_BUDGET_GUARD=auto` pauses Claude when
+    the counter would not survive a restart; options and costs:
+    `docs/STAGE_6A_DECISIONS.md` §0.4 (owner decision; nothing paid is set up).
   - **The two trial brands** are no longer independent if rule R6 is adopted.
 
 

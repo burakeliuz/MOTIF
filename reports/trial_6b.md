@@ -179,3 +179,145 @@ Render or hosted-demo request.
 - Cultural grounding: can each claim be traced to a Qloo entity and field?
 - Creative usability: a direction, starting roles, and open decisions a perfumer can act on?
 - False claims: statements the brand's own Qloo entry contradicts, audience claims, invented facts.
+
+### 3.2 What was actually used
+
+Run on 2026-10-07 in the pre-registered order: C for all four brands, then B
+for each brand through the real web interface (local live server, review gate
+on), then the suggestions, then the offline analyses.
+
+| | Live Qloo network attempts | Real Claude calls | Estimated Claude cost |
+|---|---|---|---|
+| C (four brands) | 0 | 4 | $0.0436 |
+| B brief prose (four brands; every text passed the checks on the first attempt) | 16 (4 per brand, no retries) | 4 | $0.0234 |
+| Suggestions (Harley-Davidson, Sanrio) | 0 | 2 | $0.0115 |
+| Gallery session (MUJI, live, final interface; per-session budget capped at 4 so the round cap could not be passed) | 4 | 1 | $0.0064 |
+| **Round total** (caps: 20 and 15) | **20** | **11** | **≈ $0.085** |
+
+Costs are the ledger's estimates (`data/llm_calls.jsonl`, list prices of
+2026-10-06). Qloo hackathon requests have no per-request price. This excludes
+the Claude Code session that built and ran the trial; its usage is development
+cost, not product API use, and is not measured here.
+
+**Deviation (recorded before the result was seen).** Balenciaga's live run
+stopped at a question the pre-registration did not cover: weight was pulled
+toward light (restraint) and dense (opulence), both only from related
+references. The neutral answer "Leave it open" was used. The follow-up was
+computed from the stored live responses of that same session, as the web flow
+would have done (no new request), and the brief went through the same prose
+code path with one real Claude call. The browser script stopped at that
+question, so Balenciaga has no live screenshot.
+
+### 3.3 A / A′ / B (engine, identical rules)
+
+| Brand | A (own entry) | A′ (one own cue) | B (with related brands and films) |
+|---|---|---|---|
+| Gucci | insufficient (provocation weak) | none | **dense, polished**, both only from related references; composed: AMBROX SUPER and HABANOLIDE (both base); provocation supported with no rule |
+| Harley-Davidson | insufficient (heritage weak) | none | no direction: heritage supported (own entry and related brands), no rule |
+| Sanrio | insufficient (playfulness weak) | none | no direction: playfulness supported (own entry and related brands), no rule |
+| Balenciaga | provocation supported, no rule | polished | **polished** (precision, strong: own entry, brands, films); weight conflicted between relation-only motifs, left open; provocation, experimentation, industrial character supported with no rule |
+
+Headlines shown to the user (deterministic, `narrative.headline`): Gucci "A
+profile led by provocation." (partial direction); Harley-Davidson "A profile
+led by heritage."; Sanrio "A profile led by playfulness." (no direction yet);
+Balenciaga "Precision: a smooth-finished scent." with provocation,
+experimentation, and industrial character named as the next creative decision.
+
+What relations added: they lifted each brand's own leading motif to the
+threshold (heritage, playfulness, provocation) and, for Gucci, added the only
+directions (dense, polished). They did not add a direction for Harley-Davidson
+or Sanrio, because MOTIF has no rule for heritage or playfulness.
+
+### 3.4 C (Claude alone, same purpose, structured like the brief)
+
+All four C briefs are specific and usable as creative starting points, and each
+is consistent with words in the brand's own Qloo entry that MOTIF's lexicon does
+not read (C never saw them): Gucci "eclectic maximalism … vintage-meets-
+contemporary" (Qloo: Eclectic, Maximalist, Vintage-Inspired); Harley-Davidson
+leather, chrome, and a raw, dry direction (Qloo: motorcycle leathers, Chrome
+Details, Rugged); Sanrio sweet, pastel, cheerful (Qloo: Sweet, Pastel Color
+Palette, Cheerful); Balenciaga architecture, oversized shapes, industrial stores,
+a raw texture (Qloo: Architectural Silhouettes, Oversized Proportions, Industrial
+Design). Directions: Gucci warm, dense, polished, natural; Harley-Davidson warm,
+dense, raw, natural, intimate, dry; Sanrio warm, light, polished, intimate,
+sweet; Balenciaga cool, raw, projecting, dry. Materials are mostly accords or
+materials outside MOTIF's verified palette (labdanum, orris, vetiver, bergamot
+are in it).
+
+### 3.5 Descriptive comparison (build agent's notes, not a human rating)
+
+| Criterion | B (engine with relations) | C (Claude alone) |
+|---|---|---|
+| Specificity | Gucci: two relation-only directions and two base materials; Balenciaga: one direction; Harley-Davidson and Sanrio: a clear profile but no direction | High: brand history, stores, characters, named accords for every brand |
+| Cultural grounding | Every motif, direction, and quote opens its Qloo entity and request or the supplier page; directions drawn only from references are labelled | None traceable; consistent with the brands' own Qloo entries in all four cases, from model memory |
+| Creative usability | Strong where a direction exists (roles, supplier words, open decisions); thin where the leading motif has no rule | Ready to hand to a perfumer; includes store practicalities (diffusion, dwell time) MOTIF does not cover |
+| False or unsupported claims | No audience claims; three wording slips in Claude's B prose passed the checks: Gucci "AMBROX SUPER, chosen as projecting" (it was chosen for dense and polished; projecting is a side property), Harley-Davidson "supported by … the brand itself" (it was related brands), Sanrio "one cultural descriptor" (one was read; more were returned) | Audience statements (Sanrio "a multigenerational audience of children, teens, nostalgic adults and tourists"; Harley-Davidson "a broad community") and historical facts that no source in this trial checks |
+
+What this shows, without ranking the arms: for fresh, attitude-led brands,
+Qloo's own entries carry the character (C's vivid briefs agree with them), but
+MOTIF's five rules translate only one of the four leading motifs (precision).
+The prose validator catches wrong materials, numbers, missing open dimensions,
+and claims, not misattributed reasons; that is a known gap.
+
+### 3.6 User table (B results, plain terms)
+
+| Brand | Distinctive motif (own entry) | Direction | Materials | What Qloo's relations added | Open gap |
+|---|---|---|---|---|---|
+| Gucci | provocation | dense, smooth-finished (related references only) | AMBROX SUPER, HABANOLIDE (base) | both directions; lifted provocation to the threshold | no rule for provocation; maximalism and glamour unread |
+| Harley-Davidson | heritage | none | none | lifted heritage to the threshold | no rule for heritage; Rugged, Chrome Details, motorcycle leathers unread |
+| Sanrio | playfulness | none | none | lifted playfulness to the threshold | no rule for playfulness; Sweet, Pastel, Cheerful unread |
+| Balenciaga | precision (with provocation, experimentation, industrial character) | smooth-finished; weight left open | none (one direction; reference only: HABANOLIDE, HEDIONE, AMBROX SUPER) | corroborated precision; added the weight conflict | no rule for three own motifs; conflict between relation-only motifs |
+| MUJI (gallery run) | restraint, precision, naturalness | light, smooth-finished, natural-feeling | bergamot (top), HEDIONE (heart), HABANOLIDE (base) | corroboration only | the same direction as Aesop |
+
+### 3.7 Why MUJI and Aesop collapse to the same result
+
+- **Data**: different descriptors reach the same three motifs. MUJI: Unpretentious,
+  Clean Lines, Natural Materials (own). Aesop: Architectural Store Interiors,
+  Botanical Minimalism (own); restraint only from related references.
+- **Lexicon**: twelve motif groups; many different descriptors land in the same group.
+- **Rules**: one motif, one pole: restraint → light, precision → polished,
+  naturalness → natural. Same motifs, same three targets.
+- **Materials**: for light + polished + natural, AMBROX SUPER and labdanum are
+  excluded (dense), vetiver too (raw), ISO E SUPER is unverified. Four materials
+  remain; the best per role is the same set: bergamot (top), HEDIONE (heart),
+  HABANOLIDE (base). Strength changes the scores (HEDIONE 0.667 for MUJI, 0.533
+  for Aesop) but not the order. Le Labo (light, polished, both relation-only)
+  gets the same three, with orris dropping out.
+
+More distinct results would need more rules (more motifs reaching more
+dimensions), more verified materials per pole, or a reading of the brand's own
+unread descriptors; none of these is approved today.
+
+### 3.8 R6 and olibanum on the fresh brands (offline what-if)
+
+| Brand | +R6 (provocation → raw) | +olibanum (warm only, per Givaudan's page) |
+|---|---|---|
+| Gucci | texture becomes **conflicted** (raw from Gucci's own provocation vs polished from related references); weight stays dense; no composition until the user chooses | no change |
+| Harley-Davidson | no change | no change |
+| Sanrio | no change | no change |
+| Balenciaga | texture becomes **conflicted** too (raw from provocation vs polished from strong precision); two open conflicts | no change |
+
+R6 produced a conflict, not a direction, on both fresh brands it touched. Full
+decision package: `docs/STAGE_6A_DECISIONS.md` §0.3.
+
+### 3.9 Offline regression on the existing recordings
+
+The nine earlier brands were replayed offline with this round's code: outcomes,
+targets, conflicts, and materials are unchanged from 6B (only wording and
+layout changed). A / A′ / B recomputed for them (no request), so the comparison
+now covers 13 brands:
+
+| Brand | A (own entry) | A′ (one own cue) | B (with relations) |
+|---|---|---|---|
+| MUJI | none | light, polished, natural | light, polished, natural |
+| A24 | none (provocation, no rule) | none | none (provocation, no rule) |
+| Comme des Garçons | none (no rule) | none | polished (related only) |
+| Nike | none | none | none |
+| Ralph Lauren | none | polished | dense (related only), polished |
+| Le Labo | none | none | light, polished (both related only) |
+| Patagonia | none | natural | natural |
+| Aesop | none | polished, natural | light (related only), polished, natural |
+| Supreme | none | none | light (related only) | The UI was checked in a browser on recorded data at 1440×900,
+1280×720, and 390×844 (no horizontal scroll, no fixed bar, input visible on the
+first screen), including one simulated failed request and the retry, and the
+conflict question on synthetic data. The full offline suite has 152 tests.

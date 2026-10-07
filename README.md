@@ -12,15 +12,17 @@ evidence → motif → sensory target → material suggestion → brief.
 - **The output is a creative direction:** not a formula, not a dosage, and
   not a prediction that anyone will like the scent.
 
-**Status (stage 6B, 2026-10-06):**
+**Status (after the 6B review, 2026-10-07; on the session branch, not yet on `main`):**
 
-- Hosted demo (behind a review password): <https://motif-pxh8.onrender.com>.
+- Hosted demo (behind a review password): <https://motif-pxh8.onrender.com>. It runs
+  `main`, which does not yet include stage 6A/6B or this review.
 - A web interface (`python3 -m motif.web`) runs the real research flow: brand and
-  an optional one-line creative intent, entity choice, live research steps, and a
-  result that leads with a plain scent idea, then Top/Heart/Base starting
-  materials drawn as scent strips, a short cultural basis, open decisions, the
-  brief (printable as one A4 page), optional suggested interpretations, and
-  "How it was made" with clickable evidence.
+  an optional brief purpose, entity choice, live research steps, and a result
+  that leads with the brand's cultural profile and MOTIF's proposed direction,
+  then Top/Heart/Base starting materials drawn as scent strips, the cultural
+  profile with clickable evidence, open decisions, the brief (printable as one A4
+  page with clickable sources), optional suggested interpretations, and "How it
+  was made". A failed Qloo request can be retried once.
 - Seven of eight palette materials have properties verified against the
   supplier's own full page (palette-0.3). ISO E SUPER stays unverified: the
   supplier site blocked automated access (HTTP 403), so it is never used live.
@@ -30,9 +32,9 @@ evidence → motif → sensory target → material suggestion → brief.
 - Hosting is prepared for a free Render web service (`render.yaml`); see
   [Hosting](#hosting).
 - Key documents:
-  - [`MOTIF_BUILD_SPEC.md`](MOTIF_BUILD_SPEC.md) (rev 0.4)
-  - [`docs/STAGE_6A_DECISIONS.md`](docs/STAGE_6A_DECISIONS.md) (decisions and the pending rule/material package)
-  - [`reports/trial_6b.md`](reports/trial_6b.md) (pre-registered two-brand trial)
+  - [`MOTIF_BUILD_SPEC.md`](MOTIF_BUILD_SPEC.md) (rev 0.5)
+  - [`docs/STAGE_6A_DECISIONS.md`](docs/STAGE_6A_DECISIONS.md) (decisions; §0.3 rule/material package, §0.4 paid persistence)
+  - [`reports/trial_6b.md`](reports/trial_6b.md) (pre-registered trials: two brands, then four)
   - [`docs/DEVPOST_SUBMISSION.md`](docs/DEVPOST_SUBMISSION.md) (copy-ready submission texts)
   - [`reports/holdout_t1.md`](reports/holdout_t1.md) (held-out brands and the post-hoc lexicon-0.3 re-run)
   - [`reports/design_examples.md`](reports/design_examples.md)
@@ -59,7 +61,10 @@ response. Guards against repeated calls:
   returns the existing session, so reload, back, and double clicks send nothing.
 - Answering a question (choosing an entity, resolving a conflict) reuses the
   first session's Qloo cache, so the search is not repeated.
-- Changing only the creative intent reuses the brand's Qloo cache: no request is repeated.
+- Changing only the brief purpose reuses the brand's Qloo cache: no request is repeated.
+- A search stopped by a failed Qloo request can be retried once: requests that
+  succeeded come from the session cache, only the failed step is sent again, and
+  a fresh budget is reserved first. Credential errors are never retried.
 - Interpretation suggestions are made only when the user asks, once per session.
 - Per-IP and per-day session caps, a daily Qloo attempt cap, and a daily LLM
   call cap. Daily counters live in `data/web_usage.json` and the LLM ledger in
@@ -67,9 +72,9 @@ response. Guards against repeated calls:
   before each call; if they cannot be read or written, no paid call is made. A
   reached cap is reported; nothing is replaced with sample data.
 
-What the user adds is kept apart from the evidence: the creative intent is
-recorded as the user's purpose, and an accepted interpretation as the user's
-note. Neither changes motifs, directions, materials, or scores; the same
+What the user adds is kept apart from the evidence: the brief purpose is
+recorded as the user's purpose (brief only), and an accepted interpretation as
+the user's note. Neither changes motifs, directions, materials, or scores; the same
 evidence, choices, and versions give the same engine result.
 
 **Temporary review gate.** While the hosted demo is under private review, every
@@ -137,6 +142,7 @@ MOTIF_LLM_MODEL=                # optional, default claude-sonnet-5-5; MOTIF nev
 MOTIF_LLM_EFFORT=               # optional, default "low"
 MOTIF_LLM_TIMEOUT_S=            # optional, default 30
 MOTIF_LLM_MAX_CALLS=            # optional, real API calls per UTC day (default 20), logged in data/llm_calls.jsonl
+MOTIF_LLM_BUDGET_GUARD=         # web only: auto (default), provider, or off; see "Hosting" (when Claude may be called)
 MOTIF_QLOO_MAX_CALLS_PER_DAY=   # web only, default 400
 MOTIF_WEB_SESSIONS_PER_DAY=     # web only, default 120
 MOTIF_WEB_SESSIONS_PER_IP_HOUR= # web only, default 8 (best effort; the daily caps are the hard limit)
@@ -169,13 +175,36 @@ first request after that takes about a minute). The Blueprint is
 
 Limits on the free instance: its filesystem is ephemeral, so sessions, the daily
 counters, and the LLM ledger reset when the service redeploys, restarts, or
-spins down ([Render: Deploy for Free](https://render.com/docs/free)). Within one
-running instance the caps hold, including under concurrent requests. Outer
-guards: the review password, the Anthropic workspace spend limit (set in the
-Anthropic Console, separate from MOTIF's caps), and the Qloo key's own quota.
-Persisting the counters would need a paid instance with a disk
-([Render: Persistent Disks](https://render.com/docs/disks)) or an external store;
-not set up.
+spins down after 15 idle minutes ([Render: Deploy for Free](https://render.com/docs/free)),
+and a free service cannot attach a disk. Within one running instance the caps
+hold, including under concurrent requests (file lock, atomic replace); a missing
+counter file starts at zero, a corrupt or unwritable one stops new research and
+paid calls (fail-closed).
+
+Because the LLM cap would reset with the instance, `MOTIF_LLM_BUDGET_GUARD`
+decides when Claude may be called:
+
+| Value | Meaning |
+|---|---|
+| `auto` (default) | On Render (the `RENDER` variable is set), Claude is called only when `MOTIF_DATA_DIR` points to its own persistent mount (a Render disk). Otherwise Claude is **paused**: briefs come from MOTIF's labelled template and interpretation suggestions are unavailable. Off Render, the local disk counts as persistent. |
+| `provider` | The owner has set a monthly spend limit on the Anthropic side (a dedicated workspace with a **Spend limits** setting in the Claude Console; not possible on the Default Workspace) and uses that workspace's key. Claude is called; MOTIF's own counters stay best-effort. |
+| `off` | No LLM calls. |
+
+Options and costs (owner decision; nothing paid is set up): keep `auto` on the
+free plan ($0, no Claude text); `provider` on the free plan ($0 plus the capped
+Claude spend); or a Starter instance ($7/month) with a 1 GB disk ($0.25/GB/month)
+mounted at `/var/data` and `MOTIF_DATA_DIR=/var/data`, so the counters survive
+restarts and deploys ([pricing](https://render.com/pricing),
+[disks](https://render.com/docs/disks); disks remove zero-downtime deploys). A plan
+upgrade without the disk and `MOTIF_DATA_DIR` changes nothing. Details:
+`docs/STAGE_6A_DECISIONS.md` §0.4.
+
+To change a variable on Render: open the service, **Environment**, edit or add the
+variable, then choose **Save and deploy** (or **Save only** to apply it at the next
+deploy) ([Render: environment variables](https://render.com/docs/configure-environment-variables)).
+`render.yaml` sets `autoDeploy: false`; whether the dashboard deploys new commits
+automatically is a dashboard setting this repository cannot see. `--recorded` is
+refused on Render, and a live server shows no recorded-mode wording.
 
 ---
 

@@ -1,6 +1,6 @@
 # MOTIF build specification
 
-Revision 0.4 · 2026-10-06 · rev 0.2 accepted for stage 4; rev 0.3 records stage 5 (section 0b); rev 0.4 records the owner's 6B decisions (section 0c) · Owner: Burak Eliuz
+Revision 0.5 · 2026-10-07 · rev 0.2 accepted for stage 4; rev 0.3 records stage 5 (section 0b); rev 0.4 records the owner's 6B decisions (section 0c); rev 0.5 records the post-6B review (section 0d) · Owner: Burak Eliuz
 
 This document turns the stage-2 findings (`reports/feasibility.md`,
 recommendation **narrow**) into a buildable MVP. It is the contract for
@@ -65,6 +65,20 @@ Where a later section still says otherwise, this section wins.
 | Budgets | File-locked daily counters (`web_usage.json`) with reserve/release; LLM ledger reserves before each call; both fail closed. One Qloo cache per brand within 30 minutes. |
 | Access | Review gate kept (owner decision); its removal for judging is not automatic and awaits organizer confirmation |
 | Rules and palette | Unchanged (draft-0.2, palette-0.3). Candidate R6 and one material are a pending decision package (`docs/STAGE_6A_DECISIONS.md` §0.1) |
+
+## 0d. Revision 0.5: post-6B review (implemented on the session branch, 2026-10-07)
+
+| Topic | Rev 0.5 |
+|---|---|
+| Result lead | `narrative.profile` ranks active motifs: own-entry support first, then strength, source kinds, supporting descriptors. `narrative.headline` gives a label (Scent direction, Partial direction, Direction from related references, No direction yet; Partial result after a stop), one title, at most two lines. A direction drawn only from related references never leads the title; an untranslated leading motif stays in it with "the next creative decision". Deterministic, wording only: no motif, axis, material, or score changes. |
+| Result layout | Headline → MOTIF's proposed direction (with "Still open" and an expandable six-dimension view) → starting materials (strips labelled name · short scent; detail: why MOTIF chose it, supplier's verified words, other supplier-described properties, MOTIF's reading) → cultural profile → open decisions → brief → notes → how it was made (with a sources list) |
+| Brief purpose | The optional line is labelled "Brief purpose (optional)": brief only |
+| Printed brief | Same headline, reference list (partial results), and sources as the web page; clickable supplier links; Qloo cited by request ID and date; one limits note; type steps down so one A4 page always holds the brief |
+| Prose | prose-0.5: the LLM receives MOTIF's own lead and keeps its emphasis; template prose opens with the same lead; brand names with digits no longer fail validation |
+| Live vs recorded | Recorded mode is for local development and tests only (one small label); refused when `RENDER` is set; a live server shows no recorded wording |
+| Errors | One controlled retry (`POST /api/sessions/<id>/retry`) after `stopped_request_failed` or a server error, never after a credential error; successes are served from the session cache; a fresh budget is reserved |
+| Spending | `MOTIF_LLM_BUDGET_GUARD` (`auto` default, `provider`, `off`): on Render, Claude only when the data directory sits on its own persistent mount, unless the owner confirms a provider-side spend limit; otherwise the labelled template and no suggestions |
+| Rules and palette | Still unchanged. Decision package revised (`docs/STAGE_6A_DECISIONS.md` §0.3): R6 and the checked frankincense oil are not applied; candidate text in `config/candidates/r6_and_olibanum.json` (not loaded) |
 
 ## 1. Decision
 

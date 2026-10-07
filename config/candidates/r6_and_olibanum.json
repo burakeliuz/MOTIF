@@ -1,0 +1,41 @@
+{
+  "status": "candidate: NOT approved and NOT loaded by the engine (motif/config.py reads only the four versioned files)",
+  "decision": "docs/STAGE_6A_DECISIONS.md section 0.3",
+  "written": "2026-10-06 (R6), 2026-10-07 (material check)",
+  "apply_by": "copy the rule into config/draft_rules.json as registry_version draft-0.3 with a written reason; the material only together with a rule that targets one of its verified poles",
+  "rule": {
+    "rule_id": "R6",
+    "motif": "provocative",
+    "axis": "raw_polished",
+    "toward": "raw",
+    "rationale": "Translate transgressive, unpolished cues as a raw texture target",
+    "no_automatic_inference": [
+      "natural/synthetic",
+      "temperature"
+    ]
+  },
+  "material": {
+    "material_id": "C09",
+    "name": "Frankincense Oil Somalia FairWild",
+    "kind": "natural extract (essential oil)",
+    "supplier": "Givaudan (Frankincense Oil Somalia FairWild, Boswellia carterii)",
+    "composition_role": "heart|base",
+    "motif_profile": {
+      "warm_cool": "warm"
+    },
+    "property_verification": {
+      "warm_cool": {
+        "status": "verified_full_page",
+        "source_url": "https://www.givaudan.com/fragrance-beauty/fragrance-ingredients-business/natural-ingredients/frankincense-oil-somalia-fairwild",
+        "accessed": "2026-10-07",
+        "supporting_text": "In its opening notes, frankincense develops a powerful spicy and citrus profile, wrapped in a resinous warmth. These notes evolve into a warmer, spicy, persistent character",
+        "motif_interpretation": "'resinous warmth', 'warmer' read as warm (design)"
+      }
+    },
+    "not_supported": {
+      "raw_polished": "no wording about roughness, smoke, or an unpolished surface",
+      "sweet_dry": "no 'dry' wording"
+    },
+    "effect_alone": "none of 13 brands change: no rule targets warm"
+  }
+}
