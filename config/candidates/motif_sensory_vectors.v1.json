@@ -1,0 +1,264 @@
+{
+  "model_version": "sensory-1.0",
+  "status": "candidate_not_loaded",
+  "revision": "r2: the one revision after the phase 3 review (docs/SENSORY_MODEL_RESEARCH.md section 7)",
+  "provenance_category": "design_rule",
+  "notice": "MOTIF's creative mapping from 12 motifs to 6 sensory dimensions (docs/SENSORY_MODEL_RESEARCH.md). Not perception science and not a formula. null = MOTIF makes no claim (it contributes nothing, never zero). A non-null cell without odor-step sources is MOTIF's design opinion only.",
+  "encoding": {
+    "warm_cool": {"-1": "warm", "+1": "cool"},
+    "light_dense": {"-1": "light", "+1": "dense"},
+    "raw_polished": {"-1": "raw", "+1": "polished"},
+    "natural_synthetic": {"-1": "natural", "+1": "synthetic"},
+    "intimate_projecting": {"-1": "intimate", "+1": "projecting"},
+    "sweet_dry": {"-1": "sweet", "+1": "dry"}
+  },
+  "strength_values": {"weak": 0.25, "moderate": 0.5},
+  "evidence_types": {
+    "motif_design_inference": "MOTIF's reasoning from the meaning of the motif's cue words to a sensory quality; no external source supports the link itself. 'odor_step_sources' may list odor data that is merely consistent with it.",
+    "imagery_route": "two steps: motif -> odor imagery is MOTIF's design inference; odor imagery -> pole is an association measured in published odor-descriptor data (config/candidates/odor_axis_evidence.v1.json)"
+  },
+  "strength_rule": "Design inference: at most moderate. Imagery route: moderate only if the odor step is replicated in both rated datasets with both r >= 0.3 and survives the pleasantness control; otherwise weak. Any low-confidence cell: at most weak, so a dimension resting on low cells can read at most 'slightly'.",
+  "confidence_rule": "high: not used (no cell has direct empirical support for the motif-to-dimension link). medium: a design inference that states the core meaning of the motif's cue words (the cues name the quality almost directly), or an imagery route whose imagery word appears among the motif's own cues and whose odor step is replicated. low: everything else.",
+  "forbidden_without_owner_decision": {
+    "source": "config/draft_rules.json unmapped_rule (draft-0.2) and MOTIF_QLOO_FEASIBILITY.md rev 0.2",
+    "pairs": ["playful = sweet", "melancholic = cool", "romantic = floral (and its consequences)", "heritage = warm", "industrial = synthetic"],
+    "rule": "These cells stay null. Adding any of them needs a written owner decision and a version bump."
+  },
+  "odor_step_sources": {
+    "D85": "Dravnieks (1985) Atlas of Odor Character Profiles, ASTM DS61; read as data via the Pyrfume archive (dravnieks_1985/behavior_1.csv), not the book",
+    "KV16": "Keller & Vosshall (2016) Olfactory perception of chemically diverse molecules, BMC Neuroscience; read as data via the Pyrfume archive (keller_2016/behavior.csv), not the article",
+    "LEF": "Leffingwell odor dataset (Sanchez-Lengeling et al. release); read as data via the Pyrfume archive (leffingwell/behavior.csv); too sparse to decide anything"
+  },
+  "motifs": {
+    "restrained": {
+      "cues": "restrained, understated, muted, reserved, sparse, unshowy, minimalist, unpretentious",
+      "imagery": [],
+      "imagery_note": "Restraint is about amount and contrast, not an odor character; no odor imagery is assigned.",
+      "cells": {
+        "warm_cool": null,
+        "light_dense": {"direction": "light", "strength": "moderate", "value": -0.5, "confidence": "medium", "evidence_type": "motif_design_inference",
+                        "rationale": "Muted, sparse, understated: less material and less contrast read as reduced perceived weight.",
+                        "design_origin": "legacy rule R1 (MOTIF_QLOO_FEASIBILITY.md rev 0.2)", "odor_step_sources": [],
+                        "uncertainty": "Minimal objects can be dense in material; restraint may also be read as quietness rather than lightness."},
+        "raw_polished": null,
+        "natural_synthetic": null,
+        "intimate_projecting": null,
+        "sweet_dry": null
+      },
+      "null_notes": {
+        "intimate_projecting": "Deliberately null: projection belongs to the intimate motif; restraint -> intimate was removed in draft-0.2 to avoid counting one implication twice.",
+        "raw_polished": "Minimalism can be raw (unbleached, unfinished) or polished (refined surfaces); the cues do not decide.",
+        "sweet_dry": "Legacy R1 makes no sweetness decision for restraint; nothing new supports one."
+      }
+    },
+    "intimate": {
+      "cues": "intimate, confessional",
+      "imagery": [],
+      "imagery_note": "No odor imagery: 'skin-like musk' was considered and rejected, because musk alone has no temperature, weight, or sweetness association in the data (D85 MUSK) and the lay 'musky' of KV16 means sweaty.",
+      "cells": {
+        "warm_cool": null,
+        "light_dense": null,
+        "raw_polished": null,
+        "natural_synthetic": null,
+        "intimate_projecting": {"direction": "intimate", "strength": "moderate", "value": -0.5, "confidence": "medium", "evidence_type": "motif_design_inference",
+                                "rationale": "Intimate, confessional: closeness translated as a close-to-skin spatial presence.",
+                                "design_origin": "legacy rule R2", "odor_step_sources": [],
+                                "uncertainty": "Intended presence, not measured performance; the name match makes this link look more certain than it is."},
+        "sweet_dry": null
+      },
+      "null_notes": {"warm_cool": "The 'warm skin' idiom is not supported: musk's association with WARM (D85 0.23) falls to D85 0.05 without the five most musky stimuli and its 95% interval includes 0; warmth in musky families comes from animalic notes.",
+                     "light_dense": "Legacy R2 forbids inferring lightness from intimacy; musk is not reliably heavier or lighter (D85 0.09 with HEAVY, D85 0.14 with LIGHT, neither robust)."}
+    },
+    "precise": {
+      "cues": "precise, meticulous, tailoring, clean lines, architectural, geometric, symmetry, structured",
+      "imagery": [],
+      "imagery_note": "No odor imagery: 'clean lines -> clean, soapy scent' would be a word pun.",
+      "cells": {
+        "warm_cool": {"direction": "cool", "strength": "weak", "value": 0.25, "confidence": "low", "evidence_type": "motif_design_inference",
+                      "rationale": "Crisp, controlled construction read as a crisp, cool impression.",
+                      "design_origin": "MOTIF design inference (phase 3)", "odor_step_sources": [],
+                      "uncertainty": "Design opinion only; precision does not imply temperature for every reader."},
+        "light_dense": null,
+        "raw_polished": {"direction": "polished", "strength": "moderate", "value": 0.5, "confidence": "medium", "evidence_type": "motif_design_inference",
+                         "rationale": "Meticulous, tailored, structured: controlled detail translated as a refined, finished texture.",
+                         "design_origin": "legacy rule R3", "odor_step_sources": [],
+                         "uncertainty": "No dataset measures texture; precision could also be read as sharpness."},
+        "natural_synthetic": null,
+        "intimate_projecting": null,
+        "sweet_dry": null
+      },
+      "null_notes": {"natural_synthetic": "Precision and craft can be fully natural; abstraction is carried by the experimental motif, not by precision.",
+                     "sweet_dry": "Tailored austerity suggests dry, but nothing supports it beyond that impression."}
+    },
+    "opulent": {
+      "cues": "opulent, lush, luxurious, baroque, lavish, ornate, sumptuous",
+      "imagery": ["gourmand_balsamic", "spicy", "floral"],
+      "imagery_note": "MOTIF imagines richness as balsamic, spiced, and abundant floral notes (design inference). None of these words is among the cues, so every imagery route here is low confidence.",
+      "cells": {
+        "warm_cool": {"direction": "warm", "strength": "weak", "value": -0.25, "confidence": "low", "evidence_type": "imagery_route",
+                      "rationale": "MOTIF imagines balsamic and spiced notes (design inference); in published odor-descriptor data, balsamic/gourmand odors are rated warmer in two datasets (D85 0.36, KV16 0.41) and spicy odors too (D85 0.49, KV16 0.26).",
+                      "design_origin": "MOTIF design inference (phase 3)", "odor_step_sources": ["D85", "KV16"],
+                      "uncertainty": "The imagery step is MOTIF's choice and not in the cues; floral imagery has no temperature association."},
+        "light_dense": {"direction": "dense", "strength": "moderate", "value": 0.5, "confidence": "medium", "evidence_type": "motif_design_inference",
+                        "rationale": "Lavish, sumptuous: richness translated as greater perceived density.",
+                        "design_origin": "legacy rule R4", "odor_step_sources": [],
+                        "uncertainty": "The imagery does not support it: balsamic is not rated heavier (D85 0.03) and floral is rated lighter (D85 0.49 with LIGHT)."},
+        "raw_polished": null,
+        "natural_synthetic": null,
+        "intimate_projecting": {"direction": "projecting", "strength": "weak", "value": 0.25, "confidence": "low", "evidence_type": "motif_design_inference",
+                                "rationale": "Lavish, ornate: abundance and display translated as a diffusive presence.",
+                                "design_origin": "MOTIF design inference (phase 3)", "odor_step_sources": [],
+                                "uncertainty": "Design opinion only; 'luxurious' also covers discreet luxury."},
+        "sweet_dry": {"direction": "sweet", "strength": "weak", "value": -0.25, "confidence": "low", "evidence_type": "imagery_route",
+                      "rationale": "MOTIF imagines balsamic and floral notes (design inference); in published odor-descriptor data, both are rated sweeter in two datasets (balsamic D85 0.37, KV16 0.45; floral D85 0.48, KV16 0.58), also with pleasantness held constant.",
+                      "design_origin": "MOTIF design inference (phase 3)", "odor_step_sources": ["D85", "KV16"],
+                      "uncertainty": "The imagery step is MOTIF's choice and not in the cues."}
+      },
+      "null_notes": {"raw_polished": "Baroque and lush are not necessarily polished; luxurious finish is; the cues do not agree."}
+    },
+    "natural": {
+      "cues": "natural materials, natural tones, earthy, handcrafted, organic, botanical",
+      "imagery": [],
+      "imagery_note": "No odor-family route: 'earthy' (earth tones) would map to D85's musty/moldy family, which is a pun; 'botanical' is too broad.",
+      "cells": {
+        "warm_cool": null,
+        "light_dense": null,
+        "raw_polished": {"direction": "raw", "strength": "weak", "value": -0.25, "confidence": "low", "evidence_type": "motif_design_inference",
+                         "rationale": "Earthy, handcrafted: an unrefined, tactile texture (from those two cues only).",
+                         "design_origin": "MOTIF design inference (phase 3)", "odor_step_sources": [],
+                         "uncertainty": "Botanical, organic, and natural tones describe refined brands just as often."},
+        "natural_synthetic": {"direction": "natural", "strength": "moderate", "value": -0.5, "confidence": "medium", "evidence_type": "motif_design_inference",
+                              "rationale": "Natural materials and botanical imagery translated as a natural-feeling impression. The dimension is an impression, not ingredient origin.",
+                              "design_origin": "legacy rule R5", "odor_step_sources": [],
+                              "uncertainty": "The name match makes this look circular: the motif is evidenced by Qloo's words, the translation is MOTIF's decision."},
+        "intimate_projecting": null,
+        "sweet_dry": {"direction": "dry", "strength": "weak", "value": 0.25, "confidence": "low", "evidence_type": "motif_design_inference",
+                      "rationale": "Woody, earthy materials: a non-sweet, dry character.",
+                      "design_origin": "MOTIF design inference (phase 3)", "odor_step_sources": ["D85", "KV16"],
+                      "uncertainty": "No dataset has a dry descriptor; woody odors are only rated less sweet (KV16 -0.29; D85 -0.17), which is consistent with it, not support for 'dry'."}
+      },
+      "null_notes": {"warm_cool": "Green notes are rated cooler and earthy notes less cool, but neither family is the motif's own vocabulary.",
+                     "light_dense": "Nothing in the cues decides weight."}
+    },
+    "experimental": {
+      "cues": "experimental, avant garde, deconstructed, conceptual",
+      "imagery": [],
+      "imagery_note": "No odor imagery: 'chemical' and 'metallic' were considered and rejected; D85's chemical family is nail-polish remover and gasoline, and its metallic family is mostly sulfur and amine off-notes.",
+      "cells": {
+        "warm_cool": null,
+        "light_dense": null,
+        "raw_polished": {"direction": "raw", "strength": "weak", "value": -0.25, "confidence": "low", "evidence_type": "motif_design_inference",
+                         "rationale": "Deconstructed: exposed, unfinished construction.",
+                         "design_origin": "MOTIF design inference (phase 3)", "odor_step_sources": [],
+                         "uncertainty": "Conceptual work can be highly finished."},
+        "natural_synthetic": {"direction": "synthetic", "strength": "weak", "value": 0.25, "confidence": "low", "evidence_type": "motif_design_inference",
+                              "rationale": "Conceptual, avant-garde: an abstract, non-figurative impression.",
+                              "design_origin": "MOTIF design inference (phase 3)", "odor_step_sources": [],
+                              "uncertainty": "Design opinion only; experimental work also uses raw naturals."},
+        "intimate_projecting": null,
+        "sweet_dry": null
+      },
+      "null_notes": {"sweet_dry": "The only support would be 'not sweet', which is not a direction."}
+    },
+    "provocative": {
+      "cues": "provocative, subversive, edgy, rebellious",
+      "imagery": ["burnt_tar", "leathery", "animalic"],
+      "imagery_note": "MOTIF imagines transgression as smoke, tar, leather, and animalic notes (design inference; a cultural association, not in the cues).",
+      "cells": {
+        "warm_cool": {"direction": "warm", "strength": "weak", "value": -0.25, "confidence": "low", "evidence_type": "imagery_route",
+                      "rationale": "MOTIF imagines smoke and animalic notes (design inference); in published odor-descriptor data, burnt/tar odors are rated warmer in one dataset (KV16 0.20); animalic odors are rated less cool in two datasets (D85, KV16) and burnt/tar in one (D85).",
+                      "design_origin": "MOTIF design inference (phase 3)", "odor_step_sources": ["D85", "KV16"],
+                      "uncertainty": "Weak, single-dataset odor step; the imagery is MOTIF's choice."},
+        "light_dense": {"direction": "dense", "strength": "weak", "value": 0.25, "confidence": "low", "evidence_type": "imagery_route",
+                        "rationale": "MOTIF imagines smoke and animalic notes (design inference); in published odor-descriptor data, burnt/tar odors (D85 0.49) and animalic odors (D85 0.46) are rated heavier in one dataset.",
+                        "design_origin": "MOTIF design inference (phase 3)", "odor_step_sources": ["D85"],
+                        "uncertainty": "Single dataset; D85's LIGHT/HEAVY partly tracks pleasantness."},
+        "raw_polished": {"direction": "raw", "strength": "weak", "value": -0.25, "confidence": "low", "evidence_type": "motif_design_inference",
+                         "rationale": "Edgy, rebellious, subversive: a rough, unpolished texture.",
+                         "design_origin": "MOTIF design inference (phase 3)", "odor_step_sources": [],
+                         "uncertainty": "Transgression is not a texture; slick provocation is common."},
+        "natural_synthetic": null,
+        "intimate_projecting": {"direction": "projecting", "strength": "weak", "value": 0.25, "confidence": "low", "evidence_type": "motif_design_inference",
+                                "rationale": "Provocation seeks attention: a presence that reaches others.",
+                                "design_origin": "MOTIF design inference (phase 3)", "odor_step_sources": [],
+                                "uncertainty": "Design opinion only."},
+        "sweet_dry": {"direction": "dry", "strength": "weak", "value": 0.25, "confidence": "low", "evidence_type": "motif_design_inference",
+                      "rationale": "Smoke and leather read as a dry, non-sweet character.",
+                      "design_origin": "MOTIF design inference (phase 3)", "odor_step_sources": ["D85", "KV16"],
+                      "uncertainty": "No dataset has a dry descriptor; burnt/tar odors (D85, KV16) and leathery odors (D85) are only rated less sweet. Provocation can also be sensual and sweet."}
+      },
+      "null_notes": {"natural_synthetic": "Smoke and leather can read as natural or synthetic; the cues do not decide."}
+    },
+    "heritage": {
+      "cues": "heritage, classic, timeless",
+      "imagery": [],
+      "imagery_note": "No odor imagery: nostalgia -> vanilla or powder would be a stereotype.",
+      "cells": {"warm_cool": null, "light_dense": null, "raw_polished": null, "natural_synthetic": null, "intimate_projecting": null, "sweet_dry": null},
+      "null_notes": {"raw_polished": "Heritage can mean refinement (polished) or patina and wear (raw); as with restraint, the cues do not decide.",
+                     "warm_cool": "Forbidden without an owner decision (heritage = warm); no data supports it.",
+                     "all": "Heritage stays visible in the cultural profile and is left open to the perfumer."}
+    },
+    "playful": {
+      "cues": "playful, whimsical",
+      "imagery": [],
+      "imagery_note": "No odor imagery: playful -> fruity/sweet is the stereotype the project rules forbid.",
+      "cells": {
+        "warm_cool": null,
+        "light_dense": {"direction": "light", "strength": "weak", "value": -0.25, "confidence": "low", "evidence_type": "motif_design_inference",
+                        "rationale": "Light-hearted, whimsical: an airy, light weight.",
+                        "design_origin": "MOTIF design inference (phase 3)", "odor_step_sources": [],
+                        "uncertainty": "Design opinion only; whimsy can be dense and strange."},
+        "raw_polished": null,
+        "natural_synthetic": null,
+        "intimate_projecting": {"direction": "projecting", "strength": "weak", "value": 0.25, "confidence": "low", "evidence_type": "motif_design_inference",
+                                "rationale": "Playful, outgoing: a sparkling presence that reaches others.",
+                                "design_origin": "MOTIF design inference (phase 3)", "odor_step_sources": [],
+                                "uncertainty": "Design opinion only."},
+        "sweet_dry": null
+      },
+      "null_notes": {"sweet_dry": "Forbidden without an owner decision (playful = sweet)."}
+    },
+    "melancholic": {
+      "cues": "melancholic, melancholy",
+      "imagery": [],
+      "imagery_note": "No odor imagery: 'damp earth' maps to a musty/moldy family (mould, not mood).",
+      "cells": {"warm_cool": null, "light_dense": null, "raw_polished": null, "natural_synthetic": null, "intimate_projecting": null, "sweet_dry": null},
+      "null_notes": {"warm_cool": "Forbidden without an owner decision (melancholic = cool).",
+                     "all": "Any remaining claim (for example a close presence) would duplicate the intimate motif; left open to the perfumer."}
+    },
+    "romantic": {
+      "cues": "romantic",
+      "imagery": [],
+      "imagery_note": "No odor imagery: romantic = floral is forbidden without an owner decision.",
+      "cells": {"warm_cool": null, "light_dense": null, "raw_polished": null, "natural_synthetic": null, "intimate_projecting": null, "sweet_dry": null},
+      "null_notes": {"all": "Without the floral stereotype the only remaining claim (closeness) duplicates the intimate motif; left open to the perfumer."}
+    },
+    "industrial": {
+      "cues": "industrial",
+      "imagery": ["burnt_tar", "metallic"],
+      "imagery_note": "MOTIF imagines industrial as tar, rubber, and metal (design inference). D85's metallic family is weak and mixed with off-notes.",
+      "cells": {
+        "warm_cool": null,
+        "light_dense": {"direction": "dense", "strength": "weak", "value": 0.25, "confidence": "low", "evidence_type": "imagery_route",
+                        "rationale": "MOTIF imagines tar and metal (design inference); in published odor-descriptor data, burnt/tar odors are rated heavier in one dataset (D85 0.49), metallic weakly (D85 0.24).",
+                        "design_origin": "MOTIF design inference (phase 3)", "odor_step_sources": ["D85"],
+                        "uncertainty": "Single dataset; D85's LIGHT/HEAVY partly tracks pleasantness."},
+        "raw_polished": {"direction": "raw", "strength": "weak", "value": -0.25, "confidence": "low", "evidence_type": "motif_design_inference",
+                         "rationale": "Industrial: exposed materials, unfinished surfaces.",
+                         "design_origin": "MOTIF design inference (phase 3)", "odor_step_sources": [],
+                         "uncertainty": "Industrial design can be machined and polished."},
+        "natural_synthetic": null,
+        "intimate_projecting": null,
+        "sweet_dry": {"direction": "dry", "strength": "weak", "value": 0.25, "confidence": "low", "evidence_type": "motif_design_inference",
+                      "rationale": "Metal, tar, rubber: a dry, non-sweet character.",
+                      "design_origin": "MOTIF design inference (phase 3)", "odor_step_sources": ["D85", "KV16"],
+                      "uncertainty": "No dataset has a dry descriptor; burnt/tar odors (D85, KV16) and metallic odors (D85) are only rated less sweet."}
+      },
+      "null_notes": {"natural_synthetic": "Forbidden without an owner decision (industrial = synthetic).",
+                     "warm_cool": "The common association metal = cold is not supported: D85 METALLIC is temperature-neutral."}
+    }
+  },
+  "changes": [
+    {"version": "sensory-1.0", "date": "2026-10-07", "reason": "Phase 3 of the engine refactor: first researched motif-to-sensory model; candidate, not loaded by the engine. r1 was reviewed from three lenses (method, perfumer, engine); r2 applies the one revision."}
+  ]
+}

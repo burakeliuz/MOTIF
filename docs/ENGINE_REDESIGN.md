@@ -95,8 +95,10 @@ primary engine. It must:
 ## 4. What it must NOT claim
 
 - **Not perception science.** Motif-to-sensory values are MOTIF's creative
-  mapping, informed where possible by crossmodal and perfumery literature and
-  labelled by evidence type. A cell supported only by MOTIF's reasoning says so.
+  mapping, labelled by evidence type. In this build no crossmodal or perfumery
+  literature could be read (network policy, `docs/SENSORY_MODEL_RESEARCH.md` §2);
+  the only external support is open odor-descriptor data for the odor-family →
+  pole step. A cell supported only by MOTIF's reasoning says so.
 - **Not a formula.** No ingredients with doses, no proportions, no safety or
   regulatory statements. Material references are examples of a class.
 - **Not a preference prediction.** Nothing says who will like the scent;

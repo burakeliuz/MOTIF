@@ -1,0 +1,4138 @@
+{
+ "evidence_version": "odor-axis-evidence-1.0",
+ "extra": {
+  "powdery": {
+   "dravnieks_1985": [
+    "DRY, POWDERY"
+   ]
+  }
+ },
+ "families": {
+  "animalic": {
+   "dravnieks_1985": [
+    "ANIMAL"
+   ],
+   "keller_2016": [
+    "MUSKY"
+   ],
+   "leffingwell": [
+    "animal"
+   ]
+  },
+  "burnt_tar": {
+   "dravnieks_1985": [
+    "BURNT,SMOKY",
+    "FRESH TOBACCO SMOKE",
+    "TAR",
+    "CREOSOTE"
+   ],
+   "keller_2016": [
+    "BURNT"
+   ],
+   "leffingwell": [
+    "smoky",
+    "burnt",
+    "tobacco",
+    "phenolic"
+   ]
+  },
+  "chemical_solvent": {
+   "dravnieks_1985": [
+    "CHEMICAL",
+    "ETHERISH, ANAESTHETIC",
+    "GASOLINE, SOLVENT",
+    "CLEANING FLUID",
+    "NAIL POLISH REMOVER",
+    "PAINT"
+   ],
+   "keller_2016": [
+    "CHEMICAL"
+   ],
+   "leffingwell": [
+    "solvent",
+    "ethereal",
+    "gasoline"
+   ]
+  },
+  "citrus": {
+   "dravnieks_1985": [
+    "FRUITY,CITRUS",
+    "LEMON",
+    "GRAPEFRUIT",
+    "ORANGE"
+   ],
+   "leffingwell": [
+    "citrus",
+    "lemon",
+    "orange",
+    "grapefruit"
+   ]
+  },
+  "earthy_musty": {
+   "dravnieks_1985": [
+    "MUSTY, EARTHY, MOLDY",
+    "MUSHROOM",
+    "RAW POTATO"
+   ],
+   "leffingwell": [
+    "earthy",
+    "musty",
+    "mushroom"
+   ]
+  },
+  "floral": {
+   "dravnieks_1985": [
+    "FLORAL",
+    "ROSE",
+    "VIOLETS"
+   ],
+   "keller_2016": [
+    "FLOWER"
+   ],
+   "leffingwell": [
+    "floral",
+    "rose",
+    "jasmine",
+    "violet",
+    "orris"
+   ]
+  },
+  "fruity": {
+   "dravnieks_1985": [
+    "FRUITY,OTHER THAN CITRUS",
+    "PINEAPPLE",
+    "STRAWBERRY",
+    "APPLE, FRUIT",
+    "PEAR",
+    "PEACH FRUIT",
+    "BANANA",
+    "CHERRY, BERRY"
+   ],
+   "keller_2016": [
+    "FRUIT"
+   ],
+   "leffingwell": [
+    "fruity",
+    "apple",
+    "pear",
+    "peach",
+    "berry",
+    "banana",
+    "pineapple",
+    "tropical",
+    "plum",
+    "strawberry",
+    "apricot",
+    "melon",
+    "grape"
+   ]
+  },
+  "gourmand_balsamic": {
+   "dravnieks_1985": [
+    "VANILLA",
+    "CARAMEL",
+    "MAPLE SYRUP",
+    "CHOCOLATE",
+    "HONEY"
+   ],
+   "keller_2016": [
+    "BAKERY"
+   ],
+   "leffingwell": [
+    "vanilla",
+    "caramellic",
+    "balsamic",
+    "honey",
+    "chocolate",
+    "cocoa"
+   ]
+  },
+  "green_herbal": {
+   "dravnieks_1985": [
+    "HERBAL, GREEN,CUTGRASS",
+    "CRUSHED GRASS",
+    "CRUSHED WEEDS",
+    "FRESH GREEN VEGETABLES",
+    "GERANIUM LEAVES",
+    "RAW CUCUMBER"
+   ],
+   "keller_2016": [
+    "GRASS"
+   ],
+   "leffingwell": [
+    "green",
+    "grassy",
+    "herbal",
+    "leafy",
+    "cucumber"
+   ]
+  },
+  "incense": {
+   "dravnieks_1985": [
+    "INCENSE"
+   ]
+  },
+  "leathery": {
+   "dravnieks_1985": [
+    "LEATHER"
+   ],
+   "leffingwell": [
+    "leathery"
+   ]
+  },
+  "metallic": {
+   "dravnieks_1985": [
+    "METALLIC"
+   ],
+   "leffingwell": [
+    "metallic"
+   ]
+  },
+  "minty_camphor": {
+   "dravnieks_1985": [
+    "MINTY, PEPPERMINT",
+    "CAMPHOR",
+    "EUCALYPTUS"
+   ],
+   "leffingwell": [
+    "mint",
+    "camphoreous"
+   ]
+  },
+  "musk": {
+   "dravnieks_1985": [
+    "MUSK"
+   ],
+   "leffingwell": [
+    "musk"
+   ]
+  },
+  "soapy_aldehydic": {
+   "dravnieks_1985": [
+    "SOAPY"
+   ],
+   "leffingwell": [
+    "aldehydic",
+    "waxy"
+   ]
+  },
+  "spicy": {
+   "dravnieks_1985": [
+    "SPICY",
+    "CLOVE",
+    "CINNAMON",
+    "BLACK PEPPER"
+   ],
+   "keller_2016": [
+    "SPICES"
+   ],
+   "leffingwell": [
+    "spicy",
+    "cinnamon"
+   ]
+  },
+  "woody": {
+   "dravnieks_1985": [
+    "WOODY, RESINOUS",
+    "CEDARWOOD",
+    "OAK WOOD,COGNAC",
+    "BARK,BIRCHBARK"
+   ],
+   "keller_2016": [
+    "WOOD"
+   ],
+   "leffingwell": [
+    "woody"
+   ]
+  }
+ },
+ "files_sha256": {
+  "dravnieks_1985/behavior_1.csv": "4598d408bab20a3e43d4ff377a63a377373e79832b02a51c0437b2c73a6a092a",
+  "dravnieks_1985/manifest.toml": "3e8af4c13f1637eae4adef8158023fd5b4d7e0007dded4630668a2d61870a56c",
+  "keller_2016/behavior.csv": "ab31c17c475c8b471706822f89aaf9e148bebe5f50f33ff03ebc42b32ac94df8",
+  "keller_2016/manifest.toml": "a4a8404ada9ed4f7a95f833f037a2b6ccd843e526e3f7f648710b0515faed621",
+  "leffingwell/behavior.csv": "afe0846b159ac00691ba4c07074829f7ff262b80fa32a3280661457153e70c41",
+  "leffingwell/manifest.toml": "341039ecb58ca1043012485b6b4f127425dd5def21caa89c67483dc1e31945ab"
+ },
+ "measurements": {
+  "extra:powdery": {
+   "animalic": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.272,
+      0.034
+     ],
+     "n": 160,
+     "r": -0.131,
+     "r_without_top5": -0.021,
+     "top_stimuli": [
+      "PentanoicAcid_high",
+      "ButanoicAcid_high",
+      "ThioglycolicAcid_high",
+      "ValericAcid-iso_high",
+      "Skatole_high"
+     ]
+    }
+   },
+   "burnt_tar": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.028,
+      0.26
+     ],
+     "n": 160,
+     "r": 0.114,
+     "r_without_top5": 0.058,
+     "top_stimuli": [
+      "Guaiacol_high",
+      "Cyclohexanedione1,2_high",
+      "Cyclohexanol_high",
+      "Thymol_high",
+      "Cresol-m_high"
+     ]
+    }
+   },
+   "chemical_solvent": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.262,
+      -0.037
+     ],
+     "n": 160,
+     "r": -0.162,
+     "r_without_top5": -0.112,
+     "top_stimuli": [
+      "PhenylAcetylene_high",
+      "Anisole_high",
+      "Cyclohexanol_high",
+      "Hexanol3_high",
+      "Eucalyptol_high"
+     ]
+    }
+   },
+   "citrus": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.255,
+      -0.102
+     ],
+     "n": 160,
+     "r": -0.179,
+     "r_without_top5": -0.148,
+     "top_stimuli": [
+      "Citral_high",
+      "Limonene_high",
+      "Citralva_high",
+      "Melonal_high",
+      "Myracaldehyde_high"
+     ]
+    }
+   },
+   "earthy_musty": {
+    "dravnieks_1985": {
+     "ci95": [
+      0.112,
+      0.432
+     ],
+     "n": 160,
+     "r": 0.28,
+     "r_without_top5": 0.23,
+     "top_stimuli": [
+      "PropylQuinoline-iso_high",
+      "Octenol-1-3-OL_high",
+      "Vanillin_high",
+      "Methyl-iso-Borneol2_high",
+      "Cyclocitral-iso_high"
+     ]
+    }
+   },
+   "floral": {
+    "dravnieks_1985": {
+     "ci95": [
+      0.016,
+      0.253
+     ],
+     "n": 160,
+     "r": 0.125,
+     "r_without_top5": 0.152,
+     "top_stimuli": [
+      "PhenylEthanolhighconc_high",
+      "PhenylEthanollowconc_low",
+      "Phenoxaflor_high",
+      "Ionone-betalowconc_low",
+      "Perfumecharlie_high"
+     ]
+    }
+   },
+   "fruity": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.299,
+      -0.1
+     ],
+     "n": 160,
+     "r": -0.201,
+     "r_without_top5": -0.134,
+     "top_stimuli": [
+      "AldehydeC-16lowcon_low",
+      "EthylButyrate_high",
+      "AllylCaproate_high",
+      "AldehydeC-16highcon_high",
+      "Fructone_high"
+     ]
+    }
+   },
+   "gourmand_balsamic": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.032,
+      0.235
+     ],
+     "n": 160,
+     "r": 0.116,
+     "r_without_top5": 0.059,
+     "top_stimuli": [
+      "Vanillin_high",
+      "Cyclotene_high",
+      "Celeriax_high",
+      "Abhexone_high",
+      "EthylPropionate_high"
+     ]
+    }
+   },
+   "green_herbal": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.072,
+      0.255
+     ],
+     "n": 160,
+     "r": 0.091,
+     "r_without_top5": 0.012,
+     "top_stimuli": [
+      "PropylQuinoline-iso_high",
+      "Cyclocitral-iso_high",
+      "Hexanal_high",
+      "ButylQuinolineiso_high",
+      "Melonal_high"
+     ]
+    }
+   },
+   "incense": {
+    "dravnieks_1985": {
+     "ci95": [
+      0.009,
+      0.505
+     ],
+     "n": 160,
+     "r": 0.285,
+     "r_without_top5": 0.069,
+     "top_stimuli": [
+      "Cashmeran_high",
+      "PatchouliOil_high",
+      "BornylAcetateiso-BornylA_high",
+      "MuskTonalid_high",
+      "CinnamonLeafOil_high"
+     ]
+    }
+   },
+   "leathery": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.029,
+      0.239
+     ],
+     "n": 160,
+     "r": 0.104,
+     "r_without_top5": 0.083,
+     "top_stimuli": [
+      "Cresol-m_high",
+      "Thymol_high",
+      "Guaiacol_high",
+      "CresylisoButyrate-p_high",
+      "Cyclohexanol_high"
+     ]
+    }
+   },
+   "metallic": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.189,
+      0.061
+     ],
+     "n": 160,
+     "r": -0.054,
+     "r_without_top5": -0.085,
+     "top_stimuli": [
+      "NonylAcetate_high",
+      "HexylAminelowconc_low",
+      "DiphenylOxide_high",
+      "Maritima_high",
+      "GarlicOil_high"
+     ]
+    }
+   },
+   "minty_camphor": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.222,
+      -0.031
+     ],
+     "n": 160,
+     "r": -0.134,
+     "r_without_top5": -0.065,
+     "top_stimuli": [
+      "Eucalyptol_high",
+      "Menthol-l_high",
+      "Carvone-l_high",
+      "SpearmintOil_high",
+      "Methylsalicylate_high"
+     ]
+    }
+   },
+   "musk": {
+    "dravnieks_1985": {
+     "ci95": [
+      0.149,
+      0.567
+     ],
+     "n": 160,
+     "r": 0.392,
+     "r_without_top5": 0.188,
+     "top_stimuli": [
+      "MuskTonalid_high",
+      "MuskGalaxolide_high",
+      "Cashmeran_high",
+      "Santalol_high",
+      "Sandiff_high"
+     ]
+    }
+   },
+   "soapy_aldehydic": {
+    "dravnieks_1985": {
+     "ci95": [
+      0.142,
+      0.494
+     ],
+     "n": 160,
+     "r": 0.334,
+     "r_without_top5": 0.227,
+     "top_stimuli": [
+      "OenanticEther_high",
+      "NonylAcetate_high",
+      "Cashmeran_high",
+      "Myracaldehyde_high",
+      "BornylAcetateiso-BornylA_high"
+     ]
+    }
+   },
+   "spicy": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.154,
+      0.039
+     ],
+     "n": 160,
+     "r": -0.068,
+     "r_without_top5": 0.061,
+     "top_stimuli": [
+      "CinnamonBarkOil_high",
+      "CinnamonLeafOil_high",
+      "CinnamicAldehyde_high",
+      "CloveBudOil_high",
+      "Eugenol_high"
+     ]
+    }
+   },
+   "woody": {
+    "dravnieks_1985": {
+     "ci95": [
+      0.239,
+      0.481
+     ],
+     "n": 160,
+     "r": 0.356,
+     "r_without_top5": 0.358,
+     "top_stimuli": [
+      "Cedartone_high",
+      "CedroneS_high",
+      "Andrane_high",
+      "Grisalva_high",
+      "Nootkatone_high"
+     ]
+    }
+   }
+  },
+  "light_dense:dense": {
+   "animalic": {
+    "dravnieks_1985": {
+     "ci95": [
+      0.333,
+      0.579
+     ],
+     "n": 160,
+     "r": 0.464,
+     "r_without_top5": 0.373,
+     "top_stimuli": [
+      "PentanoicAcid_high",
+      "ButanoicAcid_high",
+      "ThioglycolicAcid_high",
+      "ValericAcid-iso_high",
+      "Skatole_high"
+     ]
+    }
+   },
+   "burnt_tar": {
+    "dravnieks_1985": {
+     "ci95": [
+      0.389,
+      0.599
+     ],
+     "n": 160,
+     "r": 0.492,
+     "r_without_top5": 0.535,
+     "top_stimuli": [
+      "Guaiacol_high",
+      "Cyclohexanedione1,2_high",
+      "Cyclohexanol_high",
+      "Thymol_high",
+      "Cresol-m_high"
+     ]
+    }
+   },
+   "chemical_solvent": {
+    "dravnieks_1985": {
+     "ci95": [
+      0.068,
+      0.343
+     ],
+     "n": 160,
+     "r": 0.217,
+     "r_without_top5": 0.205,
+     "top_stimuli": [
+      "PhenylAcetylene_high",
+      "Anisole_high",
+      "Cyclohexanol_high",
+      "Hexanol3_high",
+      "Eucalyptol_high"
+     ]
+    }
+   },
+   "citrus": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.377,
+      -0.14
+     ],
+     "n": 160,
+     "r": -0.25,
+     "r_without_top5": -0.324,
+     "top_stimuli": [
+      "Citral_high",
+      "Limonene_high",
+      "Citralva_high",
+      "Melonal_high",
+      "Myracaldehyde_high"
+     ]
+    }
+   },
+   "earthy_musty": {
+    "dravnieks_1985": {
+     "ci95": [
+      0.083,
+      0.312
+     ],
+     "n": 160,
+     "r": 0.19,
+     "r_without_top5": 0.263,
+     "top_stimuli": [
+      "PropylQuinoline-iso_high",
+      "Octenol-1-3-OL_high",
+      "Vanillin_high",
+      "Methyl-iso-Borneol2_high",
+      "Cyclocitral-iso_high"
+     ]
+    }
+   },
+   "floral": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.42,
+      -0.197
+     ],
+     "n": 160,
+     "r": -0.3,
+     "r_without_top5": -0.345,
+     "top_stimuli": [
+      "PhenylEthanolhighconc_high",
+      "PhenylEthanollowconc_low",
+      "Phenoxaflor_high",
+      "Ionone-betalowconc_low",
+      "Perfumecharlie_high"
+     ]
+    }
+   },
+   "fruity": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.376,
+      -0.213
+     ],
+     "n": 160,
+     "r": -0.295,
+     "r_without_top5": -0.304,
+     "top_stimuli": [
+      "AldehydeC-16lowcon_low",
+      "EthylButyrate_high",
+      "AllylCaproate_high",
+      "AldehydeC-16highcon_high",
+      "Fructone_high"
+     ]
+    }
+   },
+   "gourmand_balsamic": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.076,
+      0.214
+     ],
+     "n": 160,
+     "r": 0.034,
+     "r_without_top5": -0.007,
+     "top_stimuli": [
+      "Vanillin_high",
+      "Cyclotene_high",
+      "Celeriax_high",
+      "Abhexone_high",
+      "EthylPropionate_high"
+     ]
+    }
+   },
+   "green_herbal": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.209,
+      0.028
+     ],
+     "n": 160,
+     "r": -0.088,
+     "r_without_top5": -0.093,
+     "top_stimuli": [
+      "PropylQuinoline-iso_high",
+      "Cyclocitral-iso_high",
+      "Hexanal_high",
+      "ButylQuinolineiso_high",
+      "Melonal_high"
+     ]
+    }
+   },
+   "incense": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.303,
+      0.005
+     ],
+     "n": 160,
+     "r": -0.143,
+     "r_without_top5": -0.225,
+     "top_stimuli": [
+      "Cashmeran_high",
+      "PatchouliOil_high",
+      "BornylAcetateiso-BornylA_high",
+      "MuskTonalid_high",
+      "CinnamonLeafOil_high"
+     ]
+    }
+   },
+   "leathery": {
+    "dravnieks_1985": {
+     "ci95": [
+      0.045,
+      0.306
+     ],
+     "n": 160,
+     "r": 0.174,
+     "r_without_top5": 0.134,
+     "top_stimuli": [
+      "Cresol-m_high",
+      "Thymol_high",
+      "Guaiacol_high",
+      "CresylisoButyrate-p_high",
+      "Cyclohexanol_high"
+     ]
+    }
+   },
+   "metallic": {
+    "dravnieks_1985": {
+     "ci95": [
+      0.11,
+      0.402
+     ],
+     "n": 160,
+     "r": 0.244,
+     "r_without_top5": 0.335,
+     "top_stimuli": [
+      "NonylAcetate_high",
+      "HexylAminelowconc_low",
+      "DiphenylOxide_high",
+      "Maritima_high",
+      "GarlicOil_high"
+     ]
+    }
+   },
+   "minty_camphor": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.159,
+      0.116
+     ],
+     "n": 160,
+     "r": -0.02,
+     "r_without_top5": -0.02,
+     "top_stimuli": [
+      "Eucalyptol_high",
+      "Menthol-l_high",
+      "Carvone-l_high",
+      "SpearmintOil_high",
+      "Methylsalicylate_high"
+     ]
+    }
+   },
+   "musk": {
+    "dravnieks_1985": {
+     "ci95": [
+      0.001,
+      0.266
+     ],
+     "n": 160,
+     "r": 0.094,
+     "r_without_top5": 0.283,
+     "top_stimuli": [
+      "MuskTonalid_high",
+      "MuskGalaxolide_high",
+      "Cashmeran_high",
+      "Santalol_high",
+      "Sandiff_high"
+     ]
+    }
+   },
+   "soapy_aldehydic": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.336,
+      -0.118
+     ],
+     "n": 160,
+     "r": -0.229,
+     "r_without_top5": -0.234,
+     "top_stimuli": [
+      "OenanticEther_high",
+      "NonylAcetate_high",
+      "Cashmeran_high",
+      "Myracaldehyde_high",
+      "BornylAcetateiso-BornylA_high"
+     ]
+    }
+   },
+   "spicy": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.073,
+      0.096
+     ],
+     "n": 160,
+     "r": 0.005,
+     "r_without_top5": 0.082,
+     "top_stimuli": [
+      "CinnamonBarkOil_high",
+      "CinnamonLeafOil_high",
+      "CinnamicAldehyde_high",
+      "CloveBudOil_high",
+      "Eugenol_high"
+     ]
+    }
+   },
+   "woody": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.249,
+      0.026
+     ],
+     "n": 160,
+     "r": -0.115,
+     "r_without_top5": -0.116,
+     "top_stimuli": [
+      "Cedartone_high",
+      "CedroneS_high",
+      "Andrane_high",
+      "Grisalva_high",
+      "Nootkatone_high"
+     ]
+    }
+   }
+  },
+  "light_dense:light": {
+   "animalic": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.603,
+      -0.395
+     ],
+     "n": 160,
+     "r": -0.507,
+     "r_without_top5": -0.45,
+     "top_stimuli": [
+      "PentanoicAcid_high",
+      "ButanoicAcid_high",
+      "ThioglycolicAcid_high",
+      "ValericAcid-iso_high",
+      "Skatole_high"
+     ]
+    }
+   },
+   "burnt_tar": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.533,
+      -0.329
+     ],
+     "n": 160,
+     "r": -0.425,
+     "r_without_top5": -0.486,
+     "top_stimuli": [
+      "Guaiacol_high",
+      "Cyclohexanedione1,2_high",
+      "Cyclohexanol_high",
+      "Thymol_high",
+      "Cresol-m_high"
+     ]
+    }
+   },
+   "chemical_solvent": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.232,
+      0.014
+     ],
+     "n": 160,
+     "r": -0.12,
+     "r_without_top5": -0.139,
+     "top_stimuli": [
+      "PhenylAcetylene_high",
+      "Anisole_high",
+      "Cyclohexanol_high",
+      "Hexanol3_high",
+      "Eucalyptol_high"
+     ]
+    }
+   },
+   "citrus": {
+    "dravnieks_1985": {
+     "ci95": [
+      0.303,
+      0.531
+     ],
+     "n": 160,
+     "r": 0.402,
+     "r_without_top5": 0.447,
+     "top_stimuli": [
+      "Citral_high",
+      "Limonene_high",
+      "Citralva_high",
+      "Melonal_high",
+      "Myracaldehyde_high"
+     ]
+    }
+   },
+   "earthy_musty": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.446,
+      -0.216
+     ],
+     "n": 160,
+     "r": -0.328,
+     "r_without_top5": -0.402,
+     "top_stimuli": [
+      "PropylQuinoline-iso_high",
+      "Octenol-1-3-OL_high",
+      "Vanillin_high",
+      "Methyl-iso-Borneol2_high",
+      "Cyclocitral-iso_high"
+     ]
+    }
+   },
+   "floral": {
+    "dravnieks_1985": {
+     "ci95": [
+      0.386,
+      0.638
+     ],
+     "n": 160,
+     "r": 0.491,
+     "r_without_top5": 0.567,
+     "top_stimuli": [
+      "PhenylEthanolhighconc_high",
+      "PhenylEthanollowconc_low",
+      "Phenoxaflor_high",
+      "Ionone-betalowconc_low",
+      "Perfumecharlie_high"
+     ]
+    }
+   },
+   "fruity": {
+    "dravnieks_1985": {
+     "ci95": [
+      0.254,
+      0.422
+     ],
+     "n": 160,
+     "r": 0.334,
+     "r_without_top5": 0.339,
+     "top_stimuli": [
+      "AldehydeC-16lowcon_low",
+      "EthylButyrate_high",
+      "AllylCaproate_high",
+      "AldehydeC-16highcon_high",
+      "Fructone_high"
+     ]
+    }
+   },
+   "gourmand_balsamic": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.125,
+      0.147
+     ],
+     "n": 160,
+     "r": 0.027,
+     "r_without_top5": 0.138,
+     "top_stimuli": [
+      "Vanillin_high",
+      "Cyclotene_high",
+      "Celeriax_high",
+      "Abhexone_high",
+      "EthylPropionate_high"
+     ]
+    }
+   },
+   "green_herbal": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.025,
+      0.277
+     ],
+     "n": 160,
+     "r": 0.118,
+     "r_without_top5": 0.204,
+     "top_stimuli": [
+      "PropylQuinoline-iso_high",
+      "Cyclocitral-iso_high",
+      "Hexanal_high",
+      "ButylQuinolineiso_high",
+      "Melonal_high"
+     ]
+    }
+   },
+   "incense": {
+    "dravnieks_1985": {
+     "ci95": [
+      0.253,
+      0.519
+     ],
+     "n": 160,
+     "r": 0.38,
+     "r_without_top5": 0.444,
+     "top_stimuli": [
+      "Cashmeran_high",
+      "PatchouliOil_high",
+      "BornylAcetateiso-BornylA_high",
+      "MuskTonalid_high",
+      "CinnamonLeafOil_high"
+     ]
+    }
+   },
+   "leathery": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.294,
+      -0.087
+     ],
+     "n": 160,
+     "r": -0.188,
+     "r_without_top5": -0.161,
+     "top_stimuli": [
+      "Cresol-m_high",
+      "Thymol_high",
+      "Guaiacol_high",
+      "CresylisoButyrate-p_high",
+      "Cyclohexanol_high"
+     ]
+    }
+   },
+   "metallic": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.368,
+      -0.126
+     ],
+     "n": 160,
+     "r": -0.241,
+     "r_without_top5": -0.256,
+     "top_stimuli": [
+      "NonylAcetate_high",
+      "HexylAminelowconc_low",
+      "DiphenylOxide_high",
+      "Maritima_high",
+      "GarlicOil_high"
+     ]
+    }
+   },
+   "minty_camphor": {
+    "dravnieks_1985": {
+     "ci95": [
+      0.158,
+      0.387
+     ],
+     "n": 160,
+     "r": 0.273,
+     "r_without_top5": 0.144,
+     "top_stimuli": [
+      "Eucalyptol_high",
+      "Menthol-l_high",
+      "Carvone-l_high",
+      "SpearmintOil_high",
+      "Methylsalicylate_high"
+     ]
+    }
+   },
+   "musk": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.187,
+      0.309
+     ],
+     "n": 160,
+     "r": 0.136,
+     "r_without_top5": -0.237,
+     "top_stimuli": [
+      "MuskTonalid_high",
+      "MuskGalaxolide_high",
+      "Cashmeran_high",
+      "Santalol_high",
+      "Sandiff_high"
+     ]
+    }
+   },
+   "soapy_aldehydic": {
+    "dravnieks_1985": {
+     "ci95": [
+      0.202,
+      0.463
+     ],
+     "n": 160,
+     "r": 0.308,
+     "r_without_top5": 0.357,
+     "top_stimuli": [
+      "OenanticEther_high",
+      "NonylAcetate_high",
+      "Cashmeran_high",
+      "Myracaldehyde_high",
+      "BornylAcetateiso-BornylA_high"
+     ]
+    }
+   },
+   "spicy": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.029,
+      0.112
+     ],
+     "n": 160,
+     "r": 0.035,
+     "r_without_top5": 0.065,
+     "top_stimuli": [
+      "CinnamonBarkOil_high",
+      "CinnamonLeafOil_high",
+      "CinnamicAldehyde_high",
+      "CloveBudOil_high",
+      "Eugenol_high"
+     ]
+    }
+   },
+   "woody": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.054,
+      0.218
+     ],
+     "n": 160,
+     "r": 0.078,
+     "r_without_top5": 0.171,
+     "top_stimuli": [
+      "Cedartone_high",
+      "CedroneS_high",
+      "Andrane_high",
+      "Grisalva_high",
+      "Nootkatone_high"
+     ]
+    }
+   }
+  },
+  "sweet_dry:dry": {
+   "animalic": {
+    "leffingwell": {
+     "family_count": 48,
+     "n": 3522,
+     "phi": -0.011,
+     "pole_count": 31
+    }
+   },
+   "burnt_tar": {
+    "leffingwell": {
+     "family_count": 264,
+     "n": 3522,
+     "phi": 0.054,
+     "pole_count": 31
+    }
+   },
+   "chemical_solvent": {
+    "leffingwell": {
+     "family_count": 260,
+     "n": 3522,
+     "phi": -0.003,
+     "pole_count": 31
+    }
+   },
+   "citrus": {
+    "leffingwell": {
+     "family_count": 256,
+     "n": 3522,
+     "phi": -0.015,
+     "pole_count": 31
+    }
+   },
+   "earthy_musty": {
+    "leffingwell": {
+     "family_count": 273,
+     "n": 3522,
+     "phi": -0.005,
+     "pole_count": 31
+    }
+   },
+   "floral": {
+    "leffingwell": {
+     "family_count": 684,
+     "n": 3522,
+     "phi": -0.016,
+     "pole_count": 31
+    }
+   },
+   "fruity": {
+    "leffingwell": {
+     "family_count": 1562,
+     "n": 3522,
+     "phi": -0.047,
+     "pole_count": 31
+    }
+   },
+   "gourmand_balsamic": {
+    "leffingwell": {
+     "family_count": 517,
+     "n": 3522,
+     "phi": -0.03,
+     "pole_count": 31
+    }
+   },
+   "green_herbal": {
+    "leffingwell": {
+     "family_count": 1207,
+     "n": 3522,
+     "phi": -0.023,
+     "pole_count": 31
+    }
+   },
+   "leathery": {
+    "leffingwell": {
+     "family_count": 20,
+     "n": 3522,
+     "phi": 0.114,
+     "pole_count": 31
+    }
+   },
+   "metallic": {
+    "leffingwell": {
+     "family_count": 25,
+     "n": 3522,
+     "phi": -0.008,
+     "pole_count": 31
+    }
+   },
+   "minty_camphor": {
+    "leffingwell": {
+     "family_count": 167,
+     "n": 3522,
+     "phi": 0.022,
+     "pole_count": 31
+    }
+   },
+   "musk": {
+    "leffingwell": {
+     "family_count": 20,
+     "n": 3522,
+     "phi": -0.007,
+     "pole_count": 31
+    }
+   },
+   "soapy_aldehydic": {
+    "leffingwell": {
+     "family_count": 265,
+     "n": 3522,
+     "phi": -0.015,
+     "pole_count": 31
+    }
+   },
+   "spicy": {
+    "leffingwell": {
+     "family_count": 208,
+     "n": 3522,
+     "phi": 0.041,
+     "pole_count": 31
+    }
+   },
+   "woody": {
+    "leffingwell": {
+     "family_count": 211,
+     "n": 3522,
+     "phi": 0.194,
+     "pole_count": 31
+    }
+   }
+  },
+  "sweet_dry:sweet": {
+   "animalic": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.513,
+      -0.332
+     ],
+     "n": 160,
+     "r": -0.428,
+     "r_without_top5": -0.401,
+     "top_stimuli": [
+      "PentanoicAcid_high",
+      "ButanoicAcid_high",
+      "ThioglycolicAcid_high",
+      "ValericAcid-iso_high",
+      "Skatole_high"
+     ]
+    },
+    "keller_2016": {
+     "ci95": [
+      -0.555,
+      -0.477
+     ],
+     "n": 960,
+     "r": -0.516,
+     "r_pleasantness_controlled": -0.115,
+     "r_without_top5": -0.517
+    },
+    "leffingwell": {
+     "family_count": 48,
+     "n": 3522,
+     "phi": -0.001,
+     "pole_count": 825
+    }
+   },
+   "burnt_tar": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.494,
+      -0.33
+     ],
+     "n": 160,
+     "r": -0.411,
+     "r_without_top5": -0.446,
+     "top_stimuli": [
+      "Guaiacol_high",
+      "Cyclohexanedione1,2_high",
+      "Cyclohexanol_high",
+      "Thymol_high",
+      "Cresol-m_high"
+     ]
+    },
+    "keller_2016": {
+     "ci95": [
+      -0.416,
+      -0.34
+     ],
+     "n": 960,
+     "r": -0.377,
+     "r_pleasantness_controlled": 0.054,
+     "r_without_top5": -0.376
+    },
+    "leffingwell": {
+     "family_count": 264,
+     "n": 3522,
+     "phi": -0.005,
+     "pole_count": 825
+    }
+   },
+   "chemical_solvent": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.392,
+      -0.192
+     ],
+     "n": 160,
+     "r": -0.289,
+     "r_without_top5": -0.286,
+     "top_stimuli": [
+      "PhenylAcetylene_high",
+      "Anisole_high",
+      "Cyclohexanol_high",
+      "Hexanol3_high",
+      "Eucalyptol_high"
+     ]
+    },
+    "keller_2016": {
+     "ci95": [
+      -0.179,
+      -0.073
+     ],
+     "n": 960,
+     "r": -0.128,
+     "r_pleasantness_controlled": 0.148,
+     "r_without_top5": -0.122
+    },
+    "leffingwell": {
+     "family_count": 260,
+     "n": 3522,
+     "phi": -0.038,
+     "pole_count": 825
+    }
+   },
+   "citrus": {
+    "dravnieks_1985": {
+     "ci95": [
+      0.284,
+      0.455
+     ],
+     "n": 160,
+     "r": 0.353,
+     "r_without_top5": 0.445,
+     "top_stimuli": [
+      "Citral_high",
+      "Limonene_high",
+      "Citralva_high",
+      "Melonal_high",
+      "Myracaldehyde_high"
+     ]
+    },
+    "leffingwell": {
+     "family_count": 256,
+     "n": 3522,
+     "phi": -0.013,
+     "pole_count": 825
+    }
+   },
+   "earthy_musty": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.55,
+      -0.22
+     ],
+     "n": 160,
+     "r": -0.396,
+     "r_without_top5": -0.533,
+     "top_stimuli": [
+      "PropylQuinoline-iso_high",
+      "Octenol-1-3-OL_high",
+      "Vanillin_high",
+      "Methyl-iso-Borneol2_high",
+      "Cyclocitral-iso_high"
+     ]
+    },
+    "leffingwell": {
+     "family_count": 273,
+     "n": 3522,
+     "phi": -0.05,
+     "pole_count": 825
+    }
+   },
+   "floral": {
+    "dravnieks_1985": {
+     "ci95": [
+      0.405,
+      0.605
+     ],
+     "n": 160,
+     "r": 0.482,
+     "r_without_top5": 0.535,
+     "top_stimuli": [
+      "PhenylEthanolhighconc_high",
+      "PhenylEthanollowconc_low",
+      "Phenoxaflor_high",
+      "Ionone-betalowconc_low",
+      "Perfumecharlie_high"
+     ]
+    },
+    "keller_2016": {
+     "ci95": [
+      0.54,
+      0.625
+     ],
+     "n": 960,
+     "r": 0.583,
+     "r_pleasantness_controlled": 0.212,
+     "r_without_top5": 0.586
+    },
+    "leffingwell": {
+     "family_count": 684,
+     "n": 3522,
+     "phi": 0.156,
+     "pole_count": 825
+    }
+   },
+   "fruity": {
+    "dravnieks_1985": {
+     "ci95": [
+      0.473,
+      0.789
+     ],
+     "n": 160,
+     "r": 0.668,
+     "r_without_top5": 0.672,
+     "top_stimuli": [
+      "AldehydeC-16lowcon_low",
+      "EthylButyrate_high",
+      "AllylCaproate_high",
+      "AldehydeC-16highcon_high",
+      "Fructone_high"
+     ]
+    },
+    "keller_2016": {
+     "ci95": [
+      0.731,
+      0.796
+     ],
+     "n": 960,
+     "r": 0.763,
+     "r_pleasantness_controlled": 0.646,
+     "r_without_top5": 0.758
+    },
+    "leffingwell": {
+     "family_count": 1562,
+     "n": 3522,
+     "phi": 0.045,
+     "pole_count": 825
+    }
+   },
+   "gourmand_balsamic": {
+    "dravnieks_1985": {
+     "ci95": [
+      0.268,
+      0.507
+     ],
+     "n": 160,
+     "r": 0.366,
+     "r_without_top5": 0.56,
+     "top_stimuli": [
+      "Vanillin_high",
+      "Cyclotene_high",
+      "Celeriax_high",
+      "Abhexone_high",
+      "EthylPropionate_high"
+     ]
+    },
+    "keller_2016": {
+     "ci95": [
+      0.383,
+      0.512
+     ],
+     "n": 960,
+     "r": 0.449,
+     "r_pleasantness_controlled": 0.254,
+     "r_without_top5": 0.402
+    },
+    "leffingwell": {
+     "family_count": 517,
+     "n": 3522,
+     "phi": 0.174,
+     "pole_count": 825
+    }
+   },
+   "green_herbal": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.13,
+      0.151
+     ],
+     "n": 160,
+     "r": -0.005,
+     "r_without_top5": 0.11,
+     "top_stimuli": [
+      "PropylQuinoline-iso_high",
+      "Cyclocitral-iso_high",
+      "Hexanal_high",
+      "ButylQuinolineiso_high",
+      "Melonal_high"
+     ]
+    },
+    "keller_2016": {
+     "ci95": [
+      -0.117,
+      -0.02
+     ],
+     "n": 960,
+     "r": -0.071,
+     "r_pleasantness_controlled": -0.238,
+     "r_without_top5": -0.063
+    },
+    "leffingwell": {
+     "family_count": 1207,
+     "n": 3522,
+     "phi": -0.074,
+     "pole_count": 825
+    }
+   },
+   "incense": {
+    "dravnieks_1985": {
+     "ci95": [
+      0.339,
+      0.588
+     ],
+     "n": 160,
+     "r": 0.456,
+     "r_without_top5": 0.554,
+     "top_stimuli": [
+      "Cashmeran_high",
+      "PatchouliOil_high",
+      "BornylAcetateiso-BornylA_high",
+      "MuskTonalid_high",
+      "CinnamonLeafOil_high"
+     ]
+    }
+   },
+   "leathery": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.39,
+      -0.204
+     ],
+     "n": 160,
+     "r": -0.302,
+     "r_without_top5": -0.294,
+     "top_stimuli": [
+      "Cresol-m_high",
+      "Thymol_high",
+      "Guaiacol_high",
+      "CresylisoButyrate-p_high",
+      "Cyclohexanol_high"
+     ]
+    },
+    "leffingwell": {
+     "family_count": 20,
+     "n": 3522,
+     "phi": -0.024,
+     "pole_count": 825
+    }
+   },
+   "metallic": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.429,
+      -0.224
+     ],
+     "n": 160,
+     "r": -0.333,
+     "r_without_top5": -0.328,
+     "top_stimuli": [
+      "NonylAcetate_high",
+      "HexylAminelowconc_low",
+      "DiphenylOxide_high",
+      "Maritima_high",
+      "GarlicOil_high"
+     ]
+    },
+    "leffingwell": {
+     "family_count": 25,
+     "n": 3522,
+     "phi": -0.039,
+     "pole_count": 825
+    }
+   },
+   "minty_camphor": {
+    "dravnieks_1985": {
+     "ci95": [
+      0.044,
+      0.312
+     ],
+     "n": 160,
+     "r": 0.166,
+     "r_without_top5": 0.105,
+     "top_stimuli": [
+      "Eucalyptol_high",
+      "Menthol-l_high",
+      "Carvone-l_high",
+      "SpearmintOil_high",
+      "Methylsalicylate_high"
+     ]
+    },
+    "leffingwell": {
+     "family_count": 167,
+     "n": 3522,
+     "phi": 0.031,
+     "pole_count": 825
+    }
+   },
+   "musk": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.241,
+      0.187
+     ],
+     "n": 160,
+     "r": 0.03,
+     "r_without_top5": -0.254,
+     "top_stimuli": [
+      "MuskTonalid_high",
+      "MuskGalaxolide_high",
+      "Cashmeran_high",
+      "Santalol_high",
+      "Sandiff_high"
+     ]
+    },
+    "leffingwell": {
+     "family_count": 20,
+     "n": 3522,
+     "phi": 0.021,
+     "pole_count": 825
+    }
+   },
+   "soapy_aldehydic": {
+    "dravnieks_1985": {
+     "ci95": [
+      0.021,
+      0.321
+     ],
+     "n": 160,
+     "r": 0.136,
+     "r_without_top5": 0.236,
+     "top_stimuli": [
+      "OenanticEther_high",
+      "NonylAcetate_high",
+      "Cashmeran_high",
+      "Myracaldehyde_high",
+      "BornylAcetateiso-BornylA_high"
+     ]
+    },
+    "leffingwell": {
+     "family_count": 265,
+     "n": 3522,
+     "phi": -0.051,
+     "pole_count": 825
+    }
+   },
+   "spicy": {
+    "dravnieks_1985": {
+     "ci95": [
+      0.165,
+      0.379
+     ],
+     "n": 160,
+     "r": 0.272,
+     "r_without_top5": 0.24,
+     "top_stimuli": [
+      "CinnamonBarkOil_high",
+      "CinnamonLeafOil_high",
+      "CinnamicAldehyde_high",
+      "CloveBudOil_high",
+      "Eugenol_high"
+     ]
+    },
+    "keller_2016": {
+     "ci95": [
+      -0.069,
+      0.07
+     ],
+     "n": 960,
+     "r": -0.001,
+     "r_pleasantness_controlled": -0.012,
+     "r_without_top5": -0.028
+    },
+    "leffingwell": {
+     "family_count": 208,
+     "n": 3522,
+     "phi": 0.049,
+     "pole_count": 825
+    }
+   },
+   "woody": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.277,
+      -0.05
+     ],
+     "n": 160,
+     "r": -0.169,
+     "r_without_top5": -0.148,
+     "top_stimuli": [
+      "Cedartone_high",
+      "CedroneS_high",
+      "Andrane_high",
+      "Grisalva_high",
+      "Nootkatone_high"
+     ]
+    },
+    "keller_2016": {
+     "ci95": [
+      -0.334,
+      -0.236
+     ],
+     "n": 960,
+     "r": -0.285,
+     "r_pleasantness_controlled": -0.286,
+     "r_without_top5": -0.28
+    },
+    "leffingwell": {
+     "family_count": 211,
+     "n": 3522,
+     "phi": 0.03,
+     "pole_count": 825
+    }
+   }
+  },
+  "warm_cool:cool": {
+   "animalic": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.471,
+      -0.331
+     ],
+     "n": 160,
+     "r": -0.387,
+     "r_without_top5": -0.381,
+     "top_stimuli": [
+      "PentanoicAcid_high",
+      "ButanoicAcid_high",
+      "ThioglycolicAcid_high",
+      "ValericAcid-iso_high",
+      "Skatole_high"
+     ]
+    },
+    "keller_2016": {
+     "ci95": [
+      -0.266,
+      -0.153
+     ],
+     "n": 960,
+     "r": -0.21,
+     "r_pleasantness_controlled": -0.173,
+     "r_without_top5": -0.202
+    }
+   },
+   "burnt_tar": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.362,
+      -0.15
+     ],
+     "n": 160,
+     "r": -0.252,
+     "r_without_top5": -0.29,
+     "top_stimuli": [
+      "Guaiacol_high",
+      "Cyclohexanedione1,2_high",
+      "Cyclohexanol_high",
+      "Thymol_high",
+      "Cresol-m_high"
+     ]
+    },
+    "keller_2016": {
+     "ci95": [
+      -0.182,
+      -0.067
+     ],
+     "n": 960,
+     "r": -0.127,
+     "r_pleasantness_controlled": -0.076,
+     "r_without_top5": -0.109
+    }
+   },
+   "chemical_solvent": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.006,
+      0.353
+     ],
+     "n": 160,
+     "r": 0.153,
+     "r_without_top5": 0.082,
+     "top_stimuli": [
+      "PhenylAcetylene_high",
+      "Anisole_high",
+      "Cyclohexanol_high",
+      "Hexanol3_high",
+      "Eucalyptol_high"
+     ]
+    },
+    "keller_2016": {
+     "ci95": [
+      0.22,
+      0.37
+     ],
+     "n": 960,
+     "r": 0.295,
+     "r_pleasantness_controlled": 0.345,
+     "r_without_top5": 0.291
+    }
+   },
+   "citrus": {
+    "dravnieks_1985": {
+     "ci95": [
+      0.183,
+      0.47
+     ],
+     "n": 160,
+     "r": 0.298,
+     "r_without_top5": 0.227,
+     "top_stimuli": [
+      "Citral_high",
+      "Limonene_high",
+      "Citralva_high",
+      "Melonal_high",
+      "Myracaldehyde_high"
+     ]
+    }
+   },
+   "earthy_musty": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.404,
+      -0.238
+     ],
+     "n": 160,
+     "r": -0.308,
+     "r_without_top5": -0.387,
+     "top_stimuli": [
+      "PropylQuinoline-iso_high",
+      "Octenol-1-3-OL_high",
+      "Vanillin_high",
+      "Methyl-iso-Borneol2_high",
+      "Cyclocitral-iso_high"
+     ]
+    }
+   },
+   "floral": {
+    "dravnieks_1985": {
+     "ci95": [
+      0.044,
+      0.304
+     ],
+     "n": 160,
+     "r": 0.142,
+     "r_without_top5": 0.23,
+     "top_stimuli": [
+      "PhenylEthanolhighconc_high",
+      "PhenylEthanollowconc_low",
+      "Phenoxaflor_high",
+      "Ionone-betalowconc_low",
+      "Perfumecharlie_high"
+     ]
+    },
+    "keller_2016": {
+     "ci95": [
+      0.047,
+      0.173
+     ],
+     "n": 960,
+     "r": 0.113,
+     "r_pleasantness_controlled": 0.049,
+     "r_without_top5": 0.126
+    }
+   },
+   "fruity": {
+    "dravnieks_1985": {
+     "ci95": [
+      0.07,
+      0.255
+     ],
+     "n": 160,
+     "r": 0.141,
+     "r_without_top5": 0.16,
+     "top_stimuli": [
+      "AldehydeC-16lowcon_low",
+      "EthylButyrate_high",
+      "AllylCaproate_high",
+      "AldehydeC-16highcon_high",
+      "Fructone_high"
+     ]
+    },
+    "keller_2016": {
+     "ci95": [
+      0.053,
+      0.164
+     ],
+     "n": 960,
+     "r": 0.105,
+     "r_pleasantness_controlled": 0.048,
+     "r_without_top5": 0.11
+    }
+   },
+   "gourmand_balsamic": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.169,
+      0.002
+     ],
+     "n": 160,
+     "r": -0.085,
+     "r_without_top5": 0.05,
+     "top_stimuli": [
+      "Vanillin_high",
+      "Cyclotene_high",
+      "Celeriax_high",
+      "Abhexone_high",
+      "EthylPropionate_high"
+     ]
+    },
+    "keller_2016": {
+     "ci95": [
+      -0.238,
+      -0.157
+     ],
+     "n": 960,
+     "r": -0.198,
+     "r_pleasantness_controlled": -0.268,
+     "r_without_top5": -0.189
+    }
+   },
+   "green_herbal": {
+    "dravnieks_1985": {
+     "ci95": [
+      0.085,
+      0.334
+     ],
+     "n": 160,
+     "r": 0.196,
+     "r_without_top5": 0.273,
+     "top_stimuli": [
+      "PropylQuinoline-iso_high",
+      "Cyclocitral-iso_high",
+      "Hexanal_high",
+      "ButylQuinolineiso_high",
+      "Melonal_high"
+     ]
+    },
+    "keller_2016": {
+     "ci95": [
+      0.013,
+      0.18
+     ],
+     "n": 960,
+     "r": 0.092,
+     "r_pleasantness_controlled": 0.081,
+     "r_without_top5": 0.103
+    }
+   },
+   "incense": {
+    "dravnieks_1985": {
+     "ci95": [
+      0.205,
+      0.465
+     ],
+     "n": 160,
+     "r": 0.321,
+     "r_without_top5": 0.341,
+     "top_stimuli": [
+      "Cashmeran_high",
+      "PatchouliOil_high",
+      "BornylAcetateiso-BornylA_high",
+      "MuskTonalid_high",
+      "CinnamonLeafOil_high"
+     ]
+    }
+   },
+   "leathery": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.198,
+      0.035
+     ],
+     "n": 160,
+     "r": -0.094,
+     "r_without_top5": -0.086,
+     "top_stimuli": [
+      "Cresol-m_high",
+      "Thymol_high",
+      "Guaiacol_high",
+      "CresylisoButyrate-p_high",
+      "Cyclohexanol_high"
+     ]
+    }
+   },
+   "metallic": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.243,
+      0.027
+     ],
+     "n": 160,
+     "r": -0.111,
+     "r_without_top5": -0.09,
+     "top_stimuli": [
+      "NonylAcetate_high",
+      "HexylAminelowconc_low",
+      "DiphenylOxide_high",
+      "Maritima_high",
+      "GarlicOil_high"
+     ]
+    }
+   },
+   "minty_camphor": {
+    "dravnieks_1985": {
+     "ci95": [
+      0.771,
+      0.922
+     ],
+     "n": 160,
+     "r": 0.872,
+     "r_without_top5": 0.695,
+     "top_stimuli": [
+      "Eucalyptol_high",
+      "Menthol-l_high",
+      "Carvone-l_high",
+      "SpearmintOil_high",
+      "Methylsalicylate_high"
+     ]
+    }
+   },
+   "musk": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.172,
+      0.008
+     ],
+     "n": 160,
+     "r": -0.061,
+     "r_without_top5": -0.144,
+     "top_stimuli": [
+      "MuskTonalid_high",
+      "MuskGalaxolide_high",
+      "Cashmeran_high",
+      "Santalol_high",
+      "Sandiff_high"
+     ]
+    }
+   },
+   "soapy_aldehydic": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.02,
+      0.242
+     ],
+     "n": 160,
+     "r": 0.081,
+     "r_without_top5": 0.113,
+     "top_stimuli": [
+      "OenanticEther_high",
+      "NonylAcetate_high",
+      "Cashmeran_high",
+      "Myracaldehyde_high",
+      "BornylAcetateiso-BornylA_high"
+     ]
+    }
+   },
+   "spicy": {
+    "dravnieks_1985": {
+     "ci95": [
+      0.105,
+      0.292
+     ],
+     "n": 160,
+     "r": 0.18,
+     "r_without_top5": 0.333,
+     "top_stimuli": [
+      "CinnamonBarkOil_high",
+      "CinnamonLeafOil_high",
+      "CinnamicAldehyde_high",
+      "CloveBudOil_high",
+      "Eugenol_high"
+     ]
+    },
+    "keller_2016": {
+     "ci95": [
+      -0.111,
+      0.012
+     ],
+     "n": 960,
+     "r": -0.051,
+     "r_pleasantness_controlled": -0.053,
+     "r_without_top5": -0.052
+    }
+   },
+   "woody": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.075,
+      0.199
+     ],
+     "n": 160,
+     "r": 0.05,
+     "r_without_top5": 0.105,
+     "top_stimuli": [
+      "Cedartone_high",
+      "CedroneS_high",
+      "Andrane_high",
+      "Grisalva_high",
+      "Nootkatone_high"
+     ]
+    },
+    "keller_2016": {
+     "ci95": [
+      -0.061,
+      0.059
+     ],
+     "n": 960,
+     "r": -0.003,
+     "r_pleasantness_controlled": 0.014,
+     "r_without_top5": 0.006
+    }
+   }
+  },
+  "warm_cool:warm": {
+   "animalic": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.209,
+      0.058
+     ],
+     "n": 160,
+     "r": -0.08,
+     "r_without_top5": -0.024,
+     "top_stimuli": [
+      "PentanoicAcid_high",
+      "ButanoicAcid_high",
+      "ThioglycolicAcid_high",
+      "ValericAcid-iso_high",
+      "Skatole_high"
+     ]
+    },
+    "keller_2016": {
+     "ci95": [
+      -0.172,
+      -0.048
+     ],
+     "n": 960,
+     "r": -0.109,
+     "r_pleasantness_controlled": -0.034,
+     "r_without_top5": -0.097
+    },
+    "leffingwell": {
+     "family_count": 48,
+     "n": 3522,
+     "phi": 0.011,
+     "pole_count": 40
+    }
+   },
+   "burnt_tar": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.011,
+      0.317
+     ],
+     "n": 160,
+     "r": 0.155,
+     "r_without_top5": 0.125,
+     "top_stimuli": [
+      "Guaiacol_high",
+      "Cyclohexanedione1,2_high",
+      "Cyclohexanol_high",
+      "Thymol_high",
+      "Cresol-m_high"
+     ]
+    },
+    "keller_2016": {
+     "ci95": [
+      0.138,
+      0.256
+     ],
+     "n": 960,
+     "r": 0.2,
+     "r_pleasantness_controlled": 0.323,
+     "r_without_top5": 0.185
+    },
+    "leffingwell": {
+     "family_count": 264,
+     "n": 3522,
+     "phi": -0.01,
+     "pole_count": 40
+    }
+   },
+   "chemical_solvent": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.27,
+      -0.015
+     ],
+     "n": 160,
+     "r": -0.154,
+     "r_without_top5": -0.146,
+     "top_stimuli": [
+      "PhenylAcetylene_high",
+      "Anisole_high",
+      "Cyclohexanol_high",
+      "Hexanol3_high",
+      "Eucalyptol_high"
+     ]
+    },
+    "keller_2016": {
+     "ci95": [
+      -0.086,
+      0.033
+     ],
+     "n": 960,
+     "r": -0.026,
+     "r_pleasantness_controlled": 0.014,
+     "r_without_top5": -0.02
+    },
+    "leffingwell": {
+     "family_count": 260,
+     "n": 3522,
+     "phi": -0.01,
+     "pole_count": 40
+    }
+   },
+   "citrus": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.251,
+      -0.071
+     ],
+     "n": 160,
+     "r": -0.161,
+     "r_without_top5": -0.111,
+     "top_stimuli": [
+      "Citral_high",
+      "Limonene_high",
+      "Citralva_high",
+      "Melonal_high",
+      "Myracaldehyde_high"
+     ]
+    },
+    "leffingwell": {
+     "family_count": 256,
+     "n": 3522,
+     "phi": -0.02,
+     "pole_count": 40
+    }
+   },
+   "earthy_musty": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.225,
+      0.063
+     ],
+     "n": 160,
+     "r": -0.09,
+     "r_without_top5": -0.082,
+     "top_stimuli": [
+      "PropylQuinoline-iso_high",
+      "Octenol-1-3-OL_high",
+      "Vanillin_high",
+      "Methyl-iso-Borneol2_high",
+      "Cyclocitral-iso_high"
+     ]
+    },
+    "leffingwell": {
+     "family_count": 273,
+     "n": 3522,
+     "phi": -0.021,
+     "pole_count": 40
+    }
+   },
+   "floral": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.094,
+      0.168
+     ],
+     "n": 160,
+     "r": 0.041,
+     "r_without_top5": 0.056,
+     "top_stimuli": [
+      "PhenylEthanolhighconc_high",
+      "PhenylEthanollowconc_low",
+      "Phenoxaflor_high",
+      "Ionone-betalowconc_low",
+      "Perfumecharlie_high"
+     ]
+    },
+    "keller_2016": {
+     "ci95": [
+      0.034,
+      0.159
+     ],
+     "n": 960,
+     "r": 0.097,
+     "r_pleasantness_controlled": 0.015,
+     "r_without_top5": 0.086
+    },
+    "leffingwell": {
+     "family_count": 684,
+     "n": 3522,
+     "phi": 0.002,
+     "pole_count": 40
+    }
+   },
+   "fruity": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.164,
+      0.036
+     ],
+     "n": 160,
+     "r": -0.066,
+     "r_without_top5": 0.011,
+     "top_stimuli": [
+      "AldehydeC-16lowcon_low",
+      "EthylButyrate_high",
+      "AllylCaproate_high",
+      "AldehydeC-16highcon_high",
+      "Fructone_high"
+     ]
+    },
+    "keller_2016": {
+     "ci95": [
+      0.014,
+      0.116
+     ],
+     "n": 960,
+     "r": 0.064,
+     "r_pleasantness_controlled": -0.013,
+     "r_without_top5": 0.057
+    },
+    "leffingwell": {
+     "family_count": 1562,
+     "n": 3522,
+     "phi": -0.031,
+     "pole_count": 40
+    }
+   },
+   "gourmand_balsamic": {
+    "dravnieks_1985": {
+     "ci95": [
+      0.245,
+      0.582
+     ],
+     "n": 160,
+     "r": 0.364,
+     "r_without_top5": 0.458,
+     "top_stimuli": [
+      "Vanillin_high",
+      "Cyclotene_high",
+      "Celeriax_high",
+      "Abhexone_high",
+      "EthylPropionate_high"
+     ]
+    },
+    "keller_2016": {
+     "ci95": [
+      0.335,
+      0.482
+     ],
+     "n": 960,
+     "r": 0.413,
+     "r_pleasantness_controlled": 0.394,
+     "r_without_top5": 0.365
+    },
+    "leffingwell": {
+     "family_count": 517,
+     "n": 3522,
+     "phi": 0.046,
+     "pole_count": 40
+    }
+   },
+   "green_herbal": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.247,
+      -0.021
+     ],
+     "n": 160,
+     "r": -0.137,
+     "r_without_top5": -0.063,
+     "top_stimuli": [
+      "PropylQuinoline-iso_high",
+      "Cyclocitral-iso_high",
+      "Hexanal_high",
+      "ButylQuinolineiso_high",
+      "Melonal_high"
+     ]
+    },
+    "keller_2016": {
+     "ci95": [
+      -0.182,
+      -0.064
+     ],
+     "n": 960,
+     "r": -0.125,
+     "r_pleasantness_controlled": -0.141,
+     "r_without_top5": -0.122
+    },
+    "leffingwell": {
+     "family_count": 1207,
+     "n": 3522,
+     "phi": 0.024,
+     "pole_count": 40
+    }
+   },
+   "incense": {
+    "dravnieks_1985": {
+     "ci95": [
+      0.094,
+      0.5
+     ],
+     "n": 160,
+     "r": 0.313,
+     "r_without_top5": 0.319,
+     "top_stimuli": [
+      "Cashmeran_high",
+      "PatchouliOil_high",
+      "BornylAcetateiso-BornylA_high",
+      "MuskTonalid_high",
+      "CinnamonLeafOil_high"
+     ]
+    }
+   },
+   "leathery": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.136,
+      0.1
+     ],
+     "n": 160,
+     "r": -0.021,
+     "r_without_top5": -0.076,
+     "top_stimuli": [
+      "Cresol-m_high",
+      "Thymol_high",
+      "Guaiacol_high",
+      "CresylisoButyrate-p_high",
+      "Cyclohexanol_high"
+     ]
+    },
+    "leffingwell": {
+     "family_count": 20,
+     "n": 3522,
+     "phi": -0.008,
+     "pole_count": 40
+    }
+   },
+   "metallic": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.271,
+      -0.043
+     ],
+     "n": 160,
+     "r": -0.165,
+     "r_without_top5": -0.134,
+     "top_stimuli": [
+      "NonylAcetate_high",
+      "HexylAminelowconc_low",
+      "DiphenylOxide_high",
+      "Maritima_high",
+      "GarlicOil_high"
+     ]
+    },
+    "leffingwell": {
+     "family_count": 25,
+     "n": 3522,
+     "phi": -0.009,
+     "pole_count": 40
+    }
+   },
+   "minty_camphor": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.06,
+      0.215
+     ],
+     "n": 160,
+     "r": 0.079,
+     "r_without_top5": 0.121,
+     "top_stimuli": [
+      "Eucalyptol_high",
+      "Menthol-l_high",
+      "Carvone-l_high",
+      "SpearmintOil_high",
+      "Methylsalicylate_high"
+     ]
+    },
+    "leffingwell": {
+     "family_count": 167,
+     "n": 3522,
+     "phi": -0.011,
+     "pole_count": 40
+    }
+   },
+   "musk": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.024,
+      0.419
+     ],
+     "n": 160,
+     "r": 0.228,
+     "r_without_top5": 0.049,
+     "top_stimuli": [
+      "MuskTonalid_high",
+      "MuskGalaxolide_high",
+      "Cashmeran_high",
+      "Santalol_high",
+      "Sandiff_high"
+     ]
+    },
+    "leffingwell": {
+     "family_count": 20,
+     "n": 3522,
+     "phi": 0.063,
+     "pole_count": 40
+    }
+   },
+   "soapy_aldehydic": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.163,
+      0.155
+     ],
+     "n": 160,
+     "r": -0.023,
+     "r_without_top5": 0.003,
+     "top_stimuli": [
+      "OenanticEther_high",
+      "NonylAcetate_high",
+      "Cashmeran_high",
+      "Myracaldehyde_high",
+      "BornylAcetateiso-BornylA_high"
+     ]
+    },
+    "leffingwell": {
+     "family_count": 265,
+     "n": 3522,
+     "phi": -0.031,
+     "pole_count": 40
+    }
+   },
+   "spicy": {
+    "dravnieks_1985": {
+     "ci95": [
+      0.3,
+      0.655
+     ],
+     "n": 160,
+     "r": 0.486,
+     "r_without_top5": 0.302,
+     "top_stimuli": [
+      "CinnamonBarkOil_high",
+      "CinnamonLeafOil_high",
+      "CinnamicAldehyde_high",
+      "CloveBudOil_high",
+      "Eugenol_high"
+     ]
+    },
+    "keller_2016": {
+     "ci95": [
+      0.198,
+      0.318
+     ],
+     "n": 960,
+     "r": 0.262,
+     "r_pleasantness_controlled": 0.264,
+     "r_without_top5": 0.247
+    },
+    "leffingwell": {
+     "family_count": 208,
+     "n": 3522,
+     "phi": 0.212,
+     "pole_count": 40
+    }
+   },
+   "woody": {
+    "dravnieks_1985": {
+     "ci95": [
+      -0.025,
+      0.229
+     ],
+     "n": 160,
+     "r": 0.106,
+     "r_without_top5": 0.08,
+     "top_stimuli": [
+      "Cedartone_high",
+      "CedroneS_high",
+      "Andrane_high",
+      "Grisalva_high",
+      "Nootkatone_high"
+     ]
+    },
+    "keller_2016": {
+     "ci95": [
+      -0.002,
+      0.143
+     ],
+     "n": 960,
+     "r": 0.069,
+     "r_pleasantness_controlled": 0.09,
+     "r_without_top5": 0.076
+    },
+    "leffingwell": {
+     "family_count": 211,
+     "n": 3522,
+     "phi": 0.018,
+     "pole_count": 40
+    }
+   }
+  }
+ },
+ "notice": "Associations between odor descriptors in published olfactory datasets, one pole descriptor at a time. Not about brands; not causal. Supports only the odor-family -> pole step of MOTIF's imagery routes.",
+ "poles": {
+  "light_dense": {
+   "dense": {
+    "dravnieks_1985": [
+     "HEAVY"
+    ]
+   },
+   "light": {
+    "dravnieks_1985": [
+     "LIGHT"
+    ]
+   }
+  },
+  "sweet_dry": {
+   "dry": {
+    "leffingwell": [
+     "dry"
+    ]
+   },
+   "sweet": {
+    "dravnieks_1985": [
+     "SWEET"
+    ],
+    "keller_2016": [
+     "SWEET"
+    ],
+    "leffingwell": [
+     "sweet"
+    ]
+   }
+  },
+  "warm_cool": {
+   "cool": {
+    "dravnieks_1985": [
+     "COOL,COOLING"
+    ],
+    "keller_2016": [
+     "COLD"
+    ]
+   },
+   "warm": {
+    "dravnieks_1985": [
+     "WARM"
+    ],
+    "keller_2016": [
+     "WARM"
+    ],
+    "leffingwell": [
+     "warm"
+    ]
+   }
+  }
+ },
+ "provenance_category": "external_dataset_aggregate",
+ "rule": "Support of one family for one pole.\n\nsupported: a rated dataset (D85, KV16) at r >= 0.2 whose bootstrap interval stays above 0 and\nwhose r stays >= 0.1 without the five top stimuli; replicated when both rated datasets support\nit; contradicted (class none) when any dataset (LEF included, |phi| >= 0.1) is at <= -0.1.\n`less`: rated datasets at r <= -0.2 with the interval below 0 (the family is rated LESS on this\npole; this is never support for the opposite pole). `weak_effect`: the smallest supporting r is\nbelow 0.3. `valence_robust`: KV16's partial r with pleasantness held constant stays >= 0.1\n(None when KV16 does not support this pole).",
+ "sources": {
+  "dravnieks_1985": {
+   "citation": "A. Dravnieks (1985), Atlas of Odor Character Profiles, ASTM DS61 (doi 10.1520/DS61-EB, as printed in the Pyrfume manifest)",
+   "key": "D85",
+   "read": "dataset only (Pyrfume processed behavior_1.csv: applicability averaged across panelists); the book itself was not read",
+   "stimuli": 160
+  },
+  "keller_2016": {
+   "citation": "A. Keller, L. B. Vosshall (2016), Olfactory perception of chemically diverse molecules, BMC Neuroscience (doi 10.1186/s12868-016-0287-2, as printed in the Pyrfume manifest)",
+   "key": "KV16",
+   "read": "dataset only (Pyrfume processed behavior.csv); the article was not read",
+   "stimuli": "960 (about 480 molecules x 2 dilutions; not independent)"
+  },
+  "leffingwell": {
+   "citation": "Leffingwell odor dataset, cleaned by B. Sanchez-Lengeling, J. N. Wei et al. (doi 10.5281/zenodo.4085098, as printed in the Pyrfume manifest)",
+   "key": "LEF",
+   "read": "dataset only (Pyrfume processed behavior.csv: binary expert labels)",
+   "stimuli": "about 3,500 molecules"
+  }
+ },
+ "summary": {
+  "extra:powdery": {
+   "animalic": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.131
+    },
+    "weak_effect": false
+   },
+   "burnt_tar": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.114
+    },
+    "weak_effect": false
+   },
+   "chemical_solvent": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.162
+    },
+    "weak_effect": false
+   },
+   "citrus": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.179
+    },
+    "weak_effect": false
+   },
+   "earthy_musty": {
+    "class": "single_dataset",
+    "less": [],
+    "supporting": [
+     "D85"
+    ],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.28
+    },
+    "weak_effect": true
+   },
+   "floral": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.125
+    },
+    "weak_effect": false
+   },
+   "fruity": {
+    "class": "none",
+    "less": [
+     "D85"
+    ],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.201
+    },
+    "weak_effect": false
+   },
+   "gourmand_balsamic": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.116
+    },
+    "weak_effect": false
+   },
+   "green_herbal": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.091
+    },
+    "weak_effect": false
+   },
+   "incense": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.285
+    },
+    "weak_effect": false
+   },
+   "leathery": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.104
+    },
+    "weak_effect": false
+   },
+   "metallic": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.054
+    },
+    "weak_effect": false
+   },
+   "minty_camphor": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.134
+    },
+    "weak_effect": false
+   },
+   "musk": {
+    "class": "single_dataset",
+    "less": [],
+    "supporting": [
+     "D85"
+    ],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.392
+    },
+    "weak_effect": false
+   },
+   "soapy_aldehydic": {
+    "class": "single_dataset",
+    "less": [],
+    "supporting": [
+     "D85"
+    ],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.334
+    },
+    "weak_effect": false
+   },
+   "spicy": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.068
+    },
+    "weak_effect": false
+   },
+   "woody": {
+    "class": "single_dataset",
+    "less": [],
+    "supporting": [
+     "D85"
+    ],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.356
+    },
+    "weak_effect": false
+   }
+  },
+  "light_dense:dense": {
+   "animalic": {
+    "class": "single_dataset",
+    "less": [],
+    "supporting": [
+     "D85"
+    ],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.464
+    },
+    "weak_effect": false
+   },
+   "burnt_tar": {
+    "class": "single_dataset",
+    "less": [],
+    "supporting": [
+     "D85"
+    ],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.492
+    },
+    "weak_effect": false
+   },
+   "chemical_solvent": {
+    "class": "single_dataset",
+    "less": [],
+    "supporting": [
+     "D85"
+    ],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.217
+    },
+    "weak_effect": true
+   },
+   "citrus": {
+    "class": "none",
+    "less": [
+     "D85"
+    ],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.25
+    },
+    "weak_effect": false
+   },
+   "earthy_musty": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.19
+    },
+    "weak_effect": false
+   },
+   "floral": {
+    "class": "none",
+    "less": [
+     "D85"
+    ],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.3
+    },
+    "weak_effect": false
+   },
+   "fruity": {
+    "class": "none",
+    "less": [
+     "D85"
+    ],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.295
+    },
+    "weak_effect": false
+   },
+   "gourmand_balsamic": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.034
+    },
+    "weak_effect": false
+   },
+   "green_herbal": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.088
+    },
+    "weak_effect": false
+   },
+   "incense": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.143
+    },
+    "weak_effect": false
+   },
+   "leathery": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.174
+    },
+    "weak_effect": false
+   },
+   "metallic": {
+    "class": "single_dataset",
+    "less": [],
+    "supporting": [
+     "D85"
+    ],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.244
+    },
+    "weak_effect": true
+   },
+   "minty_camphor": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.02
+    },
+    "weak_effect": false
+   },
+   "musk": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.094
+    },
+    "weak_effect": false
+   },
+   "soapy_aldehydic": {
+    "class": "none",
+    "less": [
+     "D85"
+    ],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.229
+    },
+    "weak_effect": false
+   },
+   "spicy": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.005
+    },
+    "weak_effect": false
+   },
+   "woody": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.115
+    },
+    "weak_effect": false
+   }
+  },
+  "light_dense:light": {
+   "animalic": {
+    "class": "none",
+    "less": [
+     "D85"
+    ],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.507
+    },
+    "weak_effect": false
+   },
+   "burnt_tar": {
+    "class": "none",
+    "less": [
+     "D85"
+    ],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.425
+    },
+    "weak_effect": false
+   },
+   "chemical_solvent": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.12
+    },
+    "weak_effect": false
+   },
+   "citrus": {
+    "class": "single_dataset",
+    "less": [],
+    "supporting": [
+     "D85"
+    ],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.402
+    },
+    "weak_effect": false
+   },
+   "earthy_musty": {
+    "class": "none",
+    "less": [
+     "D85"
+    ],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.328
+    },
+    "weak_effect": false
+   },
+   "floral": {
+    "class": "single_dataset",
+    "less": [],
+    "supporting": [
+     "D85"
+    ],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.491
+    },
+    "weak_effect": false
+   },
+   "fruity": {
+    "class": "single_dataset",
+    "less": [],
+    "supporting": [
+     "D85"
+    ],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.334
+    },
+    "weak_effect": false
+   },
+   "gourmand_balsamic": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.027
+    },
+    "weak_effect": false
+   },
+   "green_herbal": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.118
+    },
+    "weak_effect": false
+   },
+   "incense": {
+    "class": "single_dataset",
+    "less": [],
+    "supporting": [
+     "D85"
+    ],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.38
+    },
+    "weak_effect": false
+   },
+   "leathery": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.188
+    },
+    "weak_effect": false
+   },
+   "metallic": {
+    "class": "none",
+    "less": [
+     "D85"
+    ],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.241
+    },
+    "weak_effect": false
+   },
+   "minty_camphor": {
+    "class": "single_dataset",
+    "less": [],
+    "supporting": [
+     "D85"
+    ],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.273
+    },
+    "weak_effect": true
+   },
+   "musk": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.136
+    },
+    "weak_effect": false
+   },
+   "soapy_aldehydic": {
+    "class": "single_dataset",
+    "less": [],
+    "supporting": [
+     "D85"
+    ],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.308
+    },
+    "weak_effect": false
+   },
+   "spicy": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.035
+    },
+    "weak_effect": false
+   },
+   "woody": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.078
+    },
+    "weak_effect": false
+   }
+  },
+  "sweet_dry:dry": {
+   "animalic": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "LEF": -0.011
+    },
+    "weak_effect": false
+   },
+   "burnt_tar": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "LEF": 0.054
+    },
+    "weak_effect": false
+   },
+   "chemical_solvent": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "LEF": -0.003
+    },
+    "weak_effect": false
+   },
+   "citrus": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "LEF": -0.015
+    },
+    "weak_effect": false
+   },
+   "earthy_musty": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "LEF": -0.005
+    },
+    "weak_effect": false
+   },
+   "floral": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "LEF": -0.016
+    },
+    "weak_effect": false
+   },
+   "fruity": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "LEF": -0.047
+    },
+    "weak_effect": false
+   },
+   "gourmand_balsamic": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "LEF": -0.03
+    },
+    "weak_effect": false
+   },
+   "green_herbal": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "LEF": -0.023
+    },
+    "weak_effect": false
+   },
+   "leathery": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "LEF": 0.114
+    },
+    "weak_effect": false
+   },
+   "metallic": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "LEF": -0.008
+    },
+    "weak_effect": false
+   },
+   "minty_camphor": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "LEF": 0.022
+    },
+    "weak_effect": false
+   },
+   "musk": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "LEF": -0.007
+    },
+    "weak_effect": false
+   },
+   "soapy_aldehydic": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "LEF": -0.015
+    },
+    "weak_effect": false
+   },
+   "spicy": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "LEF": 0.041
+    },
+    "weak_effect": false
+   },
+   "woody": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "LEF": 0.194
+    },
+    "weak_effect": false
+   }
+  },
+  "sweet_dry:sweet": {
+   "animalic": {
+    "class": "none",
+    "less": [
+     "D85",
+     "KV16"
+    ],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.428,
+     "KV16": -0.516,
+     "LEF": -0.001
+    },
+    "weak_effect": false
+   },
+   "burnt_tar": {
+    "class": "none",
+    "less": [
+     "D85",
+     "KV16"
+    ],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.411,
+     "KV16": -0.377,
+     "LEF": -0.005
+    },
+    "weak_effect": false
+   },
+   "chemical_solvent": {
+    "class": "none",
+    "less": [
+     "D85"
+    ],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.289,
+     "KV16": -0.128,
+     "LEF": -0.038
+    },
+    "weak_effect": false
+   },
+   "citrus": {
+    "class": "single_dataset",
+    "less": [],
+    "supporting": [
+     "D85"
+    ],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.353,
+     "LEF": -0.013
+    },
+    "weak_effect": false
+   },
+   "earthy_musty": {
+    "class": "none",
+    "less": [
+     "D85"
+    ],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.396,
+     "LEF": -0.05
+    },
+    "weak_effect": false
+   },
+   "floral": {
+    "class": "replicated",
+    "less": [],
+    "supporting": [
+     "D85",
+     "KV16"
+    ],
+    "valence_robust": true,
+    "values": {
+     "D85": 0.482,
+     "KV16": 0.583,
+     "LEF": 0.156
+    },
+    "weak_effect": false
+   },
+   "fruity": {
+    "class": "replicated",
+    "less": [],
+    "supporting": [
+     "D85",
+     "KV16"
+    ],
+    "valence_robust": true,
+    "values": {
+     "D85": 0.668,
+     "KV16": 0.763,
+     "LEF": 0.045
+    },
+    "weak_effect": false
+   },
+   "gourmand_balsamic": {
+    "class": "replicated",
+    "less": [],
+    "supporting": [
+     "D85",
+     "KV16"
+    ],
+    "valence_robust": true,
+    "values": {
+     "D85": 0.366,
+     "KV16": 0.449,
+     "LEF": 0.174
+    },
+    "weak_effect": false
+   },
+   "green_herbal": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.005,
+     "KV16": -0.071,
+     "LEF": -0.074
+    },
+    "weak_effect": false
+   },
+   "incense": {
+    "class": "single_dataset",
+    "less": [],
+    "supporting": [
+     "D85"
+    ],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.456
+    },
+    "weak_effect": false
+   },
+   "leathery": {
+    "class": "none",
+    "less": [
+     "D85"
+    ],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.302,
+     "LEF": -0.024
+    },
+    "weak_effect": false
+   },
+   "metallic": {
+    "class": "none",
+    "less": [
+     "D85"
+    ],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.333,
+     "LEF": -0.039
+    },
+    "weak_effect": false
+   },
+   "minty_camphor": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.166,
+     "LEF": 0.031
+    },
+    "weak_effect": false
+   },
+   "musk": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.03,
+     "LEF": 0.021
+    },
+    "weak_effect": false
+   },
+   "soapy_aldehydic": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.136,
+     "LEF": -0.051
+    },
+    "weak_effect": false
+   },
+   "spicy": {
+    "class": "single_dataset",
+    "less": [],
+    "supporting": [
+     "D85"
+    ],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.272,
+     "KV16": -0.001,
+     "LEF": 0.049
+    },
+    "weak_effect": true
+   },
+   "woody": {
+    "class": "none",
+    "less": [
+     "KV16"
+    ],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.169,
+     "KV16": -0.285,
+     "LEF": 0.03
+    },
+    "weak_effect": false
+   }
+  },
+  "warm_cool:cool": {
+   "animalic": {
+    "class": "none",
+    "less": [
+     "D85",
+     "KV16"
+    ],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.387,
+     "KV16": -0.21
+    },
+    "weak_effect": false
+   },
+   "burnt_tar": {
+    "class": "none",
+    "less": [
+     "D85"
+    ],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.252,
+     "KV16": -0.127
+    },
+    "weak_effect": false
+   },
+   "chemical_solvent": {
+    "class": "single_dataset",
+    "less": [],
+    "supporting": [
+     "KV16"
+    ],
+    "valence_robust": true,
+    "values": {
+     "D85": 0.153,
+     "KV16": 0.295
+    },
+    "weak_effect": true
+   },
+   "citrus": {
+    "class": "single_dataset",
+    "less": [],
+    "supporting": [
+     "D85"
+    ],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.298
+    },
+    "weak_effect": true
+   },
+   "earthy_musty": {
+    "class": "none",
+    "less": [
+     "D85"
+    ],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.308
+    },
+    "weak_effect": false
+   },
+   "floral": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.142,
+     "KV16": 0.113
+    },
+    "weak_effect": false
+   },
+   "fruity": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.141,
+     "KV16": 0.105
+    },
+    "weak_effect": false
+   },
+   "gourmand_balsamic": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.085,
+     "KV16": -0.198
+    },
+    "weak_effect": false
+   },
+   "green_herbal": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.196,
+     "KV16": 0.092
+    },
+    "weak_effect": false
+   },
+   "incense": {
+    "class": "single_dataset",
+    "less": [],
+    "supporting": [
+     "D85"
+    ],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.321
+    },
+    "weak_effect": false
+   },
+   "leathery": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.094
+    },
+    "weak_effect": false
+   },
+   "metallic": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.111
+    },
+    "weak_effect": false
+   },
+   "minty_camphor": {
+    "class": "single_dataset",
+    "less": [],
+    "supporting": [
+     "D85"
+    ],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.872
+    },
+    "weak_effect": false
+   },
+   "musk": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.061
+    },
+    "weak_effect": false
+   },
+   "soapy_aldehydic": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.081
+    },
+    "weak_effect": false
+   },
+   "spicy": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.18,
+     "KV16": -0.051
+    },
+    "weak_effect": false
+   },
+   "woody": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.05,
+     "KV16": -0.003
+    },
+    "weak_effect": false
+   }
+  },
+  "warm_cool:warm": {
+   "animalic": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.08,
+     "KV16": -0.109,
+     "LEF": 0.011
+    },
+    "weak_effect": false
+   },
+   "burnt_tar": {
+    "class": "single_dataset",
+    "less": [],
+    "supporting": [
+     "KV16"
+    ],
+    "valence_robust": true,
+    "values": {
+     "D85": 0.155,
+     "KV16": 0.2,
+     "LEF": -0.01
+    },
+    "weak_effect": true
+   },
+   "chemical_solvent": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.154,
+     "KV16": -0.026,
+     "LEF": -0.01
+    },
+    "weak_effect": false
+   },
+   "citrus": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.161,
+     "LEF": -0.02
+    },
+    "weak_effect": false
+   },
+   "earthy_musty": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.09,
+     "LEF": -0.021
+    },
+    "weak_effect": false
+   },
+   "floral": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.041,
+     "KV16": 0.097,
+     "LEF": 0.002
+    },
+    "weak_effect": false
+   },
+   "fruity": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.066,
+     "KV16": 0.064,
+     "LEF": -0.031
+    },
+    "weak_effect": false
+   },
+   "gourmand_balsamic": {
+    "class": "replicated",
+    "less": [],
+    "supporting": [
+     "D85",
+     "KV16"
+    ],
+    "valence_robust": true,
+    "values": {
+     "D85": 0.364,
+     "KV16": 0.413,
+     "LEF": 0.046
+    },
+    "weak_effect": false
+   },
+   "green_herbal": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.137,
+     "KV16": -0.125,
+     "LEF": 0.024
+    },
+    "weak_effect": false
+   },
+   "incense": {
+    "class": "single_dataset",
+    "less": [],
+    "supporting": [
+     "D85"
+    ],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.313
+    },
+    "weak_effect": false
+   },
+   "leathery": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.021,
+     "LEF": -0.008
+    },
+    "weak_effect": false
+   },
+   "metallic": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.165,
+     "LEF": -0.009
+    },
+    "weak_effect": false
+   },
+   "minty_camphor": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.079,
+     "LEF": -0.011
+    },
+    "weak_effect": false
+   },
+   "musk": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.228,
+     "LEF": 0.063
+    },
+    "weak_effect": false
+   },
+   "soapy_aldehydic": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": -0.023,
+     "LEF": -0.031
+    },
+    "weak_effect": false
+   },
+   "spicy": {
+    "class": "replicated",
+    "less": [],
+    "supporting": [
+     "D85",
+     "KV16"
+    ],
+    "valence_robust": true,
+    "values": {
+     "D85": 0.486,
+     "KV16": 0.262,
+     "LEF": 0.212
+    },
+    "weak_effect": true
+   },
+   "woody": {
+    "class": "none",
+    "less": [],
+    "supporting": [],
+    "valence_robust": null,
+    "values": {
+     "D85": 0.106,
+     "KV16": 0.069,
+     "LEF": 0.018
+    },
+    "weak_effect": false
+   }
+  }
+ },
+ "thresholds": {
+  "bootstrap": 1000,
+  "robust": 0.3,
+  "strong": 0.2,
+  "weak": 0.1
+ }
+}

@@ -57,3 +57,24 @@ PDF, and one-page PDFs. No Qloo or LLM request was made.
 - `docs/ENGINE_REDESIGN.md`: baseline, problems demonstrated, what the new
   engine must improve, what it must not claim.
 - No engine behaviour changed; no Qloo or LLM request.
+
+## Phase 3: sensory model research (candidate, not loaded)
+
+- Network policy blocks academic and reference hosts; a six-agent literature run
+  was stopped (every fetch refused) and nothing it saw is cited. Open datasets
+  from the Pyrfume archive were read instead: Dravnieks 1985, Keller & Vosshall
+  2016, Leffingwell (data only; files' SHA-256 recorded; data stays git-ignored).
+- `tools/sensory_evidence.py` → `config/candidates/odor_axis_evidence.v1.json`:
+  17 odor families × poles, one pole descriptor at a time, bootstrap interval,
+  drop-top-5, pleasantness control. The dry pole has no data support.
+- `config/candidates/motif_sensory_vectors.v1.json` (`sensory-1.0`, revision r2):
+  23 of 72 cells; 5 medium (the legacy R1–R5 links, capped at moderate), 18 low
+  (always weak, read as tentative); the five stereotypes forbidden by draft-0.2
+  stay null; heritage, melancholic, romantic make no claim.
+- Review: r1 was reviewed from three lenses (method, perfumer, engine); the
+  engine lens was stopped by the session usage limit. Findings, all checked
+  against the data, drove the one revision (r2). `tools/sensory_model_review.py`
+  checks the rules, quoted numbers, coverage, and similarity;
+  `tests/test_sensory_model.py` runs it.
+- Gate: no near-identical vectors, guesses labelled and capped, not R1–R5 alone.
+- No engine behaviour changed; no Qloo or LLM request.
