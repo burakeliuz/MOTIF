@@ -45,7 +45,7 @@ architecture (opening, core, drydown) → brief.
 ## Web interface
 
 ```sh
-pip install -r requirements.txt   # only the Anthropic SDK; without it the brief uses the template
+pip install -r requirements.txt   # the Anthropic SDK (optional prose) and fpdf2 (PDF brief download)
 export MOTIF_ACCESS_PROTECTION=off   # local use; by default the app asks for MOTIF_ACCESS_PASSWORD (see below)
 python3 -m motif.web              # http://127.0.0.1:8000, live Qloo (needs QLOO_API_KEY)
 MOTIF_LLM_PROVIDER=off python3 -m motif.web   # live Qloo, template prose, no LLM calls
@@ -65,6 +65,10 @@ response. Guards against repeated calls:
   motifs pull both ways is shown as open to the perfumer.
 - Changing only the application context reuses the brand's Qloo cache: no request is repeated.
 - Quick picks on the start page only fill a field; nothing is requested until the user submits.
+- "Download brief (PDF)" renders a real one-page PDF on the server from the session already
+  there (`GET /api/sessions/<id>/brief.pdf`, behind the review gate); it sends no Qloo or LLM
+  request and is rendered once per session. It needs `fpdf2` (pure Python, in
+  `requirements.txt`); fonts are bundled in `motif/web/fonts/` (SIL Open Font License).
 - A search stopped by a failed Qloo request can be retried once: requests that
   succeeded come from the session cache, only the failed step is sent again, and
   a fresh budget is reserved first. Credential errors are never retried.

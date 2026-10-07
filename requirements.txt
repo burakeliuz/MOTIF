@@ -1,1 +1,2 @@
 anthropic==1.11.0
+fpdf2==2.8.9

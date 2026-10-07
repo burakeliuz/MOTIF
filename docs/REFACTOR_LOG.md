@@ -267,9 +267,30 @@ PDF, and one-page PDFs. No Qloo or LLM request was made.
   regression; holdout without structural failure; no internal wording; secret
   scan clean (test sentinels only); no paid infrastructure; the review gate's
   tests pass and the gate is unchanged.
-- `main` not updated: the fast-forward push (no force) was refused by this
-  session's permission check, so it waits for the owner. `main` can be
-  fast-forwarded to this branch (`origin/main` is an ancestor of it).
+- `main`: the first fast-forward push was refused by this session's permission
+  check; after the owner's explicit OK, `main` was fast-forwarded (no force) to
+  `70c3711`.
 - Render: no authenticated deploy path from this environment (no Render key; the
   host is not reachable through the network policy). The owner deploys `main`
   manually, keeping `MOTIF_ACCESS_PROTECTION=on` and the password.
+
+## After phase 13: three UI fixes (2026-10-07)
+
+- **Real PDF download.** "Download brief (PDF)" saves `MOTIF-<Brand>-Brief.pdf`,
+  rendered on the server by `motif/web/briefpdf.py` (fpdf2, pure Python, new in
+  `requirements.txt`; Archivo and Newsreader static instances under the SIL OFL in
+  `motif/web/fonts/`) from the session already there: one A4 page, selectable
+  text, clickable supplier and Qloo links, behind the review gate, no Qloo or LLM
+  request, rendered once per session. Busy state and plain errors in the page.
+- **No JSON download in the UI.** "Technical JSON" and its links are gone from the
+  result and brief pages; the developer endpoint and the session files stay.
+- **Overlapping labels.** The profile and why rows had a fixed 170 px label
+  column; long unbreakable labels ("EXPERIMENTATION", about 199 px) ran under the
+  description. The column now grows to its longest word and the description wraps
+  below; on phones the single-column grids may be narrower than a word, so text
+  wraps instead of being clipped. Checked on 4 brands at 6 widths (195–1440 px,
+  including 200% zoom) and in the source dialog.
+- While generating sample PDFs, a test script created sessions with the
+  Anthropic key present: 15 real Claude calls (about $0.10 estimated) were made
+  and logged to temporary ledgers; their rows were added to `data/llm_calls.jsonl`.
+  The PDF code itself makes no call.

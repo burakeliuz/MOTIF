@@ -6,7 +6,8 @@
 (() => {
   const sheet = document.getElementById("sheet");
   const id = (location.pathname.match(/^\/brief\/([A-Za-z0-9_-]{6,20})$/) || [])[1];
-  document.getElementById("print").addEventListener("click", () => window.print());
+  const download = document.getElementById("download");
+  download.addEventListener("click", () => id && MotifDownload.brief(id, download, document.getElementById("dlstatus")));
   document.getElementById("back").href = id ? "/#/s/" + id : "/";
 
   function h(tag, attrs, ...kids) {
@@ -77,7 +78,7 @@
     return h("ul", { class: "src" },
       h("li", {}, h("b", { text: "Cultural evidence sourced from Qloo" }), " · fetched " + q.dates.join(", ") + " · "
         + [...new Set(q.requests.map((x) => x.what.charAt(0).toLowerCase() + x.what.slice(1)))].join(", ")
-        + ". The full trail of every phrase is in the technical JSON."),
+        + ". Every phrase traces to its Qloo entity, field, and request in MOTIF's session record."),
       r.sources.suppliers.length ? h("li", {}, h("b", { text: "Supplier pages (identity of the trade-name examples)" }), " · ",
         r.sources.suppliers.map((x, i) => [i ? " · " : "", link(x.url, x.material)])) : null);
   }

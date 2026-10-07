@@ -12,7 +12,7 @@ const { chromium } = require(MODULE);
     args: ["--disable-background-networking", "--disable-component-update", "--no-pings", "--disable-domain-reliability"],
   });
   async function page(w, h) {
-    const ctx = await browser.newContext({ viewport: { width: w, height: h } });
+    const ctx = await browser.newContext({ viewport: { width: w, height: h }, acceptDownloads: true });
     const p = await ctx.newPage();
     // every request that is not to the local test server is aborted and recorded
     await p.route("**/*", (route) => (route.request().url().startsWith(BASE) ? route.continue() : (out.external.push(route.request().url()), route.abort())));
@@ -75,6 +75,17 @@ const { chromium } = require(MODULE);
   out.checks.result_role_names = await p.$$eval(".roles .role .kicker", (ks) => ks.map((x) => x.textContent.split(" · ")[0]));
   out.checks.result_open_count = count(resultText, "Open to the perfumer");
   out.checks.desktop_result_overflow = await overflow(p);
+  // labels never run under their descriptions (long words such as EXPERIMENTATION wrap the description below)
+  const labelOverflow = (q) => q.evaluate(() => [...document.querySelectorAll(".ax, h1, h2, h3, .nm, .kicker")]
+    .filter((e) => e.getBoundingClientRect().width && e.scrollWidth > e.clientWidth + 1).map((e) => e.textContent.slice(0, 30)));
+  out.checks.desktop_label_overflow = await labelOverflow(p);
+  out.checks.result_actions = await p.$$eval(".res a.btn, .res button.btn", (bs) => bs.map((x) => x.textContent));
+  const [dl] = await Promise.all([p.waitForEvent("download"), p.click("#download-pdf")]);
+  out.checks.download_name = dl.suggestedFilename();
+  const pdfBytes = require("fs").readFileSync(await dl.path());
+  out.checks.download_magic = pdfBytes.slice(0, 5).toString("latin1");
+  out.checks.download_pages = (pdfBytes.toString("latin1").match(/\/Type\s*\/Page[^s]/g) || []).length;
+  out.checks.download_status = await p.textContent(".dlstatus");
   if (SHOTS) await p.screenshot({ path: `${SHOTS}/result-desktop.png`, fullPage: true });
   const id = await p.evaluate(() => location.hash.split("/").pop());
   out.checks.posts_after_result = out.posts.slice();
@@ -82,6 +93,7 @@ const { chromium } = require(MODULE);
   const m = await page(390, 844);
   await m.goto(BASE + "/#/s/" + id); await m.waitForSelector(".lead .kicker");
   out.checks.mobile_result_overflow = await overflow(m);
+  out.checks.mobile_label_overflow = await labelOverflow(m);
   if (SHOTS) await m.screenshot({ path: `${SHOTS}/result-mobile.png`, fullPage: true });
 
   const pr = await page(1000, 1400);

@@ -145,7 +145,7 @@ details.axes dl { margin-top: 10px; max-width: 46em; }
 .roles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--g); }
 .role { display: grid; grid-template-columns: 76px 1fr; gap: 0 16px; align-items: start; min-width: 0; }
 .role.open { display: block; border-top: 1px dashed var(--mute); padding-top: 10px; }
-.role .kicker { margin: 0 0 6px; }
+.role .kicker { margin: 0 0 6px; overflow-wrap: break-word; }
 .role .nm { font: 800 22px/1.1 var(--disp); font-stretch: 85%; margin: 0; overflow-wrap: anywhere; }
 .role.open .nm { color: var(--mute); }
 .role .sc { font-size: 17px; line-height: 1.3; margin: 6px 0 0; }
@@ -166,8 +166,11 @@ details.refs li { padding: 4px 0; border-bottom: 1px solid var(--hair); overflow
 
 /* why / decisions / brief */
 .basis, .why { list-style: none; margin: 0; padding: 0; }
-.basis li, .why li { display: grid; grid-template-columns: 170px 1fr; gap: 4px 20px; padding: 12px 0; border-bottom: 1px solid var(--hair); }
-.basis .ax, .why .ax { font: 900 26px/1 var(--disp); font-stretch: 68%; text-transform: uppercase; }
+/* The label column is at least 170px and grows to its longest word ("EXPERIMENTATION"); when it grows,
+   the description wraps below it instead of running under the label. */
+.basis li, .why li { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 4px 20px; padding: 12px 0; border-bottom: 1px solid var(--hair); }
+.basis .ax, .why .ax { box-sizing: border-box; flex: 0 0 auto; width: min-content; min-width: min(170px, 100%); max-width: 100%; overflow-wrap: break-word; hyphens: auto; font: 900 26px/1 var(--disp); font-stretch: 68%; text-transform: uppercase; }
+.basis li > :not(.ax), .why li > :not(.ax) { flex: 1 1 0; min-width: min(100%, calc(100% - 190px)); }
 .basis .ax small, .why .ax small { display: block; font: 600 10.5px/1.3 var(--disp); letter-spacing: .1em; color: var(--mute); margin-top: 4px; }
 .why p { margin: 0 0 8px; font-size: 15px; }
 .why .phr { display: inline-flex; margin-top: 0; }
@@ -191,7 +194,7 @@ details.fold > summary::after { content: " +"; color: var(--ink); }
 details.fold[open] > summary::after { content: " −"; }
 details.fold > summary small { display: block; font: 400 15px/1.4 var(--text); text-transform: none; color: var(--mute); margin-top: 6px; letter-spacing: 0; font-stretch: 100%; }
 .mrow { display: grid; grid-template-columns: 1fr 2fr; gap: var(--g); padding: 14px 0; border-bottom: 1px solid var(--hair); }
-.mrow h3 { font: 800 21px/1.1 var(--disp); font-stretch: 85%; }
+.mrow h3 { font: 800 21px/1.1 var(--disp); font-stretch: 85%; overflow-wrap: break-word; }
 .mrow .sp { font-size: 14px; color: var(--mute); }
 .mrow .rl { font-size: 15px; margin-top: 8px; }
 .tag-common { font: 600 9.5px/1 var(--disp); letter-spacing: .1em; text-transform: uppercase; border: 1px dashed var(--mute); color: var(--mute); padding: 2px 4px; margin-left: 4px; }
@@ -235,7 +238,7 @@ code { font: 12px/1.4 ui-monospace, Menlo, monospace; background: var(--paper); 
   .wordmark { grid-column: auto; font-size: 18px; }
   .mast-mid { grid-column: 1 / -1; grid-row: 2; font-size: 9.5px; }
   .mode { grid-column: auto; font-size: 9.5px; }
-  .rs, .lead, .sec { grid-template-columns: 1fr; }
+  .rs, .lead, .sec { grid-template-columns: minmax(0, 1fr); }  /* tracks may be narrower than the longest word; text wraps */
   .hero h1 { font-size: clamp(56px, 18vw, 96px); }
   .benefit { font-size: 18px; }
   .askrow { flex-direction: column; align-items: stretch; gap: 12px; }
@@ -254,15 +257,16 @@ code { font: 12px/1.4 ui-monospace, Menlo, monospace; background: var(--paper); 
   .idea { font-size: 30px; }
   .char .w .v { font-size: 34px; }
   .sec { margin-top: 40px; }
-  .sec > h2 { grid-column: 1; display: flex; align-items: baseline; gap: 10px; }
+  .sec > h2 { grid-column: 1; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 10px; overflow-wrap: break-word; }
   .sec > h2 .num { font-size: 30px; margin: 0; }
   .sec > .body { grid-column: 1; }
-  .roles { grid-template-columns: 1fr; gap: 18px; }
-  .role { grid-template-columns: 48px 1fr; gap: 0 12px; }
+  .roles { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  .role { grid-template-columns: 48px minmax(0, 1fr); gap: 0 12px; }
   .strip { width: 48px; height: 150px; }
   .role .nm { font-size: 19px; }
   .ea { grid-template-columns: 1fr; }
-  .basis li, .why li, .mrow { grid-template-columns: 1fr; }
+  .mrow { grid-template-columns: minmax(0, 1fr); }
+  .basis li > :not(.ax), .why li > :not(.ax) { min-width: 100%; }
   .option { grid-template-columns: 1fr; }
   .option .btn { width: 100%; }
   dl.kv { grid-template-columns: 1fr; gap: 0; }
@@ -271,3 +275,7 @@ code { font: 12px/1.4 ui-monospace, Menlo, monospace; background: var(--paper); 
   .dlg { max-height: 86vh; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+/* PDF download: busy state and a plain status or error line */
+.btn[aria-busy="true"] { opacity: 1; cursor: progress; background: var(--ink); color: var(--paper); }
+.dlstatus { flex-basis: 100%; margin: 0; font-size: 15px; color: var(--mute); min-height: 1.4em; }
+.dlstatus.error { color: var(--ink); border-left: 3px solid var(--accent); padding-left: 10px; }

@@ -92,7 +92,7 @@ Every call is reserved in `data/llm_calls.jsonl` before it is sent.
 server; the page never builds HTML from data. Result sections: Cultural profile
 → Olfactory direction → Scent architecture → Emphasize and avoid (only when
 supported) → Why: Qloo → motif → scent → The brief; the brief prints as one A4
-page. Guards: the review gate (`motif/web/access.py`, fail-closed), per-IP and
+page; "Download brief (PDF)" returns a real PDF rendered on the server from the same session view (`motif/web/briefpdf.py`, fpdf2, no new Qloo or LLM request). Guards: the review gate (`motif/web/access.py`, fail-closed), per-IP and
 daily session caps, a daily Qloo cap, the LLM ledger and budget guard, request
 reuse within 30 minutes. Recorded mode is local only and refused on Render.
 

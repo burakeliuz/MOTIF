@@ -164,7 +164,7 @@ MOTIF is behind a reviewer password during judging.
    Qloo source), the olfactory direction, the scent architecture (opening,
    core, drydown), and "Why": which Qloo phrases led to which motif and
    dimension.
-5. "Print or save as PDF" gives the one-page brief.
+5. "Download brief (PDF)" saves the one-page brief as a PDF file.
 
 Try also "Le Labo" (ambiguous name: you choose the brand) and
 "Harley-Davidson" (a tentative direction, labelled as such).

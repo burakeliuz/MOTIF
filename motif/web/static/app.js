@@ -300,7 +300,7 @@ function sourcesList(r) {
     h("ul", {},
       h("li", {}, h("b", { text: "Cultural evidence sourced from Qloo" }), " · fetched " + q.dates.join(", ") + " · "
         + [...new Set(q.requests.map((x) => x.what.charAt(0).toLowerCase() + x.what.slice(1)))].join(", ")
-        + ". Each phrase above opens its source; the full trail is in the technical JSON."),
+        + ". Each phrase above opens its source: entity, field, request, and date."),
       r.sources.suppliers.map((x) => h("li", {}, h("b", { text: x.supplier }), " · " + x.material + " · ", supplierLink(x.url, "supplier page")))));
 }
 
@@ -326,8 +326,7 @@ function whyBlock(s, r, brand) {
       r.motifs.map(motifRow),
       sourcesList(r),
       h("details", { class: "tech" }, h("summary", { text: "Full trace" }),
-        h("p", { text: "Qloo entity: " + (res.name || brand) + (s.fetched ? " · fetched " + when(s.fetched[0]) : "") }),
-        h("p", {}, "Full trail: ", h("a", { href: "/api/sessions/" + encodeURIComponent(s.id) + "/brief.json", download: "motif-brief.json", text: "technical JSON" }), ".")))];
+        h("p", { text: "Qloo entity: " + (res.name || brand) + (s.fetched ? " · fetched " + when(s.fetched[0]) : "") })))];
 }
 
 function briefBlock(s) {
@@ -337,9 +336,14 @@ function briefBlock(s) {
     s.intent ? h("p", { class: "intentline", text: "Application context: “" + s.intent + "”" }) : null,
     h("p", { class: "text", text: b.text }),
     b.author === "llm" ? h("p", { class: "byline" }, "Prose drafted by ", src("Claude"), " from this result and checked against it.") : null,
-    h("div", { class: "actions" },
-      h("a", { class: "btn", href: "/brief/" + encodeURIComponent(s.id), target: "_blank", rel: "noopener", text: "Print or save as PDF" }),
-      h("a", { class: "btn ghost", href: "/api/sessions/" + encodeURIComponent(s.id) + "/brief.json", download: "motif-brief.json", text: "Technical JSON" })));
+    downloadAction(s.id));
+}
+
+function downloadAction(id) {
+  const status = h("p", { class: "dlstatus", "aria-live": "polite" });
+  const button = h("button", { class: "btn", type: "button", id: "download-pdf", text: MotifDownload.LABEL });
+  button.addEventListener("click", () => MotifDownload.brief(id, button, status));
+  return h("div", { class: "actions" }, button, status);
 }
 
 function renderResult(s, opts) {

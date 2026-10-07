@@ -48,6 +48,7 @@ from ..config import AXES, ContinuousConfig, EngineConfig, load_config, load_con
 from ..interpret import suggest as suggest_readings
 from ..llm import write_prose, writer_from_env
 from ..qloo import LiveQloo, RecordedQloo
+from . import briefpdf
 from .access import AccessGate
 from .guard import PAUSED_NOTE, llm_guard
 from .present import candidate_view, continuous_view
@@ -91,6 +92,8 @@ class WebSession:
         self.llm_configured = False
         self.suggestions: Optional[Dict[str, Any]] = None
         self.suggest_lock = threading.Lock()
+        self.pdf: Optional[bytes] = None  # the brief as a PDF, rendered once from this session's result
+        self.pdf_lock = threading.Lock()
         self.error: Optional[str] = None
         self.finished: Optional[float] = None
         self.retry_of: Optional[str] = None
@@ -294,6 +297,28 @@ class Hub:
     def brief(self, sid: str) -> Optional[Dict[str, Any]]:
         s = self.sessions.get(sid)
         return s.brief if s else None
+
+    def brief_pdf(self, sid: str):
+        """(status, pdf bytes or error dict, file name): the one-page brief as a real PDF file.
+
+        Rendered from the session view already on the server (no Qloo or LLM request) and
+        kept on the session, so a repeated download renders nothing new."""
+        s = self.sessions.get(sid)
+        if not s:
+            return 404, {"error": "Unknown session."}, None
+        view = self.view(sid)
+        if not view.get("result") or not view.get("brief"):
+            return 404, {"error": "No brief for this session yet."}, None
+        name = briefpdf.filename((view.get("resolution") or {}).get("name") or view["reference"])
+        with s.pdf_lock:
+            if s.pdf is None:
+                if not briefpdf.available():
+                    return 503, {"error": "PDF export is not available on this server."}, None
+                try:
+                    s.pdf = briefpdf.render(view)
+                except Exception:  # noqa: BLE001  (a layout failure must not break the page)
+                    return 500, {"error": "The PDF could not be prepared."}, None
+        return 200, s.pdf, name
 
     # -- user-requested interpretation suggestions (never part of the engine result) --------
 
@@ -500,7 +525,8 @@ class Hub:
 
 
 PUBLIC_FILES = {"/login": "login.html", "/login.js": "login.js", "/app.css": "app.css", "/favicon.svg": "favicon.svg"}
-APP_FILES = {"/": "index.html", "/app.js": "app.js", "/strips.js": "strips.js", "/print.js": "print.js", "/print.css": "print.css"}
+APP_FILES = {"/": "index.html", "/app.js": "app.js", "/strips.js": "strips.js", "/print.js": "print.js", "/print.css": "print.css",
+             "/download.js": "download.js"}
 
 
 def make_handler(hub: Hub, gate: Optional[AccessGate] = None):
@@ -579,6 +605,14 @@ def make_handler(hub: Hub, gate: Optional[AccessGate] = None):
                 return self._deny(path)
             if path == "/api/config":
                 return self._json(200, hub.describe())
+            m = re.fullmatch(r"/api/sessions/([A-Za-z0-9_-]{6,20})/brief\.pdf", path)
+            if m:
+                code, payload, name = hub.brief_pdf(m.group(1))
+                if code != 200:
+                    return self._json(code, payload)
+                self._headers(200, "application/pdf", len(payload), {"Content-Disposition": f'attachment; filename="{name}"'})
+                self.wfile.write(payload)
+                return None
             m = re.fullmatch(r"/api/sessions/([A-Za-z0-9_-]{6,20})(/brief\.json)?", path)
             if m:
                 if m.group(2):

@@ -117,6 +117,17 @@ class StartResultAndBrief(unittest.TestCase):
         self.assertFalse((Path(self.tmp.name) / "llm_calls.jsonl").exists())
         self.assertEqual(self.out["errors"], [])
 
+    def test_the_brief_downloads_as_a_real_one_page_pdf(self):
+        self.assertEqual(self.c["result_actions"], ["Download brief (PDF)"])
+        self.assertEqual(self.c["download_name"], "MOTIF-Synthbrand-Brief.pdf")
+        self.assertEqual(self.c["download_magic"], "%PDF-")
+        self.assertEqual(self.c["download_pages"], 1)
+        self.assertEqual(self.c["download_status"], "Downloaded MOTIF-Synthbrand-Brief.pdf.")
+
+    def test_labels_do_not_run_under_their_descriptions(self):
+        self.assertEqual(self.c["desktop_label_overflow"], [])
+        self.assertEqual(self.c["mobile_label_overflow"], [])
+
     def test_no_horizontal_overflow(self):
         for key in ("desktop_start_overflow", "mobile_start_overflow", "desktop_result_overflow", "mobile_result_overflow"):
             self.assertLessEqual(self.c[key], 0, key)
