@@ -112,7 +112,19 @@ primary engine. It must:
 - **Not a percentage or a lift.** Scores are bounded design quantities shown as
   words in the product; exact numbers stay in the technical JSON.
 
-## 5. Results (filled in later)
+## 5. Results
 
-Phase 6 (13-brand diagnostic), phase 7 (pre-registered holdout), and phase 10
-(final validation) add their numbers here.
+**Phase 6, 13 trial brands, same evidence** (`reports/continuous_engine_analysis.md`):
+
+| Measure | Legacy | Continuous |
+|---|---|---|
+| Distinct sensory profiles | 7 | 11 (9 without the tentative cells) |
+| Pairs at distance 0 / scale-free near pairs | 7 / 7 | 0 / 2 |
+| Unresolved dimensions | 80% | 53% |
+| Dimensions ever resolved | 3 of 6 | 6 of 6 |
+
+Remaining collisions (A24 = Supreme, Comme des Garçons = Balenciaga) mirror
+nearly identical motif profiles. Weaknesses: a tentative dry bias (9 of 13),
+precision and provocation carry half of all contributions, labels flip near
+thresholds for brands with opposed motifs. Phase 7 (holdout) and phase 10 (final
+validation) add their numbers here.

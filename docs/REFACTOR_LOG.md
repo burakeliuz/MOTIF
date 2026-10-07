@@ -119,3 +119,15 @@ PDF, and one-page PDFs. No Qloo or LLM request was made.
   shipped-model consistency), two controller tests in `tests/test_motif_agent.py`.
 - Engine changes taken from the phase 3 review: common-cue exclusion, word cap,
   evidence basis, 'balanced' only for evidenced neutrality.
+
+## Phase 6: 13-brand diagnostic, legacy vs continuous
+
+- `tools/continuous_report.py` (via `tools/engine_compare.py analysis`) →
+  `reports/continuous_engine_analysis.md`: profiles, distances (raw and
+  scale-free), coverage, unresolved share, collisions, sensitivity to one related
+  entity, stability when a minor motif is dropped, motif shares, an ablation
+  without tentative cells, the named pairs, and answers to the six questions.
+- Result: 7 → 11 distinct profiles (9 without tentative cells); zero-distance
+  pairs 7 → 0; unresolved 80% → 53%; all six dimensions reachable. Deterministic.
+- Gate: not collapsing; weaknesses recorded, not tuned on these 13 brands.
+- `tests/test_continuous_analysis.py` keeps the result (when recordings exist).
