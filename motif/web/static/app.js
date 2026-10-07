@@ -255,6 +255,10 @@ function dimensionsBlock(r) {
     resolved.some((d) => d.tentative) ? h("p", { class: "mute small", text: "Tentative leanings rest on MOTIF's design reading alone; supported ones on the brand's motifs with a medium-confidence translation." }) : null);
 }
 
+function andList(xs) {
+  return xs.length < 2 ? xs.join("") : xs.slice(0, -1).join(", ") + " and " + xs[xs.length - 1];
+}
+
 function roleDetail(role) {
   if (!role.materials.length) return h("p", { class: "mute small", text: "No material reference is named for this direction." });
   return h("details", { class: "refs" }, h("summary", { text: "Material references" }),
@@ -276,7 +280,7 @@ function architectureBlock(r) {
       return h("div", { class: "role" }, strip,
         h("div", {}, h("p", { class: "kicker", text: role.name + (role.tentative ? " · tentative" : "") }),
           h("p", { class: "nm", text: role.label }), h("p", { class: "sc", text: role.descriptors.join(", ") }),
-          role.works_with.length ? h("p", { class: "mute small", text: "Fits the " + role.works_with.join(" and ") + "." }) : null,
+          role.works_with.length ? h("p", { class: "mute small", text: "Fits the " + andList(role.works_with) + "." }) : null,
           roleDetail(role)));
     }))];
 }
@@ -309,11 +313,11 @@ function whyBlock(s, r, brand) {
   // Qloo phrases are quoted once on the page: motifs of the cultural profile point back to it
   const quoted = new Set(r.profile.map((p) => p.motif));
   const cite = (c) => {
-    if (quoted.has(c.motif)) return h("span", { class: "mute", text: " · Qloo phrases in the cultural profile" });
+    if (quoted.has(c.motif)) return null;
     quoted.add(c.motif);
     return [" · ", phraseButtons(c.examples, byMotif[c.motif] || c)];
   };
-  return [h("p", { class: "intro", text: "Qloo supplied the descriptors, quoted literally. MOTIF weighs them into motifs and translates the motifs into dimensions; the scent architecture follows from the dimensions." }),
+  return [h("p", { class: "intro", text: "Qloo supplied the descriptors, quoted literally (the phrases of each motif are in the cultural profile above). MOTIF weighs them into motifs and translates the motifs into dimensions; the scent architecture follows from the dimensions." }),
     r.why.length ? h("ul", { class: "why" }, r.why.map((w) => h("li", {},
       h("div", { class: "ax" }, w.name, h("small", { text: w.word + (w.confidence_word ? " · " + w.confidence_word : "") })),
       h("div", {}, w.chain.map((c) => h("p", {}, h("b", { text: c.label }), " → " + c.toward + (c.tentative ? " (tentative)" : ""), cite(c))))))) : h("p", { text: "No dimension to explain yet." }),

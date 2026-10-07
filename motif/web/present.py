@@ -324,7 +324,8 @@ def continuous_view(name: str, result: Dict[str, Any], library: Dict[str, Any]) 
         if r["moves"]:
             return "Moves " + story._join([m["name"].lower() + " toward " + m["word"] for m in r["moves"]]) + "."
         if r["pulls_open"]:
-            return story._join(r["pulls_open"]) + (" stays" if len(r["pulls_open"]) == 1 else " stay") + " open: motifs pull both ways."
+            text = story._join([n.lower() for n in r["pulls_open"]])
+            return text[0].upper() + text[1:] + (" stays" if len(r["pulls_open"]) == 1 else " stay") + " open: motifs pull both ways."
         cells = (result["motif_scores"].get(r["motif"]) or {})
         return "No sensory claim: open to the perfumer." if cells else ""
 

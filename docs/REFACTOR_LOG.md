@@ -242,3 +242,21 @@ PDF, and one-page PDFs. No Qloo or LLM request was made.
   `docs/STAGE_6A_DECISIONS.md` §0.5 (refactor decisions E1–E8),
   `docs/SUBMISSION_NOTES.md` §2g and limits, `docs/DEVPOST_SUBMISSION.md`
   (drafts rewritten for the continuous engine; nothing entered on Devpost).
+
+## Phase 12: screenshots and final page checks
+
+- Screenshots and the PDF (recorded preview, local; they show Qloo descriptors,
+  so they stay in git-ignored `data/design_preview/refactor/`): desktop and
+  phone start page, MUJI result (top and full, desktop and phone), the
+  contrasting Harley-Davidson result (tentative), the MUJI one-page brief (PDF
+  and PNG).
+- Checks: no horizontal overflow on any of them; the PDF is one A4 page; no
+  internal or debug wording (only "Recorded preview", local); the application
+  context once; Qloo's role named on the start page ("How it works") and at the
+  top of the result ("Cultural evidence sourced from Qloo"); each profile row
+  shows Qloo phrase → motif → dimension above the fold; trade names appear only
+  as examples (MUJI: HEDIONE® once).
+- Fixed on the way: the why-chain repeated "Qloo phrases in the cultural
+  profile" on every line (now said once); "Fits the impression and sweetness
+  and temperature" (now a proper list); dimension names capitalized mid-sentence;
+  the footer's legacy wording "rule by rule".
