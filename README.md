@@ -17,12 +17,12 @@ evidence → motif → sensory target → material suggestion → brief.
 - Hosted demo (behind a review password): <https://motif-pxh8.onrender.com>. It runs
   `main`, which does not yet include stage 6A/6B or this review.
 - A web interface (`python3 -m motif.web`) runs the real research flow: brand and
-  an optional brief purpose, entity choice, live research steps, and a result
-  that leads with the brand's cultural profile and MOTIF's proposed direction,
-  then Top/Heart/Base starting materials drawn as scent strips, the cultural
-  profile with clickable evidence, open decisions, the brief (printable as one A4
-  page with clickable sources), optional suggested interpretations, and "How it
-  was made". A failed Qloo request can be retried once.
+  an optional application context (both with quick picks that only fill the
+  field), entity choice, live research steps, and a result in five parts: the
+  cultural profile with clickable evidence, MOTIF's proposed direction, Top/Heart/
+  Base starting materials drawn as scent strips, the evidence ("How it was made"),
+  and the brief (printable as one A4 page with clickable sources). A failed Qloo
+  request can be retried once.
 - Seven of eight palette materials have properties verified against the
   supplier's own full page (palette-0.3). ISO E SUPER stays unverified: the
   supplier site blocked automated access (HTTP 403), so it is never used live.
@@ -61,18 +61,19 @@ response. Guards against repeated calls:
   returns the existing session, so reload, back, and double clicks send nothing.
 - Answering a question (choosing an entity, resolving a conflict) reuses the
   first session's Qloo cache, so the search is not repeated.
-- Changing only the brief purpose reuses the brand's Qloo cache: no request is repeated.
+- Changing only the application context reuses the brand's Qloo cache: no request is repeated.
+- Quick picks on the start page only fill a field; nothing is requested until the user submits.
 - A search stopped by a failed Qloo request can be retried once: requests that
   succeeded come from the session cache, only the failed step is sent again, and
   a fresh budget is reserved first. Credential errors are never retried.
-- Interpretation suggestions are made only when the user asks, once per session.
+- Interpretation suggestions (an API kept for internal diagnosis; not shown in the interface) are made only on request, once per session.
 - Per-IP and per-day session caps, a daily Qloo attempt cap, and a daily LLM
   call cap. Daily counters live in `data/web_usage.json` and the LLM ledger in
   `data/llm_calls.jsonl`, both changed under a file lock with the spend reserved
   before each call; if they cannot be read or written, no paid call is made. A
   reached cap is reported; nothing is replaced with sample data.
 
-What the user adds is kept apart from the evidence: the brief purpose is
+What the user adds is kept apart from the evidence: the application context is
 recorded as the user's purpose (brief only), and an accepted interpretation as
 the user's note. Neither changes motifs, directions, materials, or scores; the same
 evidence, choices, and versions give the same engine result.
@@ -186,7 +187,7 @@ decides when Claude may be called:
 
 | Value | Meaning |
 |---|---|
-| `auto` (default) | On Render (the `RENDER` variable is set), Claude is called only when `MOTIF_DATA_DIR` points to its own persistent mount (a Render disk). Otherwise Claude is **paused**: briefs come from MOTIF's labelled template and interpretation suggestions are unavailable. Off Render, the local disk counts as persistent. |
+| `auto` (default) | On Render (the `RENDER` variable is set), Claude is called only when `MOTIF_DATA_DIR` points to its own persistent mount (a Render disk). Otherwise Claude is **paused**: briefs come from MOTIF's labelled template. Off Render, the local disk counts as persistent. |
 | `provider` | The owner has set a monthly spend limit on the Anthropic side (a dedicated workspace with a **Spend limits** setting in the Claude Console; not possible on the Default Workspace) and uses that workspace's key. Claude is called; MOTIF's own counters stay best-effort. |
 | `off` | No LLM calls. |
 

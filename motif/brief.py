@@ -88,7 +88,7 @@ def template_prose(seed_name: str, result: Dict[str, Any], intent: Optional[str]
     if open_list:
         lines.append("Left open by the evidence: " + ", ".join(open_list) + ".")
     if intent:
-        lines.append(f"Stated purpose (from the user, not evidence; it changes nothing above): {intent}")
+        lines.append(f"Application context: {intent.rstrip('.')}.")
     return " ".join(lines)
 
 

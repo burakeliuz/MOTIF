@@ -62,6 +62,8 @@ CSP = ("default-src 'self'; style-src 'self' https://fonts.googleapis.com; font-
 NAME_RE = re.compile(r"^[^\x00-\x1f\x7f]{1,80}$")
 INTENT_RE = re.compile(r"^[^\x00-\x1f\x7f]{0,140}$")
 REUSE_S = 1800
+# Quick picks on the start page: they only fill the brand field; nothing is requested until the user submits.
+EXAMPLES = ["A24", "MUJI", "Comme des Garçons", "Nike", "Ralph Lauren", "Aesop", "Supreme", "Gucci", "Le Labo", "Balenciaga"]
 
 
 def _int_env(name: str, default: int) -> int:
@@ -138,7 +140,7 @@ class Hub:
                 "mode_label": "Recorded preview" if self.recorded else None,  # a live server shows no mode wording
                 "live_available": bool(self.recorded or self.live_ready),
                 "llm": "paused" if self._llm_paused() else "configured" if self._llm_configured() else "template",
-                "examples": ["MUJI", "Ralph Lauren"], "versions": self.config.versions}
+                "examples": EXAMPLES, "versions": self.config.versions}
 
     def create(self, body: Dict[str, Any], ip: str) -> (int, Dict[str, Any]):
         reference = str(body.get("reference", "")).strip()
@@ -201,8 +203,8 @@ class Hub:
                                "data_label": s.data_label, "steps": self._steps(s), "message": s.error,
                                "choose": s.params["choose"], "overrides": s.params["overrides"],
                                "intent": s.params.get("intent"),
-                               "intent_effect": ("Used in the brief only; it changed no motif, direction, or material."
-                                                 if s.params.get("intent") else None),
+                               "intent_effect": ("Used to frame the brief around its intended setting; cultural evidence "
+                                                 "and scent direction remain unchanged." if s.params.get("intent") else None),
                                "retry": self._retry_state(s)}
         o = s.outcome
         if o:

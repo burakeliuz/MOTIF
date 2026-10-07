@@ -79,6 +79,27 @@ async function startSearch(reference, extra, errorTarget) {
 
 // ---------- start ----------
 
+// Quick picks only fill a field; research starts only from the Explore button.
+const CONTEXT_PICKS = [
+  ["Flagship store", "A signature scent for the flagship stores"],
+  ["Hotel lobby", "An ambient scent for a hotel lobby"],
+  ["Fashion show", "A scent direction for a fashion show"],
+  ["Product launch", "A scent for a product launch"],
+  ["Private event", "An atmospheric scent for a private event"],
+  ["Retail pop-up", "An ambient scent for a retail pop-up"],
+  ["Exhibition", "A scent direction for a cultural exhibition"],
+  ["Brand dinner", "A scent for an intimate brand dinner"],
+];
+
+function quickPicks(label, picks, field) {
+  const buttons = picks.map(([text, value]) => h("button", { type: "button", "aria-pressed": "false", "data-value": value, onclick: (e) => {
+    field.value = value;
+    buttons.forEach((b) => b.setAttribute("aria-pressed", String(b === e.currentTarget)));
+  } }, text));
+  field.addEventListener("input", () => buttons.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.value === field.value))));
+  return h("p", { class: "tries", role: "group", "aria-label": label }, h("span", { class: "tries-label", text: label }), buttons);
+}
+
 function renderStart() {
   shown = { id: null, mode: "start" };
   const live = !config || config.live_available;
@@ -86,24 +107,24 @@ function renderStart() {
   const input = h("input", { id: "brand", name: "brand", type: "text", autocomplete: "off", spellcheck: "false", maxlength: "80",
     placeholder: "Name a brand", "aria-describedby": "form-error" });
   const intent = h("input", { id: "intent", name: "intent", type: "text", autocomplete: "off", maxlength: "140",
-    placeholder: "e.g. a signature scent for the flagship stores", "aria-describedby": "intent-hint" });
-  const go = (name) => { err.textContent = ""; startSearch(name, { intent: intent.value.trim() }, err); };
+    placeholder: "What are you designing the scent for?", "aria-describedby": "intent-hint" });
+  const brands = (config && config.examples) || ["MUJI", "Ralph Lauren"];
   const form = h("form", { class: "ask", "aria-label": "Explore a brand", onsubmit: (e) => {
       e.preventDefault();
       const name = input.value.trim();
       if (!name) { err.textContent = "Enter a brand name."; input.focus(); return; }
-      go(name);
+      err.textContent = "";
+      startSearch(name, { intent: intent.value.trim() }, err);
     } },
     h("label", { class: "kicker", for: "brand", text: "Brand" }),
     h("div", { class: "askrow" }, input,
       h("button", { class: "btn", type: "submit", "data-starts": true, disabled: !live, "data-never": !live, text: "Explore a scent direction" })),
     err,
+    quickPicks("Try", brands.map((b) => [b, b]), input),
     h("div", { class: "intent" },
-      h("label", { class: "kicker", for: "intent", text: "Brief purpose (optional)" }), intent,
-      h("p", { class: "hint", id: "intent-hint", text: "Used in the brief only; it does not change the direction." })),
-    h("p", { class: "tries" }, "Or try",
-      (config ? config.examples : ["MUJI", "Ralph Lauren"]).map((name) => h("button", { type: "button", "data-starts": true,
-        disabled: !live, "data-never": !live, onclick: () => { input.value = name; go(name); } }, name))));
+      h("label", { class: "kicker", for: "intent", text: "Application context (optional)" }), intent,
+      quickPicks("For example", CONTEXT_PICKS, intent),
+      h("p", { class: "hint", id: "intent-hint", text: "Used to frame the final brief around its intended setting; cultural evidence and scent direction remain unchanged." })));
   const llm = config && config.llm === "configured";
   const notice = config && !config.live_available
     ? h("p", { class: "notice", role: "status", text: "Live Qloo access is not configured on this server, so searches cannot run. Nothing is replaced with sample data." }) : null;
@@ -309,75 +330,23 @@ function profileBlock(r, brand) {
         phraseButtons(p.examples, byMotif[p.motif] || { label: p.label, strength_label: p.strength_label, rule: null })))))];
 }
 
-function decisionsBlock(r, brand) {
-  const items = [];
-  for (const q of r.design_questions) items.push(h("li", {}, h("div", {}, "How should " + q.label + " be expressed?", h("small", { text: q.text }))));
-  for (const a of r.still_open) {
-    const leaning = r.materials.selected.flatMap((m) => m.props.filter((p) => p.axis === a.axis).map((p) => m.name + " leans " + p.word));
-    items.push(h("li", {}, h("div", {}, a.axis + ": " + a.poles[0] + " or " + a.poles[1] + "?",
-      h("small", { text: (a.state === "conflicted" ? "The evidence points both ways." : "Not decided by the evidence; not a midpoint.")
-        + (leaning.length ? " Supplier-described: " + leaning.join("; ") + "." : "") }))));
-  }
-  items.push(h("li", {}, h("div", {}, "Proportions, further materials, and whether it reads as " + brand + ".", h("small", { text: "Only smelling can decide these." }))));
-  return h("ol", { class: "dec" }, items);
-}
-
 function briefBlock(s) {
   const b = s.brief;
   if (!b) return h("p", { class: "intro", text: "No brief is written for a stopped or incomplete result." });
   const note = b.note || "";
   const byline = b.author === "llm"
     ? ["Written by ", src("Claude"), " " + b.model + " from the result, then checked against it. It chose no motif, direction, or material."]
-    : [src("MOTIF"), " " + (/paused/.test(note) ? note
+    : [src("MOTIF"), " " + (/paused/.test(note) ? "Written by MOTIF's fixed template."
         : /budget/.test(note) ? "The LLM call budget is used up, so this is MOTIF's fixed template."
         : /failed validation/.test(note) ? "The LLM's text did not pass MOTIF's checks, so this is MOTIF's fixed template."
         : /failed/.test(note) ? "The LLM call did not succeed, so this is MOTIF's fixed template, not LLM output."
         : "Written by MOTIF's fixed template; no LLM is configured on this server.")];
-  return h("div", { class: "brief" }, h("p", { class: "text", text: b.text }), h("p", { class: "byline" }, byline),
+  return h("div", { class: "brief" },
+    s.intent ? h("p", { class: "intentline", text: "Application context: “" + s.intent + "”. " + (s.intent_effect || "") }) : null,
+    h("p", { class: "text", text: b.text }), h("p", { class: "byline" }, byline),
     h("div", { class: "actions" },
       h("a", { class: "btn", href: "/brief/" + encodeURIComponent(s.id), target: "_blank", rel: "noopener", text: "Print or save as PDF" }),
       h("a", { class: "btn ghost", href: "/api/sessions/" + encodeURIComponent(s.id) + "/brief.json", download: "motif-brief.json", text: "Technical JSON" })));
-}
-
-function suggestionsBlock(s, r) {
-  const sg = s.suggestions || { status: "unavailable", suggestions: [] };
-  const body = [h("p", { class: "intro", text: "On request, Claude suggests up to three readings for descriptors MOTIF's lexicon does not read. Nothing is applied: an accepted reading becomes your note in the brief, never Qloo evidence, and changes no direction or material." })];
-  if (r.unread && r.unread.length) {
-    body.push(h("p", { class: "mute small" }, "Unread here: ", r.unread.slice(0, 6).map((u, i) => [i ? ", " : "", u.descriptor + (u.own ? " (brand's own)" : " (" + u.entities.length + " references)")])));
-  }
-  if (sg.status === "not_requested") {
-    body.push(h("div", { class: "actions" }, h("button", { class: "btn ghost", type: "button", "data-starts": true, onclick: (e) => requestSuggestions(s, e.currentTarget) }, "Suggest interpretations (one Claude call)")));
-  } else if (sg.message) {
-    body.push(h("p", { class: "notice", text: sg.message }));
-  }
-  for (const it of sg.suggestions || []) {
-    body.push(h("div", { class: "sug" + (it.decision === "accepted" ? " accepted" : "") },
-      h("span", { class: "lbl", text: it.decision === "accepted" ? "Accepted by you — your interpretation, not Qloo evidence; no rule applied" : it.decision === "rejected" ? "Rejected" : "Suggested interpretation — not applied" }),
-      h("div", { class: "d", text: it.descriptor }),
-      h("div", { class: "from", text: (it.from_brand_itself ? "From the brand's own Qloo entry" : "From " + it.source + ": " + it.entities.join(", ")) }),
-      it.decision === "rejected" ? null : [h("p", { class: "r", text: it.reading }), h("p", { class: "qq", text: "Open question: " + it.design_question })],
-      h("div", { class: "actions" },
-        it.decision === null ? [h("button", { class: "btn", type: "button", onclick: () => decide(s, it.id, "accept") }, "Accept as my note"),
-          h("button", { class: "btn ghost", type: "button", onclick: () => decide(s, it.id, "reject") }, "Reject")]
-          : h("button", { class: "link", type: "button", onclick: () => decide(s, it.id, "undo") }, "Undo"))));
-  }
-  return h("details", { class: "fold", id: "suggest" }, h("summary", {}, "Suggested interpretations", h("small", { text: "Optional · for descriptors MOTIF does not read · never applied automatically" })), h("div", {}, body));
-}
-
-async function requestSuggestions(s, btn) {
-  if (posting) return;
-  posting = true; btn.disabled = true; btn.textContent = "Asking Claude…";
-  await api("/api/sessions/" + encodeURIComponent(s.id) + "/suggestions", { method: "POST", body: "{}" });
-  posting = false;
-  await loadSession(s.id, { keepOpen: "suggest" });
-}
-
-async function decide(s, id, decision) {
-  if (posting) return;
-  posting = true;
-  await api("/api/sessions/" + encodeURIComponent(s.id) + "/suggestions/" + id, { method: "POST", body: JSON.stringify({ decision }) });
-  posting = false;
-  await loadSession(s.id, { keepOpen: "suggest" });
 }
 
 function sourcesList(r) {
@@ -426,7 +395,6 @@ function directionBlock(r, brand) {
           : a.state === "conflicted" ? "Open: the evidence points both ways." : "Open: not decided by the evidence; not a midpoint." })];
     })));
   return h("div", { class: "dir" },
-    h("p", { class: "kicker", text: "MOTIF's proposed direction" }),
     words.length ? h("div", { class: "char" }, words) : h("p", { class: "none", text: "None yet." }),
     r.still_open.length ? h("p", { class: "stillopen", text: "Still open: " + r.still_open.map((a) => a.axis.toLowerCase()).join(", ") + "." }) : null,
     axes);
@@ -452,15 +420,12 @@ function renderResult(s, opts) {
         h("div", { class: "made" }, made)),
       h("div", { class: "main" },
         h("p", { class: "idea", text: r.headline.title }),
-        r.headline.lines.map((line) => h("p", { class: "line", text: line })),
-        directionBlock(r, brand),
-        s.intent ? h("p", { class: "intentline", text: "Brief purpose: “" + s.intent + "”. " + (s.intent_effect || "") }) : null)),
-    section("01", "Starting materials", materialsBlock(r, brand)),
-    section("02", "Cultural profile", profileBlock(r, brand)),
-    section("03", "Open decisions", decisionsBlock(r, brand)),
-    section("04", "The brief", briefBlock(s)),
-    section("05", "Notes", suggestionsBlock(s, r)),
-    section("06", "Basis", howBlock(s, r, brand))));
+        r.headline.lines.map((line) => h("p", { class: "line", text: line })))),
+    section("01", "Cultural profile", profileBlock(r, brand)),
+    section("02", "MOTIF's proposed direction", directionBlock(r, brand)),
+    section("03", "Starting materials", materialsBlock(r, brand)),
+    section("04", "Evidence", howBlock(s, r, brand)),
+    section("05", "The brief", briefBlock(s))));
   keepOpen.forEach((id) => { const d = document.getElementById(id); if (d) d.open = true; });
   if (fresh) { focusHeading(); say("Result ready for " + brand + "."); }
 }

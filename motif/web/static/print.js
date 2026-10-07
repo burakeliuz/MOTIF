@@ -63,16 +63,6 @@
       p.examples.slice(0, 3).map((e, i) => [i ? ", " : "", h("span", { class: "sc", text: e.tag }), " (" + e.entity + ")"]), ".")));
   }
 
-  function decisions(r, brand) {
-    const out = r.design_questions.map((q) => "How should " + q.label + " be expressed? (" + q.examples.slice(0, 3).join(", ") + ")");
-    for (const a of r.still_open) {
-      const lean = r.materials.selected.flatMap((m) => m.props.filter((p) => p.axis === a.axis).map((p) => m.name + " leans " + p.word));
-      out.push(a.axis + ": " + a.poles[0] + " or " + a.poles[1] + "?" + (lean.length ? " (" + lean.join("; ") + ")" : ""));
-    }
-    out.push("Proportions, further materials, and whether it reads as " + brand + ": only smelling can decide.");
-    return h("ol", {}, out.map((d) => h("li", { text: d })));
-  }
-
   function sources(r) {
     const q = r.sources.qloo;
     return h("ul", { class: "src" },
@@ -87,7 +77,6 @@
     const r = s.result;
     const brand = (s.resolution && s.resolution.name) || s.reference;
     document.title = "MOTIF brief · " + brand;
-    const accepted = ((s.suggestions || {}).suggestions || []).filter((x) => x.decision === "accepted");
     const date = s.fetched ? s.fetched[0].slice(0, 10) : "";
     const b = s.brief;
     const dir = r.direction.map((d) => d.word.toUpperCase() + " (" + d.axis.toLowerCase() + (d.relations_only ? ", related references only" : "") + ")");
@@ -101,17 +90,16 @@
       h("p", { class: "lbl", text: r.headline.label }),
       h("p", { class: "idea", text: r.headline.title }),
       r.headline.lines.map((line) => h("p", { class: "line", text: line })),
-      h("p", { class: "dirl" }, h("b", { text: "MOTIF's proposed direction: " }), dir.length ? dir.join(" · ") : "none yet",
-        r.still_open.length ? ". Still open: " + r.still_open.map((a) => a.axis.toLowerCase()).join(", ") + "." : "."),
-      s.intent ? h("p", { class: "note", text: "Brief purpose (from you, used in the brief only): “" + s.intent + "”" }) : null,
-      section(num(), "Starting materials", materials(r, brand)),
       section(num(), "Cultural profile", profile(r)),
-      section(num(), "Open decisions", decisions(r, brand)),
-      b ? section(num(), "In words", h("p", { class: "prose", text: b.text.replace(/\n\s*\n+/g, "\n").trim() }),
+      section(num(), "MOTIF's proposed direction", h("p", { class: "dirl" }, dir.length ? dir.join(" · ") : "None yet",
+        r.still_open.length ? ". Still open: " + r.still_open.map((a) => a.axis.toLowerCase()).join(", ") + "." : ".")),
+      section(num(), "Starting materials", materials(r, brand)),
+      section(num(), "Evidence", sources(r)),
+      b ? section(num(), "The brief",
+        s.intent ? h("p", { class: "note", text: "Application context: “" + s.intent + "”" }) : null,
+        h("p", { class: "prose", text: b.text.replace(/\n\s*\n+/g, "\n").trim() }),
         h("p", { class: "note", text: b.author === "llm" ? "Written by Claude (" + b.model + ") from the result and checked against it; it chose nothing."
           : "Written by MOTIF's fixed template." })) : null,
-      accepted.length ? section(num(), "Your notes", h("ol", {}, accepted.map((x) => h("li", { text: x.descriptor + ": " + x.reading + " (accepted by you; not Qloo evidence; no rule applied)" })))) : null,
-      section(num(), "Sources", sources(r)),
       h("div", { class: "ft" },
         h("span", { text: "A creative direction, not a formula: not smelled or balanced, no proportions, no prediction of who will like it. "
           + "MOTIF " + r.versions.engine + " · " + r.versions.lexicon + " · rules " + r.versions.rules + " · " + r.versions.palette + "." }),

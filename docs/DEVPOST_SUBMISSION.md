@@ -8,7 +8,7 @@ claim below matches the implemented product and the reports in this repository
 **Status of these texts: draft for after deployment.** The hosted demo runs `main`
 (commit `73e6b64`: the stage 5 interface behind the review password). The texts
 below describe the version on the session branch (art direction A with scent
-strips, cultural profile, printable brief, suggested readings, one retry, the
+strips, cultural profile, printable brief, one retry, the
 LLM budget guard). They become true only after the owner merges the branch into
 `main` and redeploys Render. If that does not happen, use the "Current demo
 variant" at the end instead of the testing steps and gallery.
@@ -49,10 +49,10 @@ scent for the flagship stores"). MOTIF then shows, step by step:
    properties verified on the supplier's own page, drawn as scent strips.
 3. **Claude, the brief.** Claude writes the brief in plain words from the
    result; MOTIF checks it (no new materials, numbers, or audience claims; every
-   open dimension named) and falls back to a labelled template otherwise. On
-   request, Claude suggests up to three readings for descriptors MOTIF cannot
-   read; they are your notes, never evidence. The brief prints as one A4 page
-   with clickable sources.
+   open dimension named) and falls back to a labelled template otherwise. An
+   optional application context ("a hotel lobby", "a product launch") frames
+   the brief; it does not change the cultural evidence or the direction. The
+   brief prints as one A4 page with clickable sources.
 
 Examples from live runs (2026-10-07):
 
@@ -64,9 +64,8 @@ Examples from live runs (2026-10-07):
   yet, so that is named as the next creative decision; the proposed direction so
   far (dense, smooth-finished) comes only from references Qloo relates to Gucci,
   and says so.
-- **Harley-Davidson**: "A profile led by heritage." No direction yet; Claude's
-  optional readings pick up Qloo's own "Chrome Details" and "Dark Matte Finishes"
-  as open questions for the perfumer.
+- **Harley-Davidson**: "A profile led by heritage." No direction yet: MOTIF has
+  no rule for heritage, and it says so instead of guessing.
 
 ### How we built it
 
@@ -157,14 +156,13 @@ MOTIF is behind a reviewer password during judging.
 1. Open https://motif-pxh8.onrender.com
    (free hosting: the first load after a quiet period can take about a minute).
 2. Sign in with the password: [PASSWORD PLACEHOLDER]
-3. Click "MUJI" (or type a brand). Optionally add a one-line brief purpose.
+3. Click "MUJI" (or type a brand), then "Explore a scent direction". Optionally
+   pick or type an application context (for example "Flagship store").
    Research takes a few seconds and shows its real steps.
 4. On the result: read the headline and MOTIF's proposed direction, then select a
    Top/Heart/Base strip for why MOTIF chose it and the supplier's own words.
    Under "Cultural profile", every phrase opens its Qloo source.
 5. "Print or save as PDF" gives the one-page brief.
-6. Optional: under "Notes", "Suggest interpretations" makes one Claude call and
-   offers readings you can accept or reject; they never change the result.
 
 Try also "Le Labo" (ambiguous name: you choose the brand) and "Gucci"
 (a profile led by provocation, with a partial direction from related references).
@@ -182,16 +180,18 @@ metni yazar; araştırmayı belirli kurallı bir denetleyici yönetir.
 ## Gallery (from real live sessions, 2026-10-07)
 
 Private image files (they show Qloo descriptors; publishing them follows the
-same data-sharing decision as the repository excerpts). Captions in English:
+same data-sharing decision as the repository excerpts). Captions in English.
+The images were taken before the 2026-10-08 presentation pass (section order,
+no open decisions, no suggested readings); retake them from a live session once
+that pass is approved and deployed.
 
 1. **Cover** (`01-cover-start.png`): "If a brand were a scent. Type a brand; MOTIF shows how Qloo, MOTIF, and Claude each contribute."
 2. **Result** (`02-result.png`): "MUJI: the headline, MOTIF's proposed direction, and three starting materials as scent strips. Temperature, projection, and sweetness stay open."
 3. **Opened strip** (`03-strip-open.png`): "Why MOTIF chose bergamot, in the supplier's own verified words, kept apart from MOTIF's reading."
 4. **Cultural profile** (`04-cultural-profile.png`): "Motifs ranked by evidence, the brand's own entry first; every phrase opens its Qloo source."
-5. **One-page brief** (`05-brief.png`, from `05-brief.pdf`): "The printable brief: direction, starting roles, open decisions, Claude's wording checked against the result, and clickable sources."
+5. **One-page brief** (`05-brief.png`, from `05-brief.pdf`): "The printable brief: cultural profile, direction, starting roles, evidence, Claude's wording checked against the result, and clickable sources."
 6. **Mobile** (`06-mobile.png`): "The same result on a phone."
 7. Optional, **partial result** (`07-gucci-partial.png`): "Gucci: a profile led by provocation; MOTIF names the next creative decision instead of guessing."
-8. Optional, **suggested readings** (`08-harley-suggestions.png`): "Claude's optional readings for descriptors MOTIF does not read; never applied unless you accept them."
 
 ## Optional demo narration (about 75 seconds; a video is not required)
 
@@ -213,17 +213,17 @@ against the result, and it prints as one page. A direction, not a formula."
 |---|---|
 | Technological implementation / Qloo use | Own entry vs. related references kept apart and labelled; A/A′/B with identical rules on 13 brands; entity choice from Qloo search; one controlled retry; evidence dialog with entity, field, request, date |
 | Design | Art direction A with scent strips; headline and direction first, evidence one tap away; phone layout; one-page brief with sources |
-| Potential impact | A brief a brand team can hand to a perfumer: roles, supplier words, open decisions, honest limits |
+| Potential impact | A brief a brand team can hand to a perfumer: direction, roles, supplier words, evidence, honest limits |
 | Quality of the idea | Culture → motif → sensory direction → verified material, with unknowns and untranslated motifs kept visible |
 
 ## Current demo variant (only if the branch is not deployed)
 
 The deployed stage 5 interface has no scent strips, no printable brief page, no
-cultural profile headline, no brief purpose field, no suggested readings, and no
+cultural profile headline, no application context field, and no
 retry; its start page reads "A scent direction, read from culture." Then:
 
-- remove the gallery images (they show the new interface) and the "Opened strip",
-  "One-page brief", and "suggested readings" sentences;
+- remove the gallery images (they show the new interface) and the "Opened strip"
+  and "One-page brief" sentences;
 - testing steps: "Sign in, click MUJI or type a brand, follow the research steps,
   then read the scent direction, the starting materials, and the perfumer brief;
   open any phrase for its Qloo source. 'Download brief (JSON)' gives the full
