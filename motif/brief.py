@@ -56,14 +56,9 @@ def open_axes(result: Dict[str, Any]) -> List[str]:
     return [a for a in AXES if result["axes"][a]["state"] != "target"]
 
 
-PLAIN_AXIS = {"warm_cool": "temperature", "light_dense": "weight", "raw_polished": "texture",
-              "natural_synthetic": "impression", "intimate_projecting": "projection", "sweet_dry": "sweetness"}
 NOUN = {"warm": "warmth", "cool": "coolness", "light": "lightness", "dense": "density", "raw": "rawness",
         "polished": "polish", "natural": "a natural feel", "synthetic": "a synthetic feel", "intimate": "closeness",
         "projecting": "diffusion", "sweet": "sweetness", "dry": "dryness"}
-MOTIF_WORD = {"restrained": "restraint", "precise": "precision", "natural": "naturalness", "opulent": "opulence",
-              "intimate": "intimacy", "experimental": "experimentation", "provocative": "provocation", "heritage": "heritage",
-              "industrial": "industrial character", "playful": "playfulness", "romantic": "romance", "melancholic": "melancholy"}
 
 
 def _list(words: List[str]) -> str:
@@ -71,21 +66,11 @@ def _list(words: List[str]) -> str:
 
 
 def template_prose(seed_name: str, result: Dict[str, Any], intent: Optional[str] = None) -> str:
-    """Plain-language brief written by a fixed template (no LLM). Rule codes and scores stay in the JSON."""
-    axes = result["axes"]
-    targets = [(a, axes[a]) for a in AXES if axes[a]["state"] == "target"]
-    lines = [f"{seed_name}: a direction, not a formula."]
-    if targets:
-        parts = []
-        for a, t in targets:
-            why = " and ".join(MOTIF_WORD.get(m, m) for m in t["motifs"])
-            note = f", only from references Qloo relates to {seed_name}, so a creative suggestion" if t.get("relations_only") else ""
-            parts.append(f"a {t['value']} {PLAIN_AXIS[a]} (from {why}, {t['evidence_strength']} support{note})")
-        lines.append("Aim for " + _list(parts) + ".")
-    unmapped = result.get("unmapped_active_motifs") or []
-    if unmapped:
-        lines.append("Open design question: the descriptors also point to " + _list([MOTIF_WORD.get(m, m) for m in unmapped])
-                     + ", which MOTIF has no scent rule for; how to express it is left to the perfumer.")
+    """Plain-language brief written by a fixed template (no LLM). It opens with the same lead as the
+    result page (`narrative.headline`); rule codes and scores stay in the JSON."""
+    from .narrative import headline  # local: keeps this module importable on its own
+    lead = headline(seed_name, result)
+    lines = [f"{seed_name}: a direction, not a formula.", lead["title"]] + list(lead["lines"])
     mats = result["materials"]
     if mats["status"] == "composed":
         where = {"top": "at the top", "heart": "in the heart", "base": "at the base"}
@@ -98,7 +83,7 @@ def template_prose(seed_name: str, result: Dict[str, Any], intent: Optional[str]
         if mats["verification_mode"] != "verified_only":
             lines.append("DESIGN PREVIEW: material properties are not verified against full supplier pages.")
     else:
-        lines.append(f"No material composition: {result['outcome_meaning']}")
+        lines.append("No material composition is proposed.")
     open_list = [AXIS_LABELS[a] for a in open_axes(result)]
     if open_list:
         lines.append("Left open by the evidence: " + ", ".join(open_list) + ".")
@@ -107,8 +92,12 @@ def template_prose(seed_name: str, result: Dict[str, Any], intent: Optional[str]
     return " ".join(lines)
 
 
-def validate_prose(text: str, result: Dict[str, Any]) -> List[str]:
+def validate_prose(text: str, result: Dict[str, Any], name: Optional[str] = None) -> List[str]:
+    """Problems with an LLM text; `name` (the brand) is set aside for the ingredient and number checks,
+    so a brand such as "A24" does not count as a stray number."""
     problems: List[str] = []
+    if name:
+        text = re.sub(re.escape(name), " ", text, flags=re.IGNORECASE)
     low = text.lower()
     chosen = set(selected_ids(result))
     allowed_terms = {t for mid in chosen for t in MATERIAL_TERMS.get(mid, ()) + EXTRA_ALLOWED.get(mid, ())}
@@ -138,7 +127,7 @@ def validate_prose(text: str, result: Dict[str, Any]) -> List[str]:
 
 def build_brief(session: Dict[str, Any], result: Dict[str, Any], prose: Dict[str, Any],
                 accepted_readings: Optional[List[Dict[str, Any]]] = None) -> Dict[str, Any]:
-    from .narrative import axis_basis, idea, open_design_questions  # local: narrative imports this module's constants
+    from .narrative import axis_basis, headline, open_design_questions, profile  # local: imported late on purpose
     name = (session.get("resolution") or {}).get("name") or "The brand"
     cited = set()
     for info in result["motifs"].values():
@@ -157,7 +146,10 @@ def build_brief(session: Dict[str, Any], result: Dict[str, Any], prose: Dict[str
         "unmapped_active_motifs": result["unmapped_active_motifs"],
         "axes": result["axes"],
         "materials": result["materials"],
-        "idea": {"text": idea(name, result), "provenance": "motif_annotation"},
+        "idea": {"text": headline(name, result)["title"], "provenance": "motif_annotation"},
+        "headline": headline(name, result),
+        "cultural_profile": [{k: r[k] for k in ("motif", "own", "strength", "source_kinds", "state", "axis", "pole")}
+                             for r in profile(name, result)],
         "basis": {a: axis_basis(name, result, a) for a in AXES if result["axes"][a]["state"] == "target"},
         "open_questions": [f"{AXIS_LABELS[a]} is not decided by the evidence" for a in open_axes(result)],
         "open_design_questions": open_design_questions(name, result),

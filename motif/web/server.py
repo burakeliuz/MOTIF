@@ -14,8 +14,12 @@ Guards against unnecessary Qloo or LLM calls:
 * per-IP and per-day session caps, a per-day Qloo attempt cap, and the LLM call
   ledger's daily cap. A cap that is reached is reported, never replaced by fake data.
 
-`--recorded` (local preview only) replays stored live runs and labels every
-result RECORDED; it is off unless the flag is given.
+`--recorded` (local development and tests only) replays stored live runs and shows
+one small "Recorded preview" label; it is refused on Render. A live server shows
+no recorded wording at all.
+
+Paid LLM calls also depend on the budget guard (`guard.py`): when the call counter
+would not survive a restart, Claude is paused and the labelled template is used.
 """
 
 from __future__ import annotations
@@ -45,6 +49,7 @@ from ..interpret import suggest as suggest_readings
 from ..llm import write_prose, writer_from_env
 from ..qloo import LiveQloo, RecordedQloo
 from .access import AccessGate
+from .guard import PAUSED_NOTE, llm_guard
 from .present import candidate_view, result_view
 from .usage import UsageError, UsageStore
 
@@ -86,6 +91,8 @@ class WebSession:
         self.suggest_lock = threading.Lock()
         self.error: Optional[str] = None
         self.finished: Optional[float] = None
+        self.retry_of: Optional[str] = None
+        self.retried_by: Optional[str] = None
 
 
 class Hub:
@@ -104,6 +111,7 @@ class Hub:
         self.limits = {"per_ip_hour": _int_env("MOTIF_WEB_SESSIONS_PER_IP_HOUR", 8),
                        "per_day": _int_env("MOTIF_WEB_SESSIONS_PER_DAY", 120),
                        "qloo_per_day": _int_env("MOTIF_QLOO_MAX_CALLS_PER_DAY", 400)}
+        self.guard = llm_guard(self.env, root)
         self.live_ready = None
         if not recorded:
             env = live_environment(harness_environment(load_manifest()))
@@ -113,15 +121,23 @@ class Hub:
 
     # -- public API -----------------------------------------------------------------
 
+    def _llm_configured(self) -> bool:
+        return bool(self.env.get("MOTIF_ANTHROPIC_API_KEY")) and self.env.get("MOTIF_LLM_PROVIDER", "anthropic") != "off"
+
+    def _llm_paused(self) -> bool:
+        """A key is configured, but the budget guard does not allow paid calls (see guard.py)."""
+        return self._llm_configured() and not self.guard["allowed"]
+
     def _writer(self):
+        if not self.guard["allowed"]:
+            return None
         return writer_from_env(self.env, ledger_path=self.root / "llm_calls.jsonl")["writer"]
 
     def describe(self) -> Dict[str, Any]:
-        configured = bool(self.env.get("MOTIF_ANTHROPIC_API_KEY")) and self.env.get("MOTIF_LLM_PROVIDER", "anthropic") != "off"
         return {"mode": "recorded" if self.recorded else "live",
-                "mode_label": ("Recorded preview · stored Qloo data" if self.recorded else "Live · Qloo API"),
+                "mode_label": "Recorded preview" if self.recorded else None,  # a live server shows no mode wording
                 "live_available": bool(self.recorded or self.live_ready),
-                "llm": "configured" if configured else "template",
+                "llm": "paused" if self._llm_paused() else "configured" if self._llm_configured() else "template",
                 "examples": ["MUJI", "Ralph Lauren"], "versions": self.config.versions}
 
     def create(self, body: Dict[str, Any], ip: str) -> (int, Dict[str, Any]):
@@ -185,8 +201,9 @@ class Hub:
                                "data_label": s.data_label, "steps": self._steps(s), "message": s.error,
                                "choose": s.params["choose"], "overrides": s.params["overrides"],
                                "intent": s.params.get("intent"),
-                               "intent_effect": ("Recorded in the brief as your stated purpose. It did not change the "
-                                                 "motifs, the direction, or the materials." if s.params.get("intent") else None)}
+                               "intent_effect": ("Used in the brief only; it changed no motif, direction, or material."
+                                                 if s.params.get("intent") else None),
+                               "retry": self._retry_state(s)}
         o = s.outcome
         if o:
             res = o.get("resolution") or {}
@@ -207,6 +224,9 @@ class Hub:
                 out["outcome"] = o.get("outcome")
             if o.get("status") == "stopped":
                 out["message"] = self._stop_message(o)
+                out["stop_reason"] = o.get("outcome")
+                if o.get("result") is not None:
+                    out["result"]["headline"] = dict(out["result"]["headline"], label="Partial result")
         if s.prose:
             out["brief"] = {"author": s.prose["author"], "text": s.prose["text"], "note": s.prose.get("note"),
                             "model": (s.prose.get("llm") or {}).get("model") if s.prose["author"] == "llm" else None}
@@ -218,6 +238,56 @@ class Hub:
             out["fetched"] = [fetched[0], fetched[-1]] if fetched else None
         return out
 
+    # -- one controlled retry after a failed Qloo request ---------------------------
+
+    RETRYABLE = ("stopped_request_failed", "error")
+
+    def _retry_kind(self, s: WebSession) -> Optional[str]:
+        if s.status == "error":
+            return "error"
+        if s.status == "stopped" and s.outcome:
+            return s.outcome.get("outcome")
+        return None
+
+    def _retry_state(self, s: WebSession) -> Dict[str, Any]:
+        retryable = self._retry_kind(s) in self.RETRYABLE
+        return {"available": retryable and s.retry_of is None and s.retried_by is None,
+                "used": s.retry_of is not None, "retried_by": s.retried_by}
+
+    def retry(self, sid: str) -> (int, Dict[str, Any]):
+        """Re-run a search stopped by a failed Qloo request, once. Requests that succeeded are served
+        from the session cache; only the failed step is sent again, within a fresh, reserved budget."""
+        s = self.sessions.get(sid)
+        if not s:
+            return 404, {"error": "Unknown session."}
+        if self._retry_kind(s) not in self.RETRYABLE:
+            return 409, {"error": "Only a search stopped by a failed Qloo request can be retried."}
+        budget = self.config.params["budget"]["max_requests_per_session"]
+        with self.lock:
+            if s.retried_by:
+                return 200, {"id": s.retried_by, "reused": True}
+            if s.retry_of is not None:
+                return 409, {"error": "This search was already retried once. Please start a new search later."}
+            if not self.recorded and not self.live_ready:
+                return 503, {"error": "Live Qloo access is not configured on this server.", "kind": "qloo_unavailable"}
+            try:
+                if not self.usage.reserve("qloo", budget, self.limits["qloo_per_day"]):
+                    return 429, {"error": "Today's Qloo request budget for this demo is used up.", "kind": "qloo_cap"}
+            except UsageError:
+                return 503, {"error": "The demo's usage budget cannot be verified right now, so nothing is retried.",
+                             "kind": "budget_unverified"}
+            new_id = secrets.token_urlsafe(9)
+            session = WebSession(new_id, s.key + ("retry", s.id), dict(s.params), s.data_label, s)
+            session.retry_of = s.id
+            session.reserved = budget
+            session.day = self.usage.clock()
+            self.sessions[new_id] = session
+            self.by_key[session.key] = new_id
+            self.by_key[s.key] = new_id  # an identical new request now lands on the retried search
+            s.retried_by = new_id
+        threading.Thread(target=self._run, args=(session,), daemon=True).start()
+        return 202, {"id": new_id, "reused": False}
+
     def brief(self, sid: str) -> Optional[Dict[str, Any]]:
         s = self.sessions.get(sid)
         return s.brief if s else None
@@ -228,8 +298,11 @@ class Hub:
         if s.suggestions is not None:
             return s.suggestions
         has_result = bool(s.outcome and s.outcome.get("result") is not None and s.status in ("completed", "stopped"))
+        message = (None if s.llm_configured else
+                   "Suggestions need Claude, which is paused on this server; the result is unaffected." if self._llm_paused() else
+                   "Suggestions need an LLM key on the server; the result is unaffected.")
         return {"status": "not_requested" if (s.llm_configured and has_result) else "unavailable", "suggestions": [],
-                "message": None if s.llm_configured else "Suggestions need an LLM key on the server; the result is unaffected."}
+                "message": message}
 
     def suggest(self, sid: str) -> (int, Dict[str, Any]):
         s = self.sessions.get(sid)
@@ -299,6 +372,8 @@ class Hub:
             s.access = access
             with ref_lock:  # sessions sharing one Qloo cache run one at a time
                 before = access.network_attempts
+                if s.retry_of is not None:  # the reserved retry budget comes on top of what was already used
+                    access.max_requests = max(access.max_requests, access.network_attempts + s.reserved)
                 original = access.request
 
                 def tracked(operation, argv):
@@ -329,6 +404,8 @@ class Hub:
                 s.llm_configured = writer is not None
                 name = (outcome.get("resolution") or {}).get("name") or p["reference"]
                 s.prose = write_prose(name, outcome["result"], writer, intent=p.get("intent"))
+                if writer is None and self._llm_paused():
+                    s.prose["note"] = PAUSED_NOTE
                 s.brief = self._build_brief(s)
             elif outcome.get("result") is not None:
                 s.llm_configured = self._writer() is not None
@@ -401,6 +478,8 @@ class Hub:
                 who = "Claude" if s.llm_configured else "MOTIF"
             else:
                 status, detail = ("not_run" if finished else "pending"), None
+            if status in ("pending", "not_run", "skipped"):
+                who = None  # a source label appears only once that stage has actually run
             steps.append({"key": key, "label": label, "status": status, "detail": detail, "who": who})
         return steps
 
@@ -409,7 +488,7 @@ class Hub:
         kind = o.get("outcome")
         return {"stopped_access_error": "Qloo refused the request (credential or permission). Nothing else was tried.",
                 "stopped_budget": "This search reached its Qloo request budget.",
-                "stopped_request_failed": "A Qloo request failed after bounded retries.",
+                "stopped_request_failed": "A Qloo request failed, even after automatic retries.",
                 "not_found": "Qloo returned no entity for this name.",
                 "invalid_choice": "That choice was not among Qloo's results.",
                 "stopped_not_recorded": "This request is not in the stored recording (recorded mode sends nothing live)."
@@ -523,6 +602,10 @@ def make_handler(hub: Hub, gate: Optional[AccessGate] = None):
                 return self._json(code, payload, {"Set-Cookie": gate.cookie(token)} if token else None)
             if not self._authorized():  # checked before anything that could reach Qloo or the LLM
                 return self._deny(path)
+            m = re.fullmatch(r"/api/sessions/([A-Za-z0-9_-]{6,20})/retry", path)
+            if m:
+                code, payload = hub.retry(m.group(1))
+                return self._json(code, payload)
             m = re.fullmatch(r"/api/sessions/([A-Za-z0-9_-]{6,20})/suggestions(?:/(s[0-9]))?", path)
             if m and not m.group(2):
                 code, payload = hub.suggest(m.group(1))
@@ -548,15 +631,19 @@ def main(argv: Optional[List[str]] = None) -> int:
     parser = argparse.ArgumentParser(prog="python3 -m motif.web")
     parser.add_argument("--host", default=os.environ.get("HOST", "127.0.0.1"))
     parser.add_argument("--port", type=int, default=int(os.environ.get("PORT", "8000")))
-    parser.add_argument("--recorded", nargs="*", help="LOCAL PREVIEW ONLY: replay stored live runs (labelled RECORDED)")
+    parser.add_argument("--recorded", nargs="*", help="LOCAL DEVELOPMENT ONLY: replay stored live runs (refused on Render)")
     parser.add_argument("--data-dir")
     args = parser.parse_args(argv)
+    if args.recorded is not None and os.environ.get("RENDER"):
+        print("Refused: --recorded is for local development and tests; it never runs on Render.", flush=True)
+        return 2
     root = data_root(args.data_dir)
     recorded = [Path(p) for p in args.recorded] if args.recorded else None
     hub = Hub(load_config(), root, recorded)
     gate = AccessGate.from_env(os.environ)
     server = ThreadingHTTPServer((args.host, args.port), make_handler(hub, gate))
     mode = "RECORDED (local preview)" if recorded else ("LIVE" if hub.live_ready else "LIVE (Qloo not configured)")
-    print(f"MOTIF web on http://{args.host}:{args.port} · {mode} · LLM {hub.describe()['llm']} · {gate.describe()}", flush=True)
+    print(f"MOTIF web on http://{args.host}:{args.port} · {mode} · LLM {hub.describe()['llm']} "
+          f"(budget guard {hub.guard['mode']}: {hub.guard['reason']}) · {gate.describe()}", flush=True)
     server.serve_forever()
     return 0

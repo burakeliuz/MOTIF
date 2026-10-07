@@ -86,12 +86,9 @@ function renderStart() {
   const input = h("input", { id: "brand", name: "brand", type: "text", autocomplete: "off", spellcheck: "false", maxlength: "80",
     placeholder: "Name a brand", "aria-describedby": "form-error" });
   const intent = h("input", { id: "intent", name: "intent", type: "text", autocomplete: "off", maxlength: "140",
-    placeholder: "e.g. a home scent for the flagship store", "aria-describedby": "intent-hint" });
-  const intentBox = h("div", { class: "intent", id: "intent-box" },
-    h("label", { class: "kicker", for: "intent", text: "Creative intent (optional, one line)" }), intent,
-    h("p", { class: "hint", id: "intent-hint", text: "Recorded in the brief as your purpose. It does not change the evidence, the rules, or the materials." }));
+    placeholder: "e.g. a signature scent for the flagship stores", "aria-describedby": "intent-hint" });
   const go = (name) => { err.textContent = ""; startSearch(name, { intent: intent.value.trim() }, err); };
-  const form = h("form", { class: "ask", onsubmit: (e) => {
+  const form = h("form", { class: "ask", "aria-label": "Explore a brand", onsubmit: (e) => {
       e.preventDefault();
       const name = input.value.trim();
       if (!name) { err.textContent = "Enter a brand name."; input.focus(); return; }
@@ -99,28 +96,31 @@ function renderStart() {
     } },
     h("label", { class: "kicker", for: "brand", text: "Brand" }),
     h("div", { class: "askrow" }, input,
-      h("button", { class: "btn", type: "submit", "data-starts": true, disabled: !live, "data-never": !live, text: "Research →" })),
+      h("button", { class: "btn", type: "submit", "data-starts": true, disabled: !live, "data-never": !live, text: "Explore a scent direction" })),
     err,
-    h("p", { class: "tries mute" }, "Try",
+    h("div", { class: "intent" },
+      h("label", { class: "kicker", for: "intent", text: "Brief purpose (optional)" }), intent,
+      h("p", { class: "hint", id: "intent-hint", text: "Used in the brief only; it does not change the direction." })),
+    h("p", { class: "tries" }, "Or try",
       (config ? config.examples : ["MUJI", "Ralph Lauren"]).map((name) => h("button", { type: "button", "data-starts": true,
-        disabled: !live, "data-never": !live, onclick: () => { input.value = name; go(name); } }, name)),
-      h("button", { type: "button", class: "addintent", "aria-controls": "intent-box", "aria-expanded": "false",
-        onclick: (e) => { const on = intentBox.classList.toggle("on"); e.currentTarget.setAttribute("aria-expanded", String(on)); if (on) intent.focus(); } },
-        "+ intent")),
-    intentBox);
-  const notices = [];
-  if (config && !config.live_available) notices.push(h("p", { class: "notice", role: "status", text: "Live Qloo access is not configured on this server, so searches cannot run. Nothing is replaced with sample data." }));
-  if (config && config.mode === "recorded") notices.push(h("p", { class: "notice", text: "Local preview: stored Qloo responses, no live requests. Only recorded brands work." }));
+        disabled: !live, "data-never": !live, onclick: () => { input.value = name; go(name); } }, name))));
+  const llm = config && config.llm === "configured";
+  const notice = config && !config.live_available
+    ? h("p", { class: "notice", role: "status", text: "Live Qloo access is not configured on this server, so searches cannot run. Nothing is replaced with sample data." }) : null;
   swap(h("section", { class: "hero" },
-    h("h1", {}, h("span", { text: "If a brand" }), h("span", { text: "were a" }), h("span", { class: "acc", text: "scent." })),
-    h("aside", { class: "index", "aria-label": "How MOTIF works" }, h("p", { class: "kicker", text: "How it works" }), h("ol", {},
-      h("li", {}, h("b", { text: "01" }), h("span", {}, src("Qloo"), " returns how culture describes the brand, and the brands and films it relates to it.")),
-      h("li", {}, h("b", { text: "02" }), h("span", {}, src("MOTIF"), " finds repeated motifs and translates them, rule by rule, into a direction and verified starting materials.")),
-      h("li", {}, h("b", { text: "03" }), h("span", {}, src("Claude"), " writes the brief in words; MOTIF checks it against the result. Without a key, a fixed template writes it.")))),
-    h("div", { class: "ask-wrap", style: null }, notices),
-    form,
-    h("div", { class: "foot" }, h("span", { text: "A creative direction for a perfumer. Never a formula, a dose, or a prediction of who will like it." }),
-      h("span", { text: "A search makes up to four requests to the Qloo API." }))));
+      h("h1", {}, h("span", { text: "If a brand" }), h("span", { text: "were a" }), h("span", { class: "acc", text: "scent." })),
+      h("p", { class: "benefit", text: "Turn a brand's cultural references into a scent direction, starting materials, and a one-page brief for a perfumer, with every step traceable." }),
+      notice, form),
+    h("section", { class: "how", "aria-labelledby": "how-title" },
+      h("h2", { class: "kicker", id: "how-title", text: "How it works" }),
+      h("ol", {},
+        h("li", {}, h("b", { text: "01" }), h("span", { class: "st" }, src("Qloo"), " Cultural references"),
+          h("span", { text: "How Qloo describes the brand, and the brands and films it relates to it." })),
+        h("li", {}, h("b", { text: "02" }), h("span", { class: "st" }, src("MOTIF"), " Scent direction"),
+          h("span", { text: "Repeated motifs, translated by visible rules into a direction and verified starting materials." })),
+        h("li", {}, h("b", { text: "03" }), h("span", { class: "st" }, llm ? src("Claude") : src("MOTIF"), " Brief"),
+          h("span", { text: llm ? "Claude writes the brief from the result; MOTIF checks it against the result."
+            : "MOTIF writes the brief from the result with a fixed template." })))));
   window.scrollTo({ top: 0 });
 }
 
@@ -133,27 +133,43 @@ function stepList(steps) {
     h("li", { class: s.status },
       h("span", { class: "n", text: String(i + 1).padStart(2, "0") }),
       h("span", { class: "t" }, s.label, " ", h("span", { class: "st", text: "· " + STATE[s.status] })),
-      src(s.who),
+      s.who ? src(s.who) : h("span", {}),
       s.detail ? h("span", { class: "d", text: s.detail }) : null)));
 }
 
 function renderProgress(s) {
   const running = s.steps.find((x) => x.status === "running");
-  const now = running ? h("div", { class: "now", "aria-hidden": "true" }, h("div", { class: "kicker", text: "Now · " + running.who }), running.label) : null;
   if (shown.id === s.id && shown.mode === "progress") {
     view.querySelector(".toc ol").replaceWith(stepList(s.steps));
-    const old = view.querySelector(".now");
-    if (old) old.remove();
-    if (now) view.querySelector(".rs").append(now);
   } else {
     shown = { id: s.id, mode: "progress" };
     swap(h("section", { class: "rs" },
       h("h1", { class: "brand" }, s.reference, h("small", { text: "Researching. Each line is a real step on the server; nothing is estimated." })),
-      h("div", { class: "toc" }, h("p", { class: "kicker", text: "Steps of this research" }), stepList(s.steps)),
-      now));
+      h("div", { class: "toc" }, h("p", { class: "kicker", text: "Steps of this research" }), stepList(s.steps))));
     focusHeading();
   }
   if (running && running.key !== shown.step) { shown.step = running.key; say(running.label + ": in progress"); }
+}
+
+// ---------- retry (one controlled retry after a failed Qloo request) ----------
+
+function retryBlock(s) {
+  const r = s.retry || {};
+  if (r.retried_by) return h("p", {}, h("a", { href: "#/s/" + r.retried_by, text: "See the retried search" }));
+  if (r.available) {
+    const err = h("p", { class: "form-error", role: "alert" });
+    return h("div", { class: "actions" }, h("button", { class: "btn", type: "button", "data-starts": true, onclick: async (e) => {
+      if (posting) return;
+      posting = true; e.currentTarget.disabled = true;
+      const res = await api("/api/sessions/" + encodeURIComponent(s.id) + "/retry", { method: "POST", body: "{}" });
+      posting = false;
+      if (res.ok && res.data && res.data.id) { location.hash = "#/s/" + res.data.id; return; }
+      e.currentTarget.disabled = false;
+      err.textContent = (res.data && res.data.error) || "The retry could not be started.";
+    } }, "Try the failed step again"), err);
+  }
+  if (r.used) return h("p", { class: "mute small", text: "This search was already retried once." });
+  return null;
 }
 
 // ---------- questions ----------
@@ -187,7 +203,11 @@ function renderConflict(s) {
     h("h1", { text: "Two ways on " + axis.name.toLowerCase() }),
     h("p", { class: "lede", text: "Different motifs push this dimension toward opposite poles. MOTIF does not average them: choose one, or leave it open." }),
     s.intent ? h("p", { class: "intentline", text: "Your stated purpose: " + s.intent }) : null,
-    h("ul", { class: "options" }, (axis.pushes || []).map((p) => h("li", { class: "option" }, h("div", { class: "name", text: cap(p.motif) + " → " + p.pole })))),
+    h("ul", { class: "options" }, (axis.pushes || []).map((p) => {
+      const row = ((s.result && s.result.profile) || []).find((x) => x.motif === p.motif);
+      return h("li", { class: "option" }, h("div", {}, h("div", { class: "name", text: (row ? row.label : cap(p.motif)) + " → " + p.pole }),
+        row ? h("div", { class: "meta", text: row.strength_label + " · " + row.source_short.join(", ") }) : null));
+    })),
     h("div", { class: "actions" }, q.options.map((opt) => h("button", { class: opt === "open" ? "btn ghost" : "btn", type: "button", "data-starts": true,
       onclick: () => startSearch(s.reference, { choose: s.choose, parent: s.id, intent: s.intent || "",
         resolve_conflict: Object.assign({}, s.overrides || {}, { [q.axis]: opt }) }) }, opt === "open" ? "Leave it open" : "Toward " + opt)))));
@@ -201,28 +221,46 @@ function section(num, title, ...body) {
     h("h2", {}, h("span", { class: "num", text: num }), title), h("div", { class: "body" }, body));
 }
 
+function supplierLink(url) {
+  let host = "";
+  try { host = new URL(url).hostname; } catch (e) { return null; }
+  return h("a", { href: url, target: "_blank", rel: "noopener noreferrer", text: host });
+}
+
 function materialDetail(m, brand) {
+  const asked = m.props.filter((p) => p.requested);
+  const other = m.props.filter((p) => !p.requested);
+  const quote = (p) => h("div", { class: "prop" },
+    h("div", { class: "k", text: p.axis + ": " + p.word }),
+    h("div", {}, p.supplier_text ? h("q", { text: p.supplier_text }) : null,
+      p.source_url ? h("div", { class: "why" }, "Supplier page: ", supplierLink(p.source_url)) : null));
   return h("div", { class: "matdetail", id: "matdetail", tabindex: "-1" },
-    h("p", { class: "kicker", text: m.slot ? "Suggested starting role: " + m.slot : "Reference only" }),
-    h("h3", { text: m.name }),
+    h("p", { class: "kicker", text: "Suggested starting role: " + m.slot }),
+    h("h3", {}, m.name, h("span", { class: "sc", text: " · " + (m.scent || "") })),
     h("p", { class: "mute", text: (m.plain ? cap(m.plain) + " · " : "") + (m.supplier_short || "") }),
-    h("p", { text: m.slot ? "A starting point for the perfumer, not a tested formula: the role says where MOTIF suggests trying it, not how the scent will develop or last." : "Shown for reference; no composition is proposed." }),
-    m.props.map((p) => h("div", { class: "prop" },
-      h("div", { class: "k" }, p.axis + ": " + p.pole,
-        h("em", { text: p.requested ? "Asked for by " + brand + "'s direction" : "Supplier-described; " + p.axis.toLowerCase() + " is open in this direction" })),
-      h("div", {},
-        p.supplier_text ? h("q", { text: p.supplier_text }) : null,
-        p.source_url ? h("div", { class: "why" }, "Supplier page: ", h("a", { href: p.source_url, target: "_blank", rel: "noopener noreferrer", text: new URL(p.source_url).hostname })) : null,
-        p.interpretation ? h("div", { class: "why", text: "MOTIF's reading: " + p.interpretation }) : null))),
+    h("h4", { text: "Why MOTIF chose it" }),
+    h("p", { text: "It fits " + brand + "'s proposed direction on " + m.fits.map((f) => f.toLowerCase()).join(" and ")
+      + ". A starting point for the perfumer, not a tested formula." }),
+    asked.length ? [h("h4", { text: "Supplier's description (verified on the supplier's page)" }), asked.map(quote)] : null,
+    other.length ? [h("h4", { text: "Also described by the supplier" }),
+      h("p", { class: "mute small", text: "On dimensions still open in this direction: creative choices, not evidence about " + brand + "." }),
+      other.map(quote)] : null,
+    m.props.some((p) => p.interpretation) ? [h("h4", { text: "MOTIF's reading" }),
+      h("ul", { class: "reading" }, m.props.filter((p) => p.interpretation).map((p) => h("li", { text: p.interpretation })))] : null,
     h("p", { class: "patnote", text: MotifStrips.NOTE }));
+}
+
+function referenceList(ref) {
+  return [h("p", { class: "intro", text: ref.note }),
+    h("ul", { class: "candlist" }, ref.items.map((m) => h("li", {},
+      h("b", { text: m.name }), " · " + (m.scent || "") + " · fits " + m.fits.map((f) => f.toLowerCase()).join(", ") + " · ",
+      m.source ? h("a", { href: m.source.url, target: "_blank", rel: "noopener noreferrer", text: m.source.supplier + " page" }) : m.supplier_short)))];
 }
 
 function materialsBlock(r, brand) {
   const mats = r.materials;
   if (!mats.selected.length) {
-    return h("div", { class: "nocomp" }, h("p", { text: mats.status_text }),
-      mats.candidates.length ? [h("p", { class: "kicker", text: "Verified materials that fit the supported direction (reference only)" }),
-        h("ul", { class: "candlist" }, mats.candidates.map((m) => h("li", {}, h("b", { text: m.name }), " · " + (m.scent || "") + " · " + m.supplier_short)))] : null);
+    return h("div", { class: "nocomp" }, h("p", { text: mats.status_text }), mats.reference ? referenceList(mats.reference) : null);
   }
   const detailHost = h("div", {});
   const buttons = [];
@@ -237,21 +275,20 @@ function materialsBlock(r, brand) {
     const strip = h("span", { class: "strip", "aria-hidden": "true" });
     strip.append(MotifStrips.svg(m.props));
     const btn = h("button", { type: "button", class: "mat", "aria-expanded": "false", "aria-controls": "matdetail",
-      "aria-label": m.slot + ": " + m.name + ", " + (m.scent || "") + ". Show role and sources." },
+      "aria-label": m.slot + ", suggested starting role: " + m.name + ", " + (m.scent || "") + ". Show why and sources." },
       strip,
-      h("span", {}, h("span", { class: "slot", text: m.slot }), h("span", { class: "role", text: "starting role" }),
-        h("span", { class: "nm", text: m.name }), h("span", { class: "pl", text: m.plain || "" }),
-        h("span", { class: "sc", text: cap(m.scent || "") }), h("span", { class: "more", text: "Role and sources" })));
+      h("span", {}, h("span", { class: "slot", text: m.slot }), h("span", { class: "role", text: "suggested starting role" }),
+        h("span", { class: "nm", text: m.name }), h("span", { class: "sc", text: m.scent || "" }),
+        h("span", { class: "more", text: "Why and sources" })));
     btn.addEventListener("click", () => select(m, btn));
     buttons.push(btn);
     return btn;
   }));
   if (openMaterial) {
-    const m = mats.selected.find((x) => x.id === openMaterial);
-    const i = mats.selected.indexOf(m);
-    if (m) { buttons[i].setAttribute("aria-expanded", "true"); detailHost.append(materialDetail(m, brand)); }
+    const i = mats.selected.findIndex((x) => x.id === openMaterial);
+    if (i >= 0) { buttons[i].setAttribute("aria-expanded", "true"); detailHost.append(materialDetail(mats.selected[i], brand)); }
   }
-  return [h("p", { class: "intro", text: mats.status_text + " Select a strip for its role and the supplier's own words." }), grid, detailHost,
+  return [h("p", { class: "intro", text: mats.status_text + " Select a strip for why and the supplier's own words." }), grid, detailHost,
     mats.empty_slots && mats.empty_slots.length ? h("p", { class: "mute small", text: "No verified material for: " + mats.empty_slots.join(", ") + ". MOTIF leaves it empty rather than inventing one." }) : null];
 }
 
@@ -260,43 +297,41 @@ function phraseButtons(items, motif) {
     "aria-label": "Evidence: " + e.tag + " from " + e.entity }, e.tag, h("span", { class: "ent", text: e.entity }))));
 }
 
-function whyBlock(r, brand) {
-  const targets = r.axes.filter((a) => a.state === "target");
-  if (!targets.length) return h("p", { class: "intro", text: r.headline + (r.headline_note ? " " + r.headline_note : "") });
-  return h("ul", { class: "basis" }, targets.map((a) => {
-    const motifs = r.motifs.filter((m) => a.motifs.includes(m.motif));
-    const ev = motifs.flatMap((m) => m.evidence.map((e) => [e, m]));
-    ev.sort((x, y) => (x[0].source_kind === "own" ? 0 : 1) - (y[0].source_kind === "own" ? 0 : 1));
-    const seen = new Set();
-    const picks = ev.filter(([e]) => (seen.has(e.tag) ? false : seen.add(e.tag))).slice(0, 4);
-    return h("li", {},
-      h("div", { class: "ax" }, a.value, h("small", { text: a.name + " · " + motifs.map((m) => m.label.toLowerCase()).join(", ") })),
-      h("div", {}, h("p", { class: a.basis && a.basis.kind === "related_only" ? "rel" : null, text: a.basis ? a.basis.text : "" }),
-        picks.map(([e, m]) => phraseButtons([e], m))));
-  }));
+function profileBlock(r, brand) {
+  if (!r.profile.length) return h("p", { class: "intro", text: r.headline.lines.join(" ") || r.outcome_text });
+  const byMotif = Object.fromEntries(r.motifs.map((m) => [m.motif, m]));
+  return [h("p", { class: "intro", text: "Motifs MOTIF found in the descriptors Qloo returned, strongest evidence first. Motifs from " + brand + "'s own entry lead." }),
+    h("ul", { class: "basis" }, r.profile.map((p) => h("li", {},
+      h("div", { class: "ax" }, p.label, h("small", { text: p.strength_label + " · " + p.source_short.join(", ") })),
+      h("div", {},
+        h("p", { class: p.basis.kind === "related_only" ? "rel" : null, text: p.basis.text }),
+        h("p", { class: "tr" + (p.state === "direction" ? "" : " open"), text: p.translation }),
+        phraseButtons(p.examples, byMotif[p.motif] || { label: p.label, strength_label: p.strength_label, rule: null })))))];
 }
 
-function decisionsBlock(r, brand, s) {
+function decisionsBlock(r, brand) {
   const items = [];
-  for (const a of r.axes.filter((x) => x.state !== "target")) {
-    const leaning = r.materials.selected.flatMap((m) => m.props.filter((p) => p.axis === a.name).map((p) => m.name + " leans " + p.pole));
-    items.push(h("li", {}, h("div", {}, a.name + ": " + a.poles[0] + " or " + a.poles[1] + "?",
+  for (const q of r.design_questions) items.push(h("li", {}, h("div", {}, "How should " + q.label + " be expressed?", h("small", { text: q.text }))));
+  for (const a of r.still_open) {
+    const leaning = r.materials.selected.flatMap((m) => m.props.filter((p) => p.axis === a.axis).map((p) => m.name + " leans " + p.word));
+    items.push(h("li", {}, h("div", {}, a.axis + ": " + a.poles[0] + " or " + a.poles[1] + "?",
       h("small", { text: (a.state === "conflicted" ? "The evidence points both ways." : "Not decided by the evidence; not a midpoint.")
         + (leaning.length ? " Supplier-described: " + leaning.join("; ") + "." : "") }))));
   }
-  for (const q of r.design_questions) items.push(h("li", {}, h("div", {}, cap(q.label) + ": how should it be expressed?", h("small", { text: q.text }))));
-  items.push(h("li", {}, h("div", {}, "Proportions, further materials, and whether it reads as " + brand + ".", h("small", { text: "Only smelling can decide these. MOTIF gives no doses." }))));
+  items.push(h("li", {}, h("div", {}, "Proportions, further materials, and whether it reads as " + brand + ".", h("small", { text: "Only smelling can decide these." }))));
   return h("ol", { class: "dec" }, items);
 }
 
 function briefBlock(s) {
   const b = s.brief;
   if (!b) return h("p", { class: "intro", text: "No brief is written for a stopped or incomplete result." });
+  const note = b.note || "";
   const byline = b.author === "llm"
-    ? ["Written by ", src("Claude"), " " + b.model + " from the engine result, then checked against it. It chose no motif, direction, or material."]
-    : [src("MOTIF"), " " + (/budget/.test(b.note || "") ? "The LLM call budget is used up, so this is MOTIF's fixed template."
-        : /failed validation/.test(b.note || "") ? "The LLM's text did not pass MOTIF's checks, so this is MOTIF's fixed template."
-        : /failed/.test(b.note || "") ? "The LLM call did not succeed, so this is MOTIF's fixed template, not LLM output."
+    ? ["Written by ", src("Claude"), " " + b.model + " from the result, then checked against it. It chose no motif, direction, or material."]
+    : [src("MOTIF"), " " + (/paused/.test(note) ? note
+        : /budget/.test(note) ? "The LLM call budget is used up, so this is MOTIF's fixed template."
+        : /failed validation/.test(note) ? "The LLM's text did not pass MOTIF's checks, so this is MOTIF's fixed template."
+        : /failed/.test(note) ? "The LLM call did not succeed, so this is MOTIF's fixed template, not LLM output."
         : "Written by MOTIF's fixed template; no LLM is configured on this server.")];
   return h("div", { class: "brief" }, h("p", { class: "text", text: b.text }), h("p", { class: "byline" }, byline),
     h("div", { class: "actions" },
@@ -306,9 +341,7 @@ function briefBlock(s) {
 
 function suggestionsBlock(s, r) {
   const sg = s.suggestions || { status: "unavailable", suggestions: [] };
-  const box = h("div", {});
-  const body = [];
-  body.push(h("p", { class: "intro", text: "MOTIF's lexicon reads only some of the descriptors Qloo returned. On request, Claude can suggest up to three readings for unread ones. A suggestion is not applied: accepting it records your interpretation in the brief, never as Qloo evidence, and changes no direction, material, or score." }));
+  const body = [h("p", { class: "intro", text: "On request, Claude suggests up to three readings for descriptors MOTIF's lexicon does not read. Nothing is applied: an accepted reading becomes your note in the brief, never Qloo evidence, and changes no direction or material." })];
   if (r.unread && r.unread.length) {
     body.push(h("p", { class: "mute small" }, "Unread here: ", r.unread.slice(0, 6).map((u, i) => [i ? ", " : "", u.descriptor + (u.own ? " (brand's own)" : " (" + u.entities.length + " references)")])));
   }
@@ -328,8 +361,7 @@ function suggestionsBlock(s, r) {
           h("button", { class: "btn ghost", type: "button", onclick: () => decide(s, it.id, "reject") }, "Reject")]
           : h("button", { class: "link", type: "button", onclick: () => decide(s, it.id, "undo") }, "Undo"))));
   }
-  box.append(...body);
-  return h("details", { class: "fold", id: "suggest" }, h("summary", {}, "Suggested interpretations", h("small", { text: "Optional · for descriptors MOTIF does not read · never applied automatically" })), box);
+  return h("details", { class: "fold", id: "suggest" }, h("summary", {}, "Suggested interpretations", h("small", { text: "Optional · for descriptors MOTIF does not read · never applied automatically" })), h("div", {}, body));
 }
 
 async function requestSuggestions(s, btn) {
@@ -348,6 +380,18 @@ async function decide(s, id, decision) {
   await loadSession(s.id, { keepOpen: "suggest" });
 }
 
+function sourcesList(r) {
+  const q = r.sources.qloo;
+  return h("div", { class: "sources" },
+    h("h3", { class: "kicker", text: "Sources" }),
+    h("ul", {},
+      h("li", {}, h("b", { text: q.api }), " · fetched " + q.dates.join(", ") + " · "
+        + q.requests.map((x) => x.what.toLowerCase() + " (" + x.path + ", " + x.request_id.replace("local:req:", "request ") + ")").join("; ")
+        + ". No public page exists for an API response; the literal values are in the technical JSON."),
+      r.sources.suppliers.map((x) => h("li", {}, h("b", { text: x.supplier }), " · " + x.material + " · ",
+        h("a", { href: x.url, target: "_blank", rel: "noopener noreferrer", text: x.document || x.url }), x.accessed ? " · read " + x.accessed : ""))));
+}
+
 function howBlock(s, r, brand) {
   const active = r.motifs.filter((m) => m.active);
   const rest = r.motifs.filter((m) => !m.active);
@@ -359,15 +403,33 @@ function howBlock(s, r, brand) {
       m.excluded.length ? h("div", { class: "rl mute", text: "Set aside by context rules: " + m.excluded.map((e) => e.tag).join(", ") }) : null));
   const res = s.resolution || {};
   return h("details", { class: "fold", id: "how" },
-    h("summary", {}, "How it was made", h("small", { text: "The readable basis first; technical records inside" })),
-    h("p", { class: "intro", text: "Qloo supplied the literal descriptors for " + brand + " and for references it relates to " + brand + ". MOTIF grouped them into motifs with a versioned lexicon and translated motifs into directions with draft rules. A motif repeated across references is a pattern, not proof of an aesthetic. Descriptors marked common appear for at least four of the seven brands in MOTIF's reference sample, which is indicative only." }),
+    h("summary", {}, "How it was made", h("small", { text: "Motifs, rules, and sources; technical records inside" })),
+    h("p", { class: "intro", text: "Qloo supplied the literal descriptors. MOTIF grouped them into motifs with a versioned lexicon and translated motifs into directions with draft rules. A motif repeated across references is a pattern, not proof of an aesthetic; descriptors marked common appear for at least four of the seven brands in MOTIF's reference sample." }),
     active.length ? active.map(motifRow) : h("p", { text: "No motif reached the threshold for use." }),
     rest.length ? h("details", { class: "tech" }, h("summary", { text: "Seen but not used (" + rest.length + ")" }), rest.map(motifRow)) : null,
+    sourcesList(r),
     h("details", { class: "tech" }, h("summary", { text: "Technical record" }),
-      h("p", {}, "Qloo entity: " + (res.name || brand) + " · " + (s.fetched ? "fetched " + when(s.fetched[0]) : "") + " · " + (s.data_label === "recorded" ? "recorded data (" + (s.recorded_from || []).join(", ") + ")" : "live data")),
+      h("p", { text: "Qloo entity: " + (res.name || brand) + (s.fetched ? " · fetched " + when(s.fetched[0]) : "") }),
       h("p", { text: "Versions: engine " + r.versions.engine + " · lexicon " + r.versions.lexicon + " · rules " + r.versions.rules + " · palette " + r.versions.palette + " · params " + r.versions.params }),
       h("p", { text: "Steps: " + s.steps.map((x) => x.label + " (" + x.status + ")").join(" · ") }),
       h("p", {}, "Every phrase above opens its entity, field, request, and date. Full trail: ", h("a", { href: "/api/sessions/" + encodeURIComponent(s.id) + "/brief.json", download: "motif-brief.json", text: "technical JSON" }), ".")));
+}
+
+function directionBlock(r, brand) {
+  const words = r.direction.map((d) => h("span", { class: "w" + (d.relations_only ? " rel" : "") },
+    h("span", { class: "v", text: d.word }), h("small", { text: d.axis + (d.relations_only ? " · related references only" : "") })));
+  const axes = h("details", { class: "axes" }, h("summary", { text: "All six dimensions" }),
+    h("dl", { class: "kv" }, r.axes.map((a) => {
+      const d = r.direction.find((x) => x.key === a.key);
+      return [h("dt", { text: a.name + " (" + a.poles[0] + " / " + a.poles[1] + ")" }),
+        h("dd", { text: d ? d.word + " · " + (d.basis ? d.basis.text : "")
+          : a.state === "conflicted" ? "Open: the evidence points both ways." : "Open: not decided by the evidence; not a midpoint." })];
+    })));
+  return h("div", { class: "dir" },
+    h("p", { class: "kicker", text: "MOTIF's proposed direction" }),
+    words.length ? h("div", { class: "char" }, words) : h("p", { class: "none", text: "None yet." }),
+    r.still_open.length ? h("p", { class: "stillopen", text: "Still open: " + r.still_open.map((a) => a.axis.toLowerCase()).join(", ") + "." }) : null,
+    axes);
 }
 
 function renderResult(s, opts) {
@@ -379,26 +441,23 @@ function renderResult(s, opts) {
   shown = { id: s.id, mode: "result" };
   const made = [src("Qloo"), src("MOTIF"), s.brief && s.brief.author === "llm" ? src("Claude") : null];
   const banners = [];
-  if (s.status === "stopped") banners.push(h("p", { class: "notice", role: "status" }, h("b", { text: "Research stopped early. " }), (s.message || "") + " What follows uses only the evidence fetched before the stop; it is incomplete."));
-  if (s.data_label === "recorded") banners.push(h("p", { class: "notice", text: "Recorded data: stored Qloo responses, not live requests." }));
-  const targets = r.axes.filter((a) => a.state === "target");
-  const open = r.axes.filter((a) => a.state !== "target");
+  if (s.status === "stopped") banners.push(h("div", { class: "notice", role: "status" },
+    h("p", {}, h("b", { text: "Research stopped early. " }), (s.message || "") + " What follows uses only what was fetched before the stop."), retryBlock(s)));
   swap(h("section", { class: "res" },
     banners,
     h("div", { class: "lead" },
-      h("div", { class: "meta" }, h("p", { class: "kicker", text: s.status === "stopped" ? "Partial result" : "Scent direction" }),
+      h("div", { class: "meta" }, h("p", { class: "kicker", text: r.headline.label }),
         h("h1", { class: brand.length > 12 ? "long" : brand.length > 5 ? "mid" : null, text: brand }),
-        h("div", { class: "facts", text: brand.toLowerCase() !== s.reference.toLowerCase() ? "You typed: " + s.reference : "" }),
+        brand.toLowerCase() !== s.reference.toLowerCase() ? h("div", { class: "facts", text: "You typed: " + s.reference }) : null,
         h("div", { class: "made" }, made)),
-      h("p", { class: "idea", text: r.idea }),
-      h("div", { class: "below" },
-        h("div", { class: "char" }, targets.map((a) => h("span", { class: "w", text: a.value })), open.map((a) => h("span", { class: "o", text: a.name }))),
-        h("p", { class: "charnote", text: (targets.length ? "Set by the evidence: " + targets.map((a) => a.name.toLowerCase() + " → " + a.value).join(", ") + ". " : "")
-          + (open.length ? "Outlined: left open by the evidence (" + open.map((a) => a.name.toLowerCase()).join(", ") + "), not midpoints." : "") }),
-        s.intent ? h("p", { class: "intentline", text: "Your stated purpose: “" + s.intent + "”. " + (s.intent_effect || "") }) : null)),
+      h("div", { class: "main" },
+        h("p", { class: "idea", text: r.headline.title }),
+        r.headline.lines.map((line) => h("p", { class: "line", text: line })),
+        directionBlock(r, brand),
+        s.intent ? h("p", { class: "intentline", text: "Brief purpose: “" + s.intent + "”. " + (s.intent_effect || "") }) : null)),
     section("01", "Starting materials", materialsBlock(r, brand)),
-    section("02", "Why " + brand, whyBlock(r, brand)),
-    section("03", "Open decisions", decisionsBlock(r, brand, s)),
+    section("02", "Cultural profile", profileBlock(r, brand)),
+    section("03", "Open decisions", decisionsBlock(r, brand)),
     section("04", "The brief", briefBlock(s)),
     section("05", "Notes", suggestionsBlock(s, r)),
     section("06", "Basis", howBlock(s, r, brand))));
@@ -441,8 +500,9 @@ function renderProblem(title, text, s) {
   shown = { id: s ? s.id : null, mode: "problem" };
   swap(h("section", { class: "state-panel" },
     h("p", { class: "kicker", text: s ? "Research stopped" : "Problem" }), h("h1", { text: title }), h("p", { class: "lede", text }),
+    s ? retryBlock(s) : null,
     s && s.steps ? h("div", { class: "toc" }, stepList(s.steps)) : null,
-    h("div", { class: "actions" }, h("a", { class: "btn", href: "#/", text: "Back to the start" }))));
+    h("div", { class: "actions" }, h("a", { class: "btn ghost", href: "#/", text: "Back to the start" }))));
   focusHeading();
 }
 
@@ -481,10 +541,7 @@ async function boot() {
   config = res.ok ? res.data : null;
   const mode = document.getElementById("mode");
   if (config) {
-    mode.textContent = config.mode_label;
-    mode.classList.toggle("recorded", config.mode === "recorded");
-    mode.hidden = false;
-    document.getElementById("versions").textContent = Object.values(config.versions || {}).join(" · ");
+    if (config.mode_label) { mode.textContent = config.mode_label; mode.hidden = false; }  // local development only
   }
   window.addEventListener("hashchange", route);
   route();

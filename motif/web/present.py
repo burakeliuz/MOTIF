@@ -8,10 +8,12 @@ explanations so the browser stays a thin renderer.
 from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
+from urllib.parse import urlparse
 
 from ..brief import AXIS_LABELS, open_axes
 from ..config import AXES
-from ..narrative import axis_basis, idea, is_common, open_design_questions, unread_descriptors
+from ..narrative import (POLE_WORDS, axis_basis, headline, is_common, open_design_questions, poss, profile,
+                         unread_descriptors)
 
 POLES = {"warm_cool": ("warm", "cool"), "light_dense": ("light", "dense"), "raw_polished": ("raw", "polished"),
          "natural_synthetic": ("natural", "synthetic"), "intimate_projecting": ("intimate", "projecting"),
@@ -20,6 +22,7 @@ AXIS_NAMES = {"warm_cool": "Temperature", "light_dense": "Weight", "raw_polished
               "natural_synthetic": "Impression", "intimate_projecting": "Projection", "sweet_dry": "Sweetness"}
 SOURCE_LABELS = {"own": "Brand's own Qloo description", "brand": "Related brands", "movie": "Related films",
                  "artist": "Related music artists"}
+SOURCE_SHORT = {"own": "own entry", "brand": "related brands", "movie": "related films", "artist": "related artists"}
 STRENGTH_WORDS = {"strong": "Strong support", "moderate": "Moderate support", "weak": "Seen, not enough to count",
                   "context_only": "Only very common descriptors"}
 TYPE_LABELS = {"urn:entity:brand": "Brand", "urn:entity:place": "Store or venue", "urn:entity:person": "Person",
@@ -28,17 +31,20 @@ TYPE_LABELS = {"urn:entity:brand": "Brand", "urn:entity:place": "Store or venue"
 RELATIONS_ONLY_TEXT = ("Derived only from references Qloo relates to {name}, not from the brand's own descriptors: "
                        "a creative suggestion, not a described trait of the brand.")
 # Plain-language copy for each palette material, written only from the supplier's own words
-# quoted in config/material_palette.json (presentation, not evidence).
+# quoted in config/material_palette.json (presentation, not evidence). `scent` is the short label
+# shown next to the name on a strip.
 MATERIAL_PLAIN = {
-    "M01": {"what": "a transparent, jasmine-like molecule", "scent": "transparent floral with citrus freshness"},
-    "M02": {"what": "a cold-pressed citrus oil", "scent": "bright, sparkling citrus"},
+    "M01": {"what": "a transparent, jasmine-like molecule", "scent": "transparent floral"},
+    "M02": {"what": "a cold-pressed citrus oil", "scent": "bright citrus"},
     "M03": {"what": "a woody molecule (properties not verified)", "scent": "not verified"},
-    "M04": {"what": "an ambery, woody molecule", "scent": "powerful ambery, musky-woody"},
-    "M05": {"what": "a musk molecule", "scent": "elegant musk with a slightly woody undertone"},
-    "M06": {"what": "a natural essential oil", "scent": "dry and woody, earthy and smoky"},
-    "M07": {"what": "a natural absolute", "scent": "warm, leathery, woody and ambery"},
-    "M08": {"what": "a natural orris (iris) extract", "scent": "earthy, with woody facets"},
+    "M04": {"what": "an ambery, woody molecule", "scent": "ambery, woody"},
+    "M05": {"what": "a musk molecule", "scent": "musk"},
+    "M06": {"what": "a natural essential oil", "scent": "dry, woody, earthy"},
+    "M07": {"what": "a natural absolute", "scent": "warm, ambery"},
+    "M08": {"what": "a natural orris (iris) extract", "scent": "earthy, powdery"},
 }
+SUPPLIER_NAMES = {"www.firmenich.com": "dsm-firmenich", "www.givaudan.com": "Givaudan", "www.iff.com": "IFF"}
+QLOO_PATHS = {"/search": "search", "/entities": "the brand's own entry", "/v2/insights": "related references"}
 OUTCOME_COPY = {
     "composed": ("A scent direction with verified starting materials.", None),
     "no_verified_materials": ("A scent direction, but no verified palette material fits it yet.",
@@ -54,12 +60,11 @@ OUTCOME_COPY = {
     "conflicted": ("The evidence points two ways on one dimension.", "Choose a direction or leave it open."),
 }
 MATERIAL_STATUS_COPY = {
-    "composed": "Proposed starting materials. Each one matches a direction on a property checked against the supplier's own page.",
-    "gated_insufficient_axes": ("No composition: MOTIF needs at least two supported directions before it suggests materials "
-                                "(a design threshold). Verified materials that fit the one supported direction are listed for reference only."),
+    "composed": "Suggested starting materials. Each matches a direction on a property verified on the supplier's own page.",
+    "gated_insufficient_axes": "No composition: MOTIF suggests materials only when at least two directions are supported (a design threshold).",
     "no_verified_materials": "No verified palette material fits these directions, so none is suggested.",
     "insufficient_eligible_materials": "Fewer than two verified materials fit these directions, so no composition is proposed.",
-    "no_targets": "No direction is supported by the evidence, so no materials are suggested.",
+    "no_targets": "No direction is supported, so no materials are suggested.",
 }
 MOTIF_NOTES = {
     "restrained": "Restraint", "precise": "Precision", "natural": "Naturalness", "opulent": "Opulence",
@@ -138,20 +143,26 @@ def result_view(name: str, result: Dict[str, Any], rules: Dict[str, Any], palett
         })
     by_id = {m["material_id"]: m for m in palette["materials"]}
     mats = result["materials"]
+    targets = [a for a in AXES if result["axes"][a]["state"] == "target"]
 
     def material_view(row: Dict[str, Any]) -> Dict[str, Any]:
         src = by_id[row["material_id"]]
         checks = src.get("property_verification", {})
-        targets = {a for a in AXES if result["axes"][a]["state"] == "target"}
-        props = [{"axis": AXIS_NAMES[a], "pole": p, "requested": a in targets,
+        props = [{"axis": AXIS_NAMES[a], "pole": p, "word": POLE_WORDS.get(p, p), "requested": a in targets,
                   "supplier_text": (checks.get(a) or {}).get("supporting_text"),
                   "interpretation": (checks.get(a) or {}).get("motif_interpretation"),
                   "source_url": (checks.get(a) or {}).get("source_url")}
                  for a, p in sorted(row.get("usable_profile", {}).items(), key=lambda x: AXES.index(x[0]))]
         plain = MATERIAL_PLAIN.get(row["material_id"], {})
+        urls = [x["source_url"] for x in props if x["source_url"]]
+        accessed = sorted({(checks.get(a) or {}).get("accessed") for a in row.get("usable_profile", {})} - {None})
         return {"id": row["material_id"], "name": row["name"], "slot": row.get("slot"), "score": row.get("score"),
                 "kind": src["kind"], "supplier": src.get("supplier"), "plain": plain.get("what"), "scent": plain.get("scent"),
                 "props": props, "supplier_short": (src.get("supplier") or "").split(" (")[0],
+                "fits": [f"{AXIS_NAMES[a]} → {POLE_WORDS.get(row['usable_profile'][a], row['usable_profile'][a])}"
+                         for a in row.get("matches", [])],
+                "source": ({"supplier": _supplier(urls[0]), "url": urls[0], "document": (src.get("source") or {}).get("document"),
+                            "accessed": accessed[-1] if accessed else None} if urls else None),
                 "matches": [{"axis": AXIS_NAMES[a], "pole": row["usable_profile"][a],
                              "supplier_text": (checks.get(a) or {}).get("supporting_text"),
                              "interpretation": (checks.get(a) or {}).get("motif_interpretation"),
@@ -161,25 +172,115 @@ def result_view(name: str, result: Dict[str, Any], rules: Dict[str, Any], palett
                                       "supplier_text": (checks.get(u["axis"]) or {}).get("supporting_text")}
                                      for u in row.get("unrequested_properties", [])],
                 "reason": _axis_words(row.get("reason"))}
+
+    selected = [material_view(m) for m in mats.get("selected", [])]
+    reference = None
+    if mats["status"] != "composed" and mats.get("ranked"):
+        reference = {"note": "For reference only, not a composition: verified materials that fit "
+                             + ("the supported direction." if len(targets) == 1 else "the supported directions."),
+                     "items": [material_view(m) for m in mats["ranked"]]}
+    status_text = MATERIAL_STATUS_COPY.get(mats["status"], mats["status"])
+    if mats["status"] == "gated_insufficient_axes" and not reference:
+        status_text += " No verified material fits the supported direction either."
+    shown = selected or (reference["items"] if reference else [])
+    head = headline(name, result)
     return {
         "outcome": result["outcome"],
-        "idea": idea(name, result),
+        "headline": head,
+        "idea": head["title"],
+        "profile": profile_view(name, result, ev, ann, rules),
+        "direction": [{"key": a, "axis": AXIS_NAMES[a], "value": result["axes"][a]["value"],
+                       "word": POLE_WORDS.get(result["axes"][a]["value"]),
+                       "relations_only": bool(result["axes"][a].get("relations_only")),
+                       "basis": axis_basis(name, result, a),
+                       "motifs": [MOTIF_NOTES.get(m, m) for m in result["axes"][a]["motifs"]]} for a in targets],
+        "still_open": [{"key": a, "axis": AXIS_NAMES[a], "poles": POLES[a], "state": result["axes"][a]["state"]}
+                       for a in open_axes(result)],
         "design_questions": open_design_questions(name, result),
         "unread": unread_descriptors(result, limit=8),
         "sample": {"brands": 7, "note": "Common in MOTIF's seven-brand reference sample; indicative only."},
-        "headline": OUTCOME_COPY[result["outcome"]][0], "headline_note": OUTCOME_COPY[result["outcome"]][1],
-        "direction": [{"axis": AXIS_NAMES[a], "value": result["axes"][a]["value"]} for a in AXES if result["axes"][a]["state"] == "target"],
+        "outcome_text": OUTCOME_COPY[result["outcome"]][0],
         "open": [AXIS_NAMES[a] for a in open_axes(result)],
         "axes": axes, "motifs": motifs,
         "materials": {"status": mats["status"], "verification_mode": mats["verification_mode"],
-                      "status_text": MATERIAL_STATUS_COPY.get(mats["status"], mats["status"]),
-                      "selected": [material_view(m) for m in mats.get("selected", [])],
-                      "candidates": [material_view(m) for m in mats.get("ranked", [])] if mats["status"] != "composed" else [],
+                      "status_text": status_text, "selected": selected, "reference": reference,
                       "excluded": [material_view(m) for m in mats.get("excluded", [])],
                       "empty_slots": mats.get("empty_slots", []), "gate": mats.get("gate")},
+        "sources": sources_view(result, shown),
         "unmapped_active": [MOTIF_NOTES.get(m, m) for m in result["unmapped_active_motifs"]],
         "versions": dict(result["versions"], engine=result["engine_version"]),
     }
+
+
+def _supplier(url: Optional[str]) -> Optional[str]:
+    host = urlparse(url).netloc if url else ""
+    return SUPPLIER_NAMES.get(host, host) or None
+
+
+MOTIF_BASIS = {
+    "own_and_related": "In {poss} own Qloo descriptors and in references Qloo relates to {name}.",
+    "own_only": "In {poss} own Qloo descriptors.",
+    "related_only": "Only in references Qloo relates to {name}, not in {poss} own descriptors.",
+}
+
+
+def profile_view(name: str, result: Dict[str, Any], ev: Dict[str, Any], ann: Dict[Any, Any],
+                 rules: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """The cultural profile, ranked as in `narrative.profile`, with each motif's examples and translation."""
+    rule_by_motif = {r["motif"]: r for r in rules["rules"]}
+    rows = []
+    for row in profile(name, result):
+        info = result["motifs"][row["motif"]]
+        kinds = set(info["source_kinds"])
+        basis = "own_and_related" if row["own"] and kinds - {"own"} else "own_only" if row["own"] else "related_only"
+        picks, seen = [], set()
+        for i in sorted(info["support_evidence_ids"], key=lambda i: (ev[i]["source_kind"] != "own", i) if i in ev else (True, i)):
+            if i in ev and ev[i]["tag_name"].lower() not in seen:
+                seen.add(ev[i]["tag_name"].lower())
+                picks.append(evidence_view(ev[i], ann.get((row["motif"], i))))
+        rule = rule_by_motif.get(row["motif"])
+        if row["state"] == "direction":
+            translation = f"MOTIF's draft rule: {AXIS_NAMES[row['axis']].lower()} → {row['word']}."
+        elif row["state"] == "no_rule":
+            translation = "MOTIF has no scent rule for it yet: an open design question."
+        elif row["state"] == "set_aside":
+            translation = f"You chose the other pole on {AXIS_NAMES[row['axis']].lower()}, so it sets no direction here."
+        else:
+            translation = f"{AXIS_NAMES[row['axis']]} stays open: motifs point both ways."
+        rows.append({"motif": row["motif"], "label": MOTIF_NOTES.get(row["motif"], row["motif"]), "own": row["own"],
+                     "strength": row["strength"], "strength_label": STRENGTH_WORDS[row["strength"]],
+                     "sources": [SOURCE_LABELS[k] for k in info["source_kinds"]],
+                     "source_short": [SOURCE_SHORT[k] for k in info["source_kinds"]], "state": row["state"],
+                     "axis": AXIS_NAMES[row["axis"]] if row["axis"] else None, "word": row["word"],
+                     "rule_id": rule["rule_id"] if rule and row["state"] == "direction" else None,
+                     "basis": {"kind": basis, "text": MOTIF_BASIS[basis].format(poss=poss(name), name=name)},
+                     "translation": translation, "examples": picks[:4]})
+    return rows
+
+
+def sources_view(result: Dict[str, Any], materials: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """The sources behind a result, shared by the web page and the printed brief.
+
+    Qloo is cited by MOTIF's request log IDs, request paths, and fetch dates (no page URL
+    exists for an API response); suppliers by the page each verified property was read on.
+    """
+    requests: Dict[str, Dict[str, Any]] = {}
+    for e in result["evidence"]:
+        rid = e.get("request_id")
+        if rid and rid not in requests:
+            req = e.get("request") or {}
+            requests[rid] = {"request_id": rid, "path": req.get("path"), "what": SOURCE_LABELS[e["source_kind"]],
+                             "fetched_at": e.get("fetched_at")}
+    dates = sorted({(r["fetched_at"] or "")[:10] for r in requests.values()} - {""})
+    suppliers, seen = [], set()
+    for m in materials:
+        src = m.get("source")
+        if src and (src["url"], m["name"]) not in seen:
+            seen.add((src["url"], m["name"]))
+            suppliers.append(dict(src, material=m["name"]))
+    return {"qloo": {"api": "Qloo Hackathon API", "requests": sorted(requests.values(), key=lambda r: r["request_id"]),
+                     "dates": dates},
+            "suppliers": suppliers}
 
 
 def axis_labels() -> Dict[str, str]:

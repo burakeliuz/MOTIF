@@ -42,22 +42,144 @@ def _join(words: List[str]) -> str:
     return words[0] if len(words) == 1 else ", ".join(words[:-1]) + " and " + words[-1]
 
 
+STRENGTH_RANK = {"strong": 0, "moderate": 1, "weak": 2, "context_only": 3}
+# Noun phrases for a direction named on its own ("MOTIF also proposes a light weight").
+POLE_PHRASES = {"light": "a light weight", "dense": "a dense weight", "raw": "a raw texture",
+                "polished": "a smooth-finished texture", "natural": "a natural-feeling impression",
+                "synthetic": "a synthetic-feeling impression", "warm": "warmth", "cool": "coolness",
+                "intimate": "close-wearing projection", "projecting": "diffusive projection", "sweet": "sweetness", "dry": "dryness"}
+
+
+def _or(words: List[str]) -> str:
+    return words[0] if len(words) == 1 else ", ".join(words[:-1]) + " or " + words[-1]
+
+
+def profile(name: str, result: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """The cultural profile: active motifs ranked by the evidence that exists for them.
+
+    Order: support in the brand's own Qloo entry first, then strength, then the number
+    of source kinds, then the number of supporting descriptors. Each row says whether
+    MOTIF translates the motif into a direction ("direction"), has no rule for it
+    ("no_rule"), leaves its dimension open after a conflict ("open"), or the user chose the
+    other pole on its dimension ("set_aside").
+    """
+    target_of, set_aside, split = {}, {}, {}
+    for a in AXES:
+        v = result["axes"][a]
+        if v["state"] == "target":
+            for m in v["motifs"]:
+                target_of[m] = a
+        for m in (v.get("user_choice") or {}).get("overrode_conflict_with", []):
+            set_aside[m] = a  # the user chose the other pole on this axis
+        for push in v.get("pushes", []) if v["state"] == "conflicted" else []:
+            split[push["motif"]] = a  # the axis stays open: motifs point both ways
+    unmapped = set(result.get("unmapped_active_motifs", []))
+    rows = []
+    for m, info in result["motifs"].items():
+        if not info["active"]:
+            continue
+        axis = target_of.get(m) or set_aside.get(m) or split.get(m)
+        state = ("direction" if m in target_of else "set_aside" if m in set_aside else "no_rule" if m in unmapped else "open")
+        pole = result["axes"][axis]["value"] if state == "direction" else None
+        rows.append({"motif": m, "label": MOTIF_LABELS.get(m, m), "own": "own" in info["source_kinds"],
+                     "strength": info["strength"], "source_kinds": list(info["source_kinds"]),
+                     "support_count": len(info["support_evidence_ids"]), "state": state,
+                     "axis": axis, "pole": pole, "word": POLE_WORDS.get(pole) if pole else None})
+    rows.sort(key=lambda r: (not r["own"], STRENGTH_RANK[r["strength"]], -len(r["source_kinds"]), -r["support_count"], r["label"]))
+    return rows
+
+
+def _so_far(name: str, result: Dict[str, Any], targets: List[str]) -> str:
+    word = lambda a: POLE_WORDS.get(result["axes"][a]["value"], result["axes"][a]["value"])
+    chosen = [a for a in targets if result["axes"][a].get("user_choice")]
+    rel = [a for a in targets if a not in chosen and result["axes"][a].get("relations_only")]
+    own = [a for a in targets if a not in chosen and a not in rel]
+    parts = []
+    if own:
+        parts.append(_join([word(a) for a in own]) + " (from " + poss(name) + " own descriptors)")
+    if chosen:
+        parts.append(_join([word(a) for a in chosen]) + " (your choice)")
+    if rel:
+        parts.append(_join([word(a) for a in rel]) + (" (drawn only from references Qloo relates to " + name + ")" if parts
+                                                       else ", drawn only from references Qloo relates to " + name))
+    return "Proposed direction so far: " + " and ".join(parts) + "."
+
+
+def headline(name: str, result: Dict[str, Any]) -> Dict[str, Any]:
+    """The result's lead: a status label, one title, and at most two short lines.
+
+    The identity comes from motifs supported by the brand's own Qloo entry, ranked by
+    evidence (see `profile`). A direction drawn only from references Qloo relates to
+    the brand never leads the title; it is named in a line of its own. A leading motif
+    MOTIF cannot translate stays in the title, and the next creative decision is named.
+    """
+    rows = profile(name, result)
+    own = [r for r in rows if r["own"]]
+    targets = [a for a in AXES if result["axes"][a]["state"] == "target"]
+    rel_targets = [a for a in targets if result["axes"][a].get("relations_only")]
+    composed = result["materials"]["status"] == "composed"
+    lines: List[str] = []
+    if own and own[0]["state"] == "direction":
+        lead = [r for r in own if r["state"] == "direction"]
+        title = (_join([r["label"] for r in lead]).capitalize() + ": a "
+                 + _join(list(dict.fromkeys(r["word"] for r in lead))) + " scent.")
+        rest = [r for r in own if r["state"] != "direction"]
+        if rest:
+            one = len(rest) == 1
+            lines.append(_join([r["label"] for r in rest]).capitalize() + (" is" if one else " are") + " also in "
+                         + poss(name) + " own descriptors; MOTIF does not yet translate " + ("it" if one else "them")
+                         + " into scent, so how to express " + ("it" if one else "them") + " is the next creative decision.")
+        if rel_targets:
+            lines.append("MOTIF also proposes " + _join([POLE_PHRASES[result["axes"][a]["value"]] for a in rel_targets])
+                         + ", drawn only from references Qloo relates to " + name + ".")
+        if not composed and len(lines) < 2:
+            lines.append("One supported direction is not enough for a composition; the other dimensions are open creative decisions."
+                         if result["outcome"] == "partial_direction" else
+                         "No verified starting materials are proposed for this direction yet.")
+        label = "Scent direction" if composed else "Partial direction"
+    elif own:
+        lead = []
+        for r in own:
+            if r["state"] == "direction":
+                break
+            lead.append(r)
+        one = len(lead) == 1
+        labels = [r["label"] for r in lead]
+        title = "A profile led by " + _join(labels) + "."
+        if all(r["state"] == "no_rule" for r in lead):
+            lines.append("MOTIF does not yet translate " + _or(labels) + " into scent; how to express "
+                         + ("it" if one else "them") + " is the next creative decision.")
+        elif all(r["state"] == "set_aside" for r in lead):
+            lines.append("You chose the other pole on " + _join(sorted({AXIS_NAMES[r["axis"]].lower() for r in lead}))
+                         + ", so " + _join(labels) + " sets no direction here; how else to express "
+                         + ("it" if one else "them") + " is the next creative decision.")
+        else:
+            lines.append("MOTIF sets no direction for " + _or(labels) + " here; how to express "
+                         + ("it" if one else "them") + " is the next creative decision.")
+        lines.append(_so_far(name, result, targets) if targets else "No scent direction is proposed yet.")
+        label = "Partial direction" if targets else "No direction yet"
+    elif targets:
+        title = "A " + _join([POLE_WORDS.get(result["axes"][a]["value"]) for a in targets]) + " direction from related references."
+        lines.append(poss(name) + " own Qloo descriptors do not support a direction on their own; this one is drawn only "
+                     "from references Qloo relates to the brand.")
+        label = "Direction from related references"
+    else:
+        title = "Not enough repeated signal for a direction yet."
+        rel = [r for r in rows if r["state"] == "no_rule"]
+        if rel:
+            lines.append("References Qloo relates to " + name + " point to " + _join([r["label"] for r in rel])
+                         + ", which MOTIF does not yet translate into scent.")
+        elif result["outcome"] == "no_descriptive_data":
+            lines.append("Qloo returned no descriptors MOTIF can read for " + name + ".")
+        else:
+            lines.append("Qloo returned descriptors for " + name + ", but none repeated enough to count.")
+        label = "No direction yet"
+    return {"label": label, "title": title, "lines": lines[:2], "provenance": "motif_annotation"}
+
+
 def idea(name: str, result: Dict[str, Any]) -> str:
-    """One sentence that states the direction; built only from targets and active motifs."""
-    targets = [result["axes"][a]["value"] for a in AXES if result["axes"][a]["state"] == "target"]
-    motifs = [MOTIF_LABELS.get(m, m) for m, i in sorted(result["motifs"].items()) if i["active"]
-              and m not in result.get("unmapped_active_motifs", [])]
-    if not targets:
-        unmapped = [MOTIF_LABELS.get(m, m) for m in result.get("unmapped_active_motifs", [])]
-        if unmapped:
-            return f"{name} reads as {_join(unmapped)}, but MOTIF has no scent rule for that yet: the direction is an open question."
-        return f"The descriptors Qloo returned for {name} do not yet support a scent direction."
-    words = [POLE_WORDS.get(t, t) for t in targets]
-    lead = f"A {_join(words)} scent" + (f", built on {_join(motifs)}." if motifs else ".")
-    unmapped = [MOTIF_LABELS.get(m, m) for m in result.get("unmapped_active_motifs", [])]
-    if unmapped:
-        lead += f" {_join(unmapped).capitalize()} {'is' if len(unmapped) == 1 else 'are'} supported too, with no scent rule yet: an open question."
-    return lead
+    """The headline title (kept for the brief JSON's `idea` field)."""
+    return headline(name, result)["title"]
 
 
 def poss(name: str) -> str:
@@ -74,6 +196,11 @@ def axis_basis(name: str, result: Dict[str, Any], axis: str) -> Optional[Dict[st
         kinds.update(result["motifs"][m]["source_kinds"])
     own = "own" in kinds
     related = bool(kinds - {"own"})
+    chosen = (v.get("user_choice") or {}).get("overrode_conflict_with")
+    if chosen:
+        return {"kind": "user_choice",
+                "text": "Chosen by you where motifs pointed both ways (set aside: "
+                        + _join([MOTIF_LABELS.get(m, m) for m in chosen]) + ")."}
     if own and related:
         return {"kind": "own_and_related",
                 "text": f"From {poss(name)} own Qloo descriptors; the same motif also appears in references Qloo relates to {name}."}
@@ -96,8 +223,7 @@ def open_design_questions(name: str, result: Dict[str, Any]) -> List[Dict[str, A
                 phrases.append(ev[i]["tag_name"])
         label = MOTIF_LABELS.get(m, m)
         out.append({"motif": m, "label": label, "examples": phrases[:4],
-                    "text": (f"Qloo descriptors point to {label} ({', '.join(phrases[:3])}). MOTIF has no scent rule for "
-                             f"{label}, so it sets no direction: how should {label} be expressed in this scent?")})
+                    "text": f"Qloo descriptors point to {label} ({', '.join(phrases[:3])}); MOTIF has no scent rule for it yet."})
     return out
 
 

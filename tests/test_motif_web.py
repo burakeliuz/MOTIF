@@ -491,7 +491,7 @@ class IntentAndReadings(unittest.TestCase):
         brief = hub.brief(with_intent["id"])
         self.assertEqual(brief["user_intent"]["provenance"], "user_intent")
         self.assertNotIn("a home scent", json.dumps(brief["evidence"]))
-        self.assertIn("did not change", b["intent_effect"])
+        self.assertIn("brief only", b["intent_effect"])
         self.assertEqual(hub.create({"reference": "Synthbrand", "intent": "x" * 141}, "10.0.0.1")[0], 400)
 
     def test_suggestions_are_checked_cached_and_kept_out_of_the_evidence(self):
