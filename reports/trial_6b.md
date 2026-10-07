@@ -122,3 +122,60 @@ Palettes"; none of these changes the direction today.
 None applied. A rule candidate (R6, provocation → raw texture) and one palette
 candidate are proposed in `docs/STAGE_6A_DECISIONS.md` §0.1. If R6 is adopted,
 Aesop and Supreme are no longer independent checks for it.
+
+## 3. Second trial: four fresh brands (pre-registered 2026-10-07)
+
+### 3.1 Pre-registration (committed before any request for these brands)
+
+Written 2026-10-07, before any Qloo or LLM request for the four brands below.
+Product code frozen at commit `c82aef7`: engine-0.3, lexicon-0.3, rules
+draft-0.2, palette-0.3, params-0.1, reference sample sample-0.1, prose prompt
+prose-0.5 (the brief now opens with MOTIF's own lead), interpretation prompt
+interpret-0.1. Nothing below changes these; if anything changes after the
+results are seen, these brands stop being independent checks and the first
+results stay recorded here unchanged. Failures are kept; no brand is swapped.
+
+**Brands** (never used in MOTIF before; chosen for contrasting cultural
+positions, not for expected results):
+
+| Brand | Why it is in the set |
+|---|---|
+| Gucci | maximalist luxury fashion: tests the opulence path (R4, dense) against a polished house |
+| Harley-Davidson | rugged American heritage outside fashion: tests motifs MOTIF has no rule for (heritage, industrial) |
+| Sanrio | playful character brand: tests a profile led by a motif without a rule (playfulness) |
+| Balenciaga | provocative luxury fashion with sharp tailoring: stress test for the R6 candidate (provocation → raw) against precision → polished |
+
+**Arms** (same shared intent for every arm: "a signature scent for the brand's flagship stores")
+
+| Arm | What runs | Question |
+|---|---|---|
+| A | engine on the brand's own Qloo entry only, from the B recording | what does the own entry support? |
+| A′ | as A, one own cue group sufficient (sensitivity check) | is A empty only because of the threshold? |
+| B | the live web flow (search, own entry, related brands, related films when the controller fetches them), then the brief | what do Qloo's relations add under identical rules? |
+| C | Claude alone (`claude-sonnet-5-5`, effort low), no Qloo data, no engine; JSON with a schema like the brief: one-sentence idea, cultural basis, six dimensions (a pole or "open"), three materials with role and why, open decisions | what does a strong general model propose from its own knowledge? |
+| R6 / olibanum what-if | offline on the B recordings, after B is recorded: baseline, +R6, +olibanum, both | does the unapproved rule or material change these fresh brands, and how? |
+
+C runs first for all four brands, so nothing from B can reach it. A, A′, and
+the what-ifs reuse the B responses; they send no request. R6 was written on
+2026-10-06 (`docs/STAGE_6A_DECISIONS.md` §0.1) before these brands were chosen,
+so they are independent checks of its behaviour, not of its creative merit.
+The olibanum what-if uses only what Givaudan's full page for "Frankincense Oil
+Somalia FairWild" supports (read 2026-10-07): warm, nothing else.
+
+**Fixed choices**: if a name is ambiguous, the brand-type candidate whose name
+matches the input is chosen (the first one in Qloo's order if several); the
+answer reuses the cached search. Interpretation suggestions are requested for
+Harley-Davidson and Sanrio only.
+
+**Budget for this round**: at most 20 live Qloo network attempts (enforced by
+`MOTIF_QLOO_MAX_CALLS_PER_DAY=20` on the trial server; 16 expected) and at most
+15 real LLM calls (enforced by `MOTIF_LLM_MAX_CALLS=15` in the ledger): C 4,
+B brief 4 to 8 (one re-write allowed after a failed check), suggestions 2. No
+Render or hosted-demo request.
+
+**What is compared (descriptively; no human rating, so no "better")**
+
+- Specificity: does the output name things particular to this brand?
+- Cultural grounding: can each claim be traced to a Qloo entity and field?
+- Creative usability: a direction, starting roles, and open decisions a perfumer can act on?
+- False claims: statements the brand's own Qloo entry contradicts, audience claims, invented facts.
