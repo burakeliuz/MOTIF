@@ -207,3 +207,25 @@ PDF, and one-page PDFs. No Qloo or LLM request was made.
   new sections (browser: section order from the served data, role names, "open
   to the perfumer" on both pages, one A4 page, context once, no internal
   wording, no extra request).
+
+## Phase 10: final validation
+
+- `tools/validation_report.py` → `reports/final_validation.md`;
+  `tests/test_validation_report.py`; `docs/VALIDATION.md` (methods, results,
+  limits, gates).
+- Deterministic in process and across interpreters with different hash seeds;
+  13 of 13 trial brands traceable.
+- Collapse: legacy 13/13/12/7/7/3 → continuous 13/13/12/11/12/11 (descriptors,
+  cue groups, motifs, profiles, eligible materials or directions, final output).
+- Forcing check (negative findings kept): without the tentative design cells,
+  11 → 7 distinct architectures; literal Qloo descriptor overlap barely predicts
+  output overlap (Spearman 0.08). Perturbation: one descriptor left out changes
+  labels in 6% and the architecture in 4% of 523 runs.
+- Holdout replay with the architecture added post hoc: LEGO = Coca-Cola = Ralph
+  Lauren share one tentative structure (single "slightly polished" texture).
+- LLM-only baseline: no new call (11 of the 20-call daily cap already used); the
+  four structured stage-6B answers: the LLM commits 19 of 24 dimensions, the
+  continuous engine 10, legacy 3; where continuous and LLM both commit, 7 of 8
+  agree. Agreement is not validation.
+- Full suite: 228 tests, all pass (network blocked; browser and PDF included).
+  Secret scan of tracked files: only the existing test sentinels.
