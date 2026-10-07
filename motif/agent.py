@@ -101,7 +101,7 @@ class Controller:
         """The selected engine's result on the evidence fetched so far (deterministic, offline)."""
         if self.engine == "continuous":
             c = self.continuous
-            return run_continuous(self.evidence, c.lexicon, c.scoring, c.vectors, c.params, ["own"] + self.domains)
+            return run_continuous(self.evidence, c.lexicon, c.scoring, c.vectors, c.params, ["own"] + self.domains, c.library)
         return run_engine(self.evidence, self.config, self.allow_unverified, self.overrides)
 
     # -- the flow ----------------------------------------------------------------------

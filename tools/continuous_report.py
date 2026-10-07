@@ -82,7 +82,7 @@ def continuous_of(evidence, cc) -> Dict[str, Any]:
 
 def analysis(legacy: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
     cc = load_continuous_config()
-    cc_medium = type(cc)(cc.lexicon, cc.scoring, medium_only(cc.vectors), cc.params)
+    cc_medium = type(cc)(cc.lexicon, cc.scoring, medium_only(cc.vectors), cc.params, cc.library)
     brands: Dict[str, Any] = {}
     for name, lr in legacy.items():
         r = continuous_of(lr["evidence"], cc)

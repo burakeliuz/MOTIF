@@ -1,0 +1,1266 @@
+{
+ "library_version": "olfactory-1.0",
+ "status": "active",
+ "provenance_category": "design_rule",
+ "notice": "MOTIF's MVP library of olfactory directions (accord types) for the scent architecture (docs/OLFACTORY_LAYER.md). A direction is a creative building block for a perfumer, not a formula: no doses, no proportions, no safety or regulatory statement. Its sensory cells are labelled: 'odor_data' cells come from config/candidates/odor_axis_evidence.v1.json (x2 = both rated datasets, x1 = one); 'design' cells are MOTIF's reading. Material references are examples of a class: the generic name and its descriptors come from the IFRA Fragrance Ingredient Glossary (2019) as digitized in the Pyrfume archive; a trade name appears only where MOTIF read the supplier's own page (identity and provenance only, never the sensory authority).",
+ "cell_rule": "odor_data x2 -> 0.5, odor_data x1 -> 0.25; D85 LIGHT/HEAVY counts as x1 with the caveat that it partly tracks pleasantness; 'rated less sweet' is never used as data for 'dry' (it is cited only as consistent with a design cell); design -> 0.25, or 0.5 when it is the accord's defining quality. null = no claim.",
+ "roles": {
+  "opening": "first impression, most volatile",
+  "core": "heart, the character",
+  "drydown": "base, what stays on skin or fabric"
+ },
+ "sources": {
+  "IFRA19": "IFRA Fragrance Ingredient Glossary (2019), as digitized in the Pyrfume archive (ifra_2019/behavior.csv: the top 3 descriptors of each ingredient, in order); read as data via raw.githubusercontent.com, not the IFRA document itself",
+  "OAE": "config/candidates/odor_axis_evidence.v1.json (Dravnieks 1985, Keller & Vosshall 2016)",
+  "PALETTE": "config/material_palette.json palette-0.3: supplier pages read for identity (verified_full_page)"
+ },
+ "directions": [
+  {
+   "id": "citrus_bright",
+   "label": "Bright citrus",
+   "family": "citrus",
+   "odor_families": [
+    "citrus"
+   ],
+   "roles": [
+    "opening"
+   ],
+   "descriptors": [
+    "sparkling",
+    "zesty",
+    "radiant"
+   ],
+   "vector": {
+    "warm_cool": {
+     "value": 0.25,
+     "basis": "odor_data: citrus rated cooler, x1 (D85 COOL 0.30, weak)"
+    },
+    "light_dense": null,
+    "raw_polished": null,
+    "natural_synthetic": {
+     "value": -0.25,
+     "basis": "design: citrus oils read as natural"
+    },
+    "intimate_projecting": {
+     "value": 0.25,
+     "basis": "design: a radiant, volatile top note"
+    },
+    "sweet_dry": {
+     "value": -0.25,
+     "basis": "odor_data: citrus rated sweeter, x1 (D85 SWEET 0.35)"
+    }
+   },
+   "materials": [
+    {
+     "generic": "limonene",
+     "ifra": [
+      "Citrus",
+      "Fresh",
+      "Sharp"
+     ],
+     "source": "IFRA19"
+    },
+    {
+     "generic": "citral",
+     "ifra": [
+      "Citrus",
+      "Sharp",
+      "Lemon"
+     ],
+     "source": "IFRA19"
+    },
+    {
+     "generic": "bergamot oil (natural)",
+     "example": "Bergamot Oil Italy",
+     "supplier": "Givaudan",
+     "url": "https://www.givaudan.com/fragrance-beauty/fragrance-ingredients-business/natural-ingredients/bergamot-oil-italy",
+     "source": "PALETTE"
+    }
+   ],
+   "uncertainty": "Citrus is light in D85, but D85 LIGHT partly tracks pleasantness; weight is left unclaimed."
+  },
+  {
+   "id": "aromatic_herbal",
+   "label": "Aromatic herbs",
+   "family": "aromatic",
+   "odor_families": [
+    "green_herbal"
+   ],
+   "roles": [
+    "opening",
+    "core"
+   ],
+   "descriptors": [
+    "herbal",
+    "lavender-like",
+    "clean-aromatic"
+   ],
+   "vector": {
+    "warm_cool": {
+     "value": 0.25,
+     "basis": "design: fresh aromatic herbs read as cool"
+    },
+    "light_dense": null,
+    "raw_polished": null,
+    "natural_synthetic": {
+     "value": -0.5,
+     "basis": "design: the accord's defining herbal naturalness"
+    },
+    "intimate_projecting": null,
+    "sweet_dry": {
+     "value": 0.25,
+     "basis": "design: herbal, not sweet"
+    }
+   },
+   "materials": [
+    {
+     "generic": "linalool",
+     "ifra": [
+      "Floral",
+      "Fresh",
+      "Lavender"
+     ],
+     "source": "IFRA19"
+    },
+    {
+     "generic": "fenchone",
+     "ifra": [
+      "Aromatic",
+      "Woody",
+      "Minty"
+     ],
+     "source": "IFRA19"
+    }
+   ],
+   "uncertainty": "Green/herbal odors show no robust temperature association in the data; the cool reading is MOTIF's."
+  },
+  {
+   "id": "green_leafy",
+   "label": "Green, leafy",
+   "family": "green",
+   "odor_families": [
+    "green_herbal"
+   ],
+   "roles": [
+    "opening"
+   ],
+   "descriptors": [
+    "crushed leaves",
+    "stem",
+    "sap"
+   ],
+   "vector": {
+    "warm_cool": {
+     "value": 0.25,
+     "basis": "design: fresh green reads cool"
+    },
+    "light_dense": null,
+    "raw_polished": {
+     "value": -0.25,
+     "basis": "design: sappy, unrefined edge"
+    },
+    "natural_synthetic": {
+     "value": -0.5,
+     "basis": "design: the accord's defining naturalness"
+    },
+    "intimate_projecting": null,
+    "sweet_dry": null
+   },
+   "materials": [
+    {
+     "generic": "3-hexenal",
+     "ifra": [
+      "Green",
+      "Fruity",
+      "Floral"
+     ],
+     "source": "IFRA19"
+    },
+    {
+     "generic": "nerone",
+     "ifra": [
+      "Green",
+      "Leafy",
+      "Herbal"
+     ],
+     "source": "IFRA19"
+    }
+   ],
+   "uncertainty": "No data supports a temperature for green notes (D85 COOL 0.20 is not robust)."
+  },
+  {
+   "id": "minty_cool",
+   "label": "Minty coolness",
+   "family": "minty",
+   "odor_families": [
+    "minty_camphor"
+   ],
+   "roles": [
+    "opening"
+   ],
+   "descriptors": [
+    "cooling",
+    "camphoraceous",
+    "crisp"
+   ],
+   "vector": {
+    "warm_cool": {
+     "value": 0.5,
+     "basis": "odor_data: minty/camphor rated cooler, x1 but strong (D85 COOL 0.87)"
+    },
+    "light_dense": null,
+    "raw_polished": null,
+    "natural_synthetic": null,
+    "intimate_projecting": null,
+    "sweet_dry": null
+   },
+   "materials": [
+    {
+     "generic": "menthol",
+     "ifra": [
+      "Minty",
+      "Fresh",
+      "Cooling"
+     ],
+     "source": "IFRA19"
+    }
+   ],
+   "uncertainty": "D85 COOL is largely trigeminal cooling; in a fine fragrance it reads as a functional, minty freshness."
+  },
+  {
+   "id": "aldehydic_clean",
+   "label": "Aldehydic, clean",
+   "family": "aldehydic",
+   "odor_families": [
+    "soapy_aldehydic"
+   ],
+   "roles": [
+    "opening"
+   ],
+   "descriptors": [
+    "clean",
+    "waxy-bright",
+    "fizzy"
+   ],
+   "vector": {
+    "warm_cool": null,
+    "light_dense": null,
+    "raw_polished": {
+     "value": 0.25,
+     "basis": "design: a clean, finished sheen"
+    },
+    "natural_synthetic": {
+     "value": 0.5,
+     "basis": "design: the accord's defining abstraction"
+    },
+    "intimate_projecting": {
+     "value": 0.25,
+     "basis": "design: diffusive top"
+    },
+    "sweet_dry": null
+   },
+   "materials": [
+    {
+     "generic": "decanal",
+     "ifra": [
+      "Aldehydic",
+      "Orange",
+      "Green"
+     ],
+     "source": "IFRA19"
+    },
+    {
+     "generic": "undec-9-enal",
+     "ifra": [
+      "Aldehydic",
+      "Green",
+      "Clean"
+     ],
+     "source": "IFRA19"
+    }
+   ],
+   "uncertainty": "Soapy notes are rated lighter in D85 only, which partly tracks pleasantness; not used."
+  },
+  {
+   "id": "watery_ozonic",
+   "label": "Watery, ozonic",
+   "family": "marine",
+   "odor_families": [],
+   "roles": [
+    "opening",
+    "core"
+   ],
+   "descriptors": [
+    "airy",
+    "watery",
+    "ozonic"
+   ],
+   "vector": {
+    "warm_cool": {
+     "value": 0.25,
+     "basis": "design: air and water read as cool"
+    },
+    "light_dense": {
+     "value": -0.5,
+     "basis": "design: the accord's defining airiness"
+    },
+    "raw_polished": null,
+    "natural_synthetic": {
+     "value": 0.5,
+     "basis": "design: an abstract, non-figurative accord"
+    },
+    "intimate_projecting": null,
+    "sweet_dry": null
+   },
+   "materials": [
+    {
+     "generic": "6-methoxy-2,6-dimethylheptanal",
+     "ifra": [
+      "Marine",
+      "Ozonic",
+      "Fruity"
+     ],
+     "source": "IFRA19"
+    },
+    {
+     "generic": "3-(4-ethylphenyl)-2,2-dimethylpropanal",
+     "ifra": [
+      "Ozonic",
+      "Floral",
+      "Aldehydic"
+     ],
+     "source": "IFRA19"
+    }
+   ],
+   "uncertainty": "No odor family in the datasets covers marine or ozonic notes; all cells are MOTIF's reading."
+  },
+  {
+   "id": "transparent_floral",
+   "label": "Transparent floral",
+   "family": "floral",
+   "odor_families": [
+    "floral"
+   ],
+   "roles": [
+    "core"
+   ],
+   "descriptors": [
+    "sheer",
+    "jasmine-like",
+    "airy"
+   ],
+   "vector": {
+    "warm_cool": null,
+    "light_dense": {
+     "value": -0.5,
+     "basis": "design: the accord's defining transparency"
+    },
+    "raw_polished": {
+     "value": 0.25,
+     "basis": "design: a smooth, finished floral"
+    },
+    "natural_synthetic": null,
+    "intimate_projecting": {
+     "value": 0.25,
+     "basis": "design: diffusive radiance"
+    },
+    "sweet_dry": {
+     "value": -0.25,
+     "basis": "odor_data: floral rated sweeter, x2 (D85 0.48, KV16 0.58), kept weak for a sheer floral"
+    }
+   },
+   "materials": [
+    {
+     "generic": "methyl dihydrojasmonate",
+     "ifra": [
+      "Floral",
+      "Fresh",
+      "Jasmin"
+     ],
+     "example": "HEDIONE®",
+     "supplier": "dsm-firmenich",
+     "url": "https://www.firmenich.com/sites/default/files/uploads/files/ingredients/marketing-sheet/perfumery/HEDIONE_964898.pdf",
+     "source": "IFRA19 + PALETTE"
+    }
+   ],
+   "uncertainty": "Transparency is the accord's design intent, not a measured weight."
+  },
+  {
+   "id": "white_floral_rich",
+   "label": "Rich white floral",
+   "family": "floral",
+   "odor_families": [
+    "floral"
+   ],
+   "roles": [
+    "core"
+   ],
+   "descriptors": [
+    "narcotic",
+    "creamy-floral",
+    "heady"
+   ],
+   "vector": {
+    "warm_cool": {
+     "value": -0.25,
+     "basis": "design: heady, enveloping warmth"
+    },
+    "light_dense": {
+     "value": 0.25,
+     "basis": "design: dense heart materials"
+    },
+    "raw_polished": null,
+    "natural_synthetic": null,
+    "intimate_projecting": {
+     "value": 0.5,
+     "basis": "design: the accord's defining sillage"
+    },
+    "sweet_dry": {
+     "value": -0.5,
+     "basis": "odor_data: floral rated sweeter, x2 (D85 0.48, KV16 0.58)"
+    }
+   },
+   "materials": [
+    {
+     "generic": "linalyl benzoate",
+     "ifra": [
+      "Floral",
+      "Tuberose",
+      "Lily"
+     ],
+     "source": "IFRA19"
+    },
+    {
+     "generic": "benzyl acetate",
+     "ifra": [
+      "Fruity",
+      "Floral",
+      "Jasmin"
+     ],
+     "source": "IFRA19"
+    }
+   ],
+   "uncertainty": "D85's floral family has no white florals; weight and warmth here are MOTIF's reading."
+  },
+  {
+   "id": "rose",
+   "label": "Rose",
+   "family": "floral",
+   "odor_families": [
+    "floral"
+   ],
+   "roles": [
+    "core"
+   ],
+   "descriptors": [
+    "petal",
+    "rosy",
+    "geranium-like"
+   ],
+   "vector": {
+    "warm_cool": null,
+    "light_dense": null,
+    "raw_polished": null,
+    "natural_synthetic": {
+     "value": -0.25,
+     "basis": "design: a figurative flower"
+    },
+    "intimate_projecting": null,
+    "sweet_dry": {
+     "value": -0.25,
+     "basis": "odor_data: floral rated sweeter, x2, kept weak for rose"
+    }
+   },
+   "materials": [
+    {
+     "generic": "rhodinol",
+     "ifra": [
+      "Floral",
+      "Rose",
+      "Geranium"
+     ],
+     "source": "IFRA19"
+    },
+    {
+     "generic": "nerolidol",
+     "ifra": [
+      "Floral",
+      "Rose",
+      "Woody"
+     ],
+     "source": "IFRA19"
+    }
+   ],
+   "uncertainty": "Rose ranges from dewy to dark; only its floral sweetness is data-backed."
+  },
+  {
+   "id": "powdery_iris",
+   "label": "Powdery iris, violet",
+   "family": "powdery",
+   "odor_families": [
+    "musk",
+    "soapy_aldehydic",
+    "woody"
+   ],
+   "roles": [
+    "core",
+    "drydown"
+   ],
+   "descriptors": [
+    "powdery",
+    "soft",
+    "cool-rooty"
+   ],
+   "vector": {
+    "warm_cool": null,
+    "light_dense": null,
+    "raw_polished": {
+     "value": 0.5,
+     "basis": "design: the accord's defining softness and finish"
+    },
+    "natural_synthetic": null,
+    "intimate_projecting": {
+     "value": -0.25,
+     "basis": "design: a close, soft halo"
+    },
+    "sweet_dry": null
+   },
+   "materials": [
+    {
+     "generic": "beta-irone",
+     "ifra": [
+      "Floral",
+      "Violet",
+      "Powdery"
+     ],
+     "source": "IFRA19"
+    },
+    {
+     "generic": "dihydro-alpha-ionone",
+     "ifra": [
+      "Floral",
+      "Orris",
+      "Woody"
+     ],
+     "source": "IFRA19"
+    },
+    {
+     "generic": "orris butter (natural)",
+     "example": "Orris Pallida Butter (France)",
+     "supplier": "Givaudan",
+     "url": "https://www.givaudan.com/fragrance-beauty/fragrance-ingredients-business/natural-ingredients/orris-pallida-butter-8-irones-france",
+     "source": "PALETTE"
+    }
+   ],
+   "uncertainty": "Powdery is measured in D85 only and is not used as 'dry'; perfumers often place it near soft and slightly sweet."
+  },
+  {
+   "id": "fruity_juicy",
+   "label": "Juicy fruit",
+   "family": "fruity",
+   "odor_families": [
+    "fruity"
+   ],
+   "roles": [
+    "opening",
+    "core"
+   ],
+   "descriptors": [
+    "juicy",
+    "ripe",
+    "bright"
+   ],
+   "vector": {
+    "warm_cool": null,
+    "light_dense": null,
+    "raw_polished": null,
+    "natural_synthetic": null,
+    "intimate_projecting": {
+     "value": 0.25,
+     "basis": "design: an outgoing, bright note"
+    },
+    "sweet_dry": {
+     "value": -0.5,
+     "basis": "odor_data: fruity rated sweeter, x2 (D85 0.67, KV16 0.76)"
+    }
+   },
+   "materials": [
+    {
+     "generic": "gamma-decalactone",
+     "ifra": [
+      "Fruity",
+      "Sweet",
+      "Peach"
+     ],
+     "source": "IFRA19"
+    },
+    {
+     "generic": "alpha-damascone",
+     "ifra": [
+      "Floral",
+      "Sweet",
+      "Berry"
+     ],
+     "source": "IFRA19"
+    }
+   ],
+   "uncertainty": "Fruity sweetness is near-definitional co-use of words in the data."
+  },
+  {
+   "id": "spicy_warm",
+   "label": "Warm spice",
+   "family": "spicy",
+   "odor_families": [
+    "spicy"
+   ],
+   "roles": [
+    "core"
+   ],
+   "descriptors": [
+    "cinnamon-like",
+    "clove-like",
+    "glowing"
+   ],
+   "vector": {
+    "warm_cool": {
+     "value": -0.25,
+     "basis": "odor_data: spicy rated warmer, x2 but weak (D85 0.49, KV16 0.26)"
+    },
+    "light_dense": null,
+    "raw_polished": null,
+    "natural_synthetic": null,
+    "intimate_projecting": {
+     "value": 0.25,
+     "basis": "design: a radiant spice"
+    },
+    "sweet_dry": {
+     "value": -0.25,
+     "basis": "odor_data: spicy rated sweeter, x1 (D85 0.27, weak)"
+    }
+   },
+   "materials": [
+    {
+     "generic": "cinnamaldehyde",
+     "ifra": [
+      "Spicy",
+      "Cinnamon",
+      "Warm"
+     ],
+     "source": "IFRA19"
+    },
+    {
+     "generic": "isoeugenol",
+     "ifra": [
+      "Spicy",
+      "Clove",
+      "Floral"
+     ],
+     "source": "IFRA19"
+    }
+   ],
+   "uncertainty": "KV16's association is weak; the warmth is clearer in D85."
+  },
+  {
+   "id": "spicy_fresh",
+   "label": "Fresh spice",
+   "family": "spicy",
+   "odor_families": [],
+   "roles": [
+    "opening"
+   ],
+   "descriptors": [
+    "peppery",
+    "crisp-spicy",
+    "dry-spicy"
+   ],
+   "vector": {
+    "warm_cool": null,
+    "light_dense": null,
+    "raw_polished": {
+     "value": -0.25,
+     "basis": "design: a prickly, unpolished edge"
+    },
+    "natural_synthetic": null,
+    "intimate_projecting": {
+     "value": 0.25,
+     "basis": "design: a lively, projecting opening"
+    },
+    "sweet_dry": {
+     "value": 0.25,
+     "basis": "design: dry spice, not sweet"
+    }
+   },
+   "materials": [],
+   "uncertainty": "No fresh-spice ingredient is named in the digitized IFRA glossary; no data family separates fresh from warm spice."
+  },
+  {
+   "id": "gourmand_vanilla",
+   "label": "Gourmand, vanilla",
+   "family": "gourmand",
+   "odor_families": [
+    "gourmand_balsamic"
+   ],
+   "roles": [
+    "drydown"
+   ],
+   "descriptors": [
+    "vanilla",
+    "caramelised",
+    "comforting"
+   ],
+   "vector": {
+    "warm_cool": {
+     "value": -0.5,
+     "basis": "odor_data: gourmand/balsamic rated warmer, x2 (D85 0.36, KV16 0.41)"
+    },
+    "light_dense": {
+     "value": 0.25,
+     "basis": "design: a rounded, enveloping base"
+    },
+    "raw_polished": null,
+    "natural_synthetic": null,
+    "intimate_projecting": {
+     "value": -0.25,
+     "basis": "design: a close, skin-warm base"
+    },
+    "sweet_dry": {
+     "value": -0.5,
+     "basis": "odor_data: gourmand/balsamic rated sweeter, x2 (D85 0.37, KV16 0.45)"
+    }
+   },
+   "materials": [
+    {
+     "generic": "vanillin",
+     "ifra": [
+      "Gourmand",
+      "Vanilla",
+      "Powdery"
+     ],
+     "source": "IFRA19"
+    },
+    {
+     "generic": "ethyl maltol",
+     "ifra": [
+      "Gourmand",
+      "Sweet",
+      "Caramel"
+     ],
+     "source": "IFRA19"
+    },
+    {
+     "generic": "coumarin",
+     "ifra": [
+      "Powdery",
+      "Warm",
+      "Almond"
+     ],
+     "source": "IFRA19"
+    }
+   ],
+   "uncertainty": "Both data-backed cells survive the pleasantness control."
+  },
+  {
+   "id": "amber_resinous",
+   "label": "Resinous amber",
+   "family": "amber",
+   "odor_families": [
+    "gourmand_balsamic"
+   ],
+   "roles": [
+    "drydown"
+   ],
+   "descriptors": [
+    "resinous",
+    "balsamic",
+    "glowing"
+   ],
+   "vector": {
+    "warm_cool": {
+     "value": -0.5,
+     "basis": "odor_data: balsamic rated warmer, x2 (D85 0.36, KV16 0.41)"
+    },
+    "light_dense": {
+     "value": 0.5,
+     "basis": "design: the accord's defining richness and body"
+    },
+    "raw_polished": null,
+    "natural_synthetic": {
+     "value": -0.25,
+     "basis": "design: resins read as natural"
+    },
+    "intimate_projecting": null,
+    "sweet_dry": {
+     "value": -0.25,
+     "basis": "odor_data: balsamic rated sweeter, x2, kept weak for resins"
+    }
+   },
+   "materials": [
+    {
+     "generic": "sclareol",
+     "ifra": [
+      "Balsamic",
+      "Amber",
+      "Sage"
+     ],
+     "source": "IFRA19"
+    },
+    {
+     "generic": "labdanum absolute (natural)",
+     "example": "Labdanum Absolute Spain Clear",
+     "supplier": "Givaudan",
+     "url": "https://www.givaudan.com/fragrance-beauty/fragrance-ingredients-business/natural-ingredients/labdanum-absolute-spain-clear",
+     "source": "PALETTE"
+    }
+   ],
+   "uncertainty": "Balsamic is not rated heavier in D85 (0.03); the body is MOTIF's reading."
+  },
+  {
+   "id": "dry_woods",
+   "label": "Dry woods",
+   "family": "woody",
+   "odor_families": [
+    "woody"
+   ],
+   "roles": [
+    "core",
+    "drydown"
+   ],
+   "descriptors": [
+    "cedar-like",
+    "vetiver-like",
+    "pencil-dry"
+   ],
+   "vector": {
+    "warm_cool": null,
+    "light_dense": null,
+    "raw_polished": {
+     "value": -0.25,
+     "basis": "design: a dry, grainy texture"
+    },
+    "natural_synthetic": {
+     "value": -0.25,
+     "basis": "design: woods read as natural"
+    },
+    "intimate_projecting": null,
+    "sweet_dry": {
+     "value": 0.5,
+     "basis": "design: the accord's defining dryness (woody odors are only rated less sweet in the data, KV16)"
+    }
+   },
+   "materials": [
+    {
+     "generic": "cedrol",
+     "ifra": [
+      "Woody",
+      "Soft",
+      "Cedarwood"
+     ],
+     "source": "IFRA19"
+    },
+    {
+     "generic": "vetiverol",
+     "ifra": [
+      "Woody",
+      "Vetiver",
+      "Grapefruit"
+     ],
+     "source": "IFRA19"
+    },
+    {
+     "generic": "vetiver oil (natural)",
+     "example": "Vetiver Oil Haiti",
+     "supplier": "Givaudan",
+     "url": "https://www.givaudan.com/fragrance-beauty/fragrance-ingredients-business/natural-ingredients/vetiver-oil-haiti",
+     "source": "PALETTE"
+    }
+   ],
+   "uncertainty": "'Dry' is perfumery vocabulary here; no dataset has a dry descriptor."
+  },
+  {
+   "id": "creamy_woods",
+   "label": "Creamy woods",
+   "family": "woody",
+   "odor_families": [
+    "woody"
+   ],
+   "roles": [
+    "drydown"
+   ],
+   "descriptors": [
+    "sandalwood-like",
+    "milky",
+    "smooth"
+   ],
+   "vector": {
+    "warm_cool": {
+     "value": -0.25,
+     "basis": "design: soft, skin-warm woods"
+    },
+    "light_dense": null,
+    "raw_polished": {
+     "value": 0.5,
+     "basis": "design: the accord's defining smoothness"
+    },
+    "natural_synthetic": null,
+    "intimate_projecting": {
+     "value": -0.25,
+     "basis": "design: a close base"
+    },
+    "sweet_dry": {
+     "value": -0.25,
+     "basis": "design: lactonic softness"
+    }
+   },
+   "materials": [
+    {
+     "generic": "santalol",
+     "ifra": [
+      "Woody",
+      "Sandalwood",
+      "Creamy"
+     ],
+     "source": "IFRA19"
+    },
+    {
+     "generic": "ebanol",
+     "ifra": [
+      "Woody",
+      "Sandalwood",
+      "Milky"
+     ],
+     "source": "IFRA19"
+    }
+   ],
+   "uncertainty": "All cells are MOTIF's reading; woody odors have no data-backed temperature."
+  },
+  {
+   "id": "ambery_woody_molecular",
+   "label": "Ambery-woody molecule",
+   "family": "amber",
+   "odor_families": [],
+   "roles": [
+    "drydown"
+   ],
+   "descriptors": [
+    "mineral-amber",
+    "radiant",
+    "dry-woody"
+   ],
+   "vector": {
+    "warm_cool": null,
+    "light_dense": null,
+    "raw_polished": {
+     "value": 0.25,
+     "basis": "design: a sleek, finished trail"
+    },
+    "natural_synthetic": {
+     "value": 0.5,
+     "basis": "design: the accord's defining abstraction"
+    },
+    "intimate_projecting": {
+     "value": 0.5,
+     "basis": "design: the accord's defining diffusion"
+    },
+    "sweet_dry": {
+     "value": 0.25,
+     "basis": "design: dry amber, not sweet"
+    }
+   },
+   "materials": [
+    {
+     "generic": "(-)-ambroxide",
+     "ifra": [
+      "Amber",
+      "Woody",
+      "Herbal"
+     ],
+     "example": "AMBROX® SUPER",
+     "supplier": "dsm-firmenich",
+     "url": "https://www.firmenich.com/sites/default/files/uploads/files/ingredients/marketing-sheet/perfumery/AMBROX_SUPER_909158.pdf",
+     "source": "IFRA19 + PALETTE"
+    }
+   ],
+   "uncertainty": "Diffusion is the supplier's own claim for the trade grade; here it is a design reading of the class."
+  },
+  {
+   "id": "clean_musk",
+   "label": "Clean musk",
+   "family": "musk",
+   "odor_families": [
+    "musk"
+   ],
+   "roles": [
+    "drydown"
+   ],
+   "descriptors": [
+    "skin-like",
+    "soft",
+    "clean"
+   ],
+   "vector": {
+    "warm_cool": null,
+    "light_dense": null,
+    "raw_polished": {
+     "value": 0.5,
+     "basis": "design: the accord's defining smoothness"
+    },
+    "natural_synthetic": {
+     "value": 0.25,
+     "basis": "design: an abstract skin note"
+    },
+    "intimate_projecting": {
+     "value": -0.5,
+     "basis": "design: the accord's defining closeness"
+    },
+    "sweet_dry": null
+   },
+   "materials": [
+    {
+     "generic": "galaxolide",
+     "ifra": [
+      "Musk like",
+      "Floral",
+      "Woody"
+     ],
+     "source": "IFRA19"
+    },
+    {
+     "generic": "celestolide",
+     "ifra": [
+      "Musk like",
+      "Powdery",
+      "Clean"
+     ],
+     "source": "IFRA19"
+    },
+    {
+     "generic": "a musk molecule",
+     "example": "HABANOLIDE®",
+     "supplier": "dsm-firmenich",
+     "url": "https://www.firmenich.com/sites/default/files/uploads/files/ingredients/marketing-sheet/perfumery/HABANOLIDE_947303.pdf",
+     "source": "PALETTE"
+    }
+   ],
+   "uncertainty": "Musk alone has no robust temperature, weight, or sweetness association in D85."
+  },
+  {
+   "id": "animalic_leather",
+   "label": "Leather, animalic",
+   "family": "leather",
+   "odor_families": [
+    "animalic",
+    "leathery"
+   ],
+   "roles": [
+    "drydown"
+   ],
+   "descriptors": [
+    "leathery",
+    "animalic",
+    "tobacco-like"
+   ],
+   "vector": {
+    "warm_cool": null,
+    "light_dense": {
+     "value": 0.25,
+     "basis": "odor_data: animalic rated heavier, x1 (D85 HEAVY 0.46)"
+    },
+    "raw_polished": {
+     "value": -0.5,
+     "basis": "design: the accord's defining rawness"
+    },
+    "natural_synthetic": null,
+    "intimate_projecting": null,
+    "sweet_dry": {
+     "value": 0.25,
+     "basis": "design: dry leather (animalic and leathery odors are rated less sweet, D85, KV16)"
+    }
+   },
+   "materials": [
+    {
+     "generic": "civetone",
+     "ifra": [
+      "Musk like",
+      "Animal Like",
+      "Soft"
+     ],
+     "source": "IFRA19"
+    },
+    {
+     "generic": "6-methylquinoline",
+     "ifra": [
+      "Animal like",
+      "Leathery",
+      "Tobacco"
+     ],
+     "source": "IFRA19"
+    }
+   ],
+   "uncertainty": "Animalic odors are rated less cool, not warmer; temperature is unclaimed."
+  },
+  {
+   "id": "smoky_incense",
+   "label": "Smoke, incense",
+   "family": "smoky",
+   "odor_families": [
+    "burnt_tar",
+    "incense"
+   ],
+   "roles": [
+    "core",
+    "drydown"
+   ],
+   "descriptors": [
+    "smoky",
+    "tarry",
+    "incense-like"
+   ],
+   "vector": {
+    "warm_cool": {
+     "value": -0.25,
+     "basis": "odor_data: burnt/tar rated warmer, x1 (KV16 0.20, weak)"
+    },
+    "light_dense": {
+     "value": 0.25,
+     "basis": "odor_data: burnt/tar rated heavier, x1 (D85 HEAVY 0.49)"
+    },
+    "raw_polished": {
+     "value": -0.5,
+     "basis": "design: the accord's defining roughness"
+    },
+    "natural_synthetic": null,
+    "intimate_projecting": null,
+    "sweet_dry": {
+     "value": 0.25,
+     "basis": "design: dry smoke (burnt/tar odors are rated less sweet, D85, KV16)"
+    }
+   },
+   "materials": [
+    {
+     "generic": "2,4-dimethylphenol",
+     "ifra": [
+      "Smoky",
+      "Roasted",
+      "Balsamic"
+     ],
+     "source": "IFRA19"
+    },
+    {
+     "generic": "guaiol",
+     "ifra": [
+      "Woody",
+      "Smoky",
+      "Rose"
+     ],
+     "source": "IFRA19"
+    }
+   ],
+   "uncertainty": "Incense alone reads differently (rated both warmer and cooler, lighter and sweeter in D85); the cells follow the burnt/tar side."
+  },
+  {
+   "id": "earthy_mossy",
+   "label": "Earthy, mossy",
+   "family": "earthy",
+   "odor_families": [
+    "earthy_musty"
+   ],
+   "roles": [
+    "drydown"
+   ],
+   "descriptors": [
+    "damp earth",
+    "moss",
+    "rooty"
+   ],
+   "vector": {
+    "warm_cool": null,
+    "light_dense": null,
+    "raw_polished": {
+     "value": -0.25,
+     "basis": "design: an unrefined, earthy texture"
+    },
+    "natural_synthetic": {
+     "value": -0.5,
+     "basis": "design: the accord's defining naturalness"
+    },
+    "intimate_projecting": null,
+    "sweet_dry": {
+     "value": 0.25,
+     "basis": "design: earthy, not sweet (earthy odors are rated less sweet, D85)"
+    }
+   },
+   "materials": [
+    {
+     "generic": "3-octanol",
+     "ifra": [
+      "Earthy",
+      "Mushroom",
+      "Woody"
+     ],
+     "source": "IFRA19"
+    },
+    {
+     "generic": "methyl 2,4-dihydroxy-3,6-dimethylbenzoate",
+     "ifra": [
+      "Woody",
+      "Mossy",
+      "Earthy"
+     ],
+     "source": "IFRA19"
+    }
+   ],
+   "uncertainty": "The data family is musty/moldy; perfumery earthiness (patchouli, moss) is broader."
+  },
+  {
+   "id": "mineral_metallic",
+   "label": "Mineral, metallic",
+   "family": "mineral",
+   "odor_families": [
+    "metallic"
+   ],
+   "roles": [
+    "opening",
+    "core"
+   ],
+   "descriptors": [
+    "mineral",
+    "metallic",
+    "flinty"
+   ],
+   "vector": {
+    "warm_cool": null,
+    "light_dense": null,
+    "raw_polished": {
+     "value": -0.25,
+     "basis": "design: a hard, unpolished surface"
+    },
+    "natural_synthetic": {
+     "value": 0.5,
+     "basis": "design: the accord's defining abstraction"
+    },
+    "intimate_projecting": null,
+    "sweet_dry": {
+     "value": 0.25,
+     "basis": "design: mineral, not sweet (metallic odors are rated less sweet, D85)"
+    }
+   },
+   "materials": [],
+   "uncertainty": "Metal is not rated cold in the data; no mineral or metallic perfumery ingredient is named in the digitized IFRA glossary."
+  }
+ ],
+ "changes": [
+  {
+   "version": "olfactory-1.0",
+   "date": "2026-10-07",
+   "reason": "Phase 8 of the engine refactor: scent architecture replaces the 7-material starting list as the product's olfactory output."
+  }
+ ],
+ "matching": {
+  "min_fit": 0.3,
+  "conflict_floor": 0.05,
+  "imagery_bonus": 0.1,
+  "max_emphasize": 3,
+  "max_avoid": 3,
+  "why": "fit = cosine similarity between the resolved commitment vector and the direction's cells; a direction that works against a resolved dimension by at least conflict_floor (target x cell) is set aside; imagery_bonus x motif score is added when a leading motif's odor imagery names the direction's family (ranking only, never eligibility)."
+ }
+}

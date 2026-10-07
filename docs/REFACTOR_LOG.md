@@ -140,3 +140,18 @@ PDF, and one-page PDFs. No Qloo or LLM request was made.
 - Part B (this commit): no structural failure; 4 of 5 resolved (IKEA not:
   untyped search); 3 distinct profiles among the 4; Hermès = Ralph Lauren;
   misreads 5 of 59 (8%); weak coverage for LEGO and Coca-Cola. Nothing tuned.
+
+## Phase 8: olfactory layer (scent architecture)
+
+- `config/olfactory_directions.v1.json` (`olfactory-1.0`): 23 directions (accord
+  types) with roles, labelled sensory cells (odor data vs MOTIF design),
+  descriptors, material references (IFRA 2019 generic names and descriptors from
+  the Pyrfume digitization; trade names only from supplier pages read in
+  palette-0.3), uncertainties, and the matching parameters.
+- `motif/olfactory.py`: deterministic cosine matching from the continuous target,
+  conflicts set aside, opening/core/drydown or "open to the perfumer",
+  emphasize/avoid only when a supported dimension backs them, tentative basis
+  labelled. Wired into the continuous engine and the command line.
+- `docs/OLFACTORY_LAYER.md`; `tests/test_olfactory.py` (library rules, evidence
+  consistency, trade names, IFRA names, matching, determinism, 13 brands).
+- 13 brands: 11 distinct structures (legacy: 3 material sets).

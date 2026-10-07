@@ -21,6 +21,7 @@ from typing import Any, Dict, List, Optional, Sequence
 from .classify import Lexicon, classify
 from .config import AXES
 from .evidence import normalize_evidence
+from .olfactory import architecture
 from .scoring import score_motifs
 
 CONTINUOUS_ENGINE_VERSION = "continuous-1.0"
@@ -107,8 +108,8 @@ def aggregate_axes(scores: Dict[str, Dict[str, Any]], vectors: Dict[str, Any], p
 
 def run_continuous(evidence: Sequence[Dict[str, Any]], lexicon: Dict[str, Any], scoring: Dict[str, Any],
                    vectors: Dict[str, Any], params: Dict[str, Any], kinds: Sequence[str] = ("own", "brand", "movie"),
-                   olfactory: Optional[Any] = None) -> Dict[str, Any]:
-    """`olfactory(axes, scores)` (motif/olfactory.py) adds the scent architecture when given."""
+                   library: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    """`library` (config/olfactory_directions.v1.json) adds the scent architecture (motif/olfactory.py)."""
     items = normalize_evidence(evidence)
     classified = classify(items, Lexicon(lexicon))
     scores = score_motifs(classified["annotations"], scoring, kinds)
@@ -140,8 +141,9 @@ def run_continuous(evidence: Sequence[Dict[str, Any]], lexicon: Dict[str, Any], 
         "resolved_axes": resolved,
         "open_axes": [a for a in AXES if axes[a]["state"] != "resolved"],
     }
-    if olfactory is not None:
-        result["olfactory"] = olfactory(axes, scores)
+    if library is not None:
+        result["versions"]["olfactory"] = library["library_version"]
+        result["architecture"] = architecture(axes, scores, vectors, library, params["lead"]["min_score"])
     return result
 
 

@@ -135,6 +135,18 @@ def _continuous_lines(result: Dict[str, Any]) -> List[str]:
             text = "open" + (": contributors pull both ways" if v["state"] == "balanced_open" else "")
         pulls = "; ".join(f"{pole}: {', '.join(ms)}" for pole, ms in v["pulls"].items() if ms)
         lines.append(f"  {a:20} {text}" + (f"  [{pulls}]" if pulls else ""))
+    arch = result.get("architecture")
+    if arch:
+        lines.append(f"Scent architecture ({arch['status']}" + (f", {arch['basis']}" if arch["basis"] else "") + "):")
+        for role, s in arch["structure"].items():
+            if not s:
+                lines.append(f"  {role:8} open to the perfumer")
+                continue
+            refs = "; ".join(m["generic"] + (f" (e.g. {m['example']})" if m.get("example") else "") for m in s["materials"][:2])
+            lines.append(f"  {role:8} {s['label']} ({s['basis']}): {', '.join(s['descriptors'])}" + (f" · e.g. {refs}" if refs else ""))
+        for key in ("emphasize", "avoid"):
+            if arch[key]:
+                lines.append(f"  {key}: " + "; ".join(f"{x['label']} ({', '.join(x['because'])})" for x in arch[key]))
     return lines
 
 
@@ -267,7 +279,7 @@ def cmd_compare_engines(args) -> int:
         print(json.dumps({k: outcome.get(k) for k in ("status", "outcome", "question", "message")}, indent=2))
         return 3
     legacy = run_engine(controller.evidence, config)
-    cont = run_continuous(controller.evidence, cc.lexicon, cc.scoring, cc.vectors, cc.params, ["own"] + domains)
+    cont = run_continuous(controller.evidence, cc.lexicon, cc.scoring, cc.vectors, cc.params, ["own"] + domains, cc.library)
     if args.json:
         print(json.dumps({"legacy": {k: legacy[k] for k in ("engine_version", "outcome", "axes", "materials")},
                           "continuous": {k: cont[k] for k in ("engine_version", "versions", "outcome", "motif_scores", "axes")}},

@@ -52,15 +52,19 @@ class ContinuousConfig:
     scoring: Dict[str, Any]
     vectors: Dict[str, Any]
     params: Dict[str, Any]
+    library: Optional[Dict[str, Any]] = None  # olfactory directions (scent architecture)
 
     @property
     def versions(self) -> Dict[str, str]:
-        return {
+        out = {
             "lexicon": self.lexicon["lexicon_version"],
             "scoring": self.scoring["scoring_version"],
             "sensory_model": self.vectors["model_version"],
             "params": self.params["params_version"],
         }
+        if self.library:
+            out["olfactory"] = self.library["library_version"]
+        return out
 
 
 def load_continuous_config(config_dir: Optional[Path] = None) -> ContinuousConfig:
@@ -70,6 +74,7 @@ def load_continuous_config(config_dir: Optional[Path] = None) -> ContinuousConfi
         scoring=read_json(base / "motif_scoring.v1.json"),
         vectors=read_json(base / "motif_sensory_vectors.v1.json"),
         params=read_json(base / "continuous_params.v1.json"),
+        library=read_json(base / "olfactory_directions.v1.json"),
     )
     if tuple(config.vectors["encoding"]) != AXES:
         raise ValueError(f"motif_sensory_vectors axes changed: {tuple(config.vectors['encoding'])}")
