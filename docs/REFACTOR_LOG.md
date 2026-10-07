@@ -44,3 +44,16 @@ Qloo line present in web and PDF). The collapse diagnostic is byte-identical to
 the baseline (markdown and JSON). A recorded-data scan of MUJI, Ralph Lauren,
 A24, Supreme, and Sanrio found no internal wording, the context once in web and
 PDF, and one-page PDFs. No Qloo or LLM request was made.
+
+## Phase 2: legacy engine frozen as the baseline
+
+- `tools/legacy_baseline.py` replays the 13 trial brands from recordings through
+  the unchanged legacy engine with stage definitions written fresh (not the
+  collapse script's code) and reproduces 13/13/12/7/7/3.
+- `reports/baselines/legacy_engine_0.3.json`: frozen per-brand stage sets,
+  counts, legacy config versions, and SHA-256 of the four legacy config files.
+- `tests/test_legacy_baseline.py`: the legacy config cannot change silently; the
+  replay must match the frozen sets when recordings are on disk.
+- `docs/ENGINE_REDESIGN.md`: baseline, problems demonstrated, what the new
+  engine must improve, what it must not claim.
+- No engine behaviour changed; no Qloo or LLM request.
