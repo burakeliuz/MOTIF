@@ -141,40 +141,37 @@ details.axes dl { margin-top: 10px; max-width: 46em; }
 .sec > .body { grid-column: 4 / 13; min-width: 0; }
 .sec .intro { color: var(--mute); max-width: 46em; }
 
-/* strips */
-.strips { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--g); }
-.mat { display: grid; grid-template-columns: 76px 1fr; gap: 0 16px; text-align: left; background: none; border: 0; padding: 0; align-items: start; }
-.mat[aria-expanded="true"] .nm { text-decoration: underline; text-decoration-thickness: 3px; text-decoration-color: var(--accent); text-underline-offset: 5px; }
-.strip { position: relative; width: 76px; height: 300px; border: 2px solid var(--ink); background: var(--sheet);
+/* scent architecture: one strip per role */
+.roles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--g); }
+.role { display: grid; grid-template-columns: 76px 1fr; gap: 0 16px; align-items: start; min-width: 0; }
+.role.open { display: block; border-top: 1px dashed var(--mute); padding-top: 10px; }
+.role .kicker { margin: 0 0 6px; }
+.role .nm { font: 800 22px/1.1 var(--disp); font-stretch: 85%; margin: 0; overflow-wrap: anywhere; }
+.role.open .nm { color: var(--mute); }
+.role .sc { font-size: 17px; line-height: 1.3; margin: 6px 0 0; }
+.role .mute.small { margin: 6px 0 0; }
+.strip { position: relative; width: 76px; height: 220px; border: 2px solid var(--ink); background: var(--sheet);
   clip-path: polygon(0 0, 100% 0, 100% 90%, 50% 100%, 0 90%); }
 .strip::after { content: ""; position: absolute; left: 0; right: 0; bottom: 10%; border-top: 2px solid var(--ink); }
 .strip svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-.mat .slot { display: block; font: 900 30px/.9 var(--disp); font-stretch: 62%; text-transform: uppercase; }
-.mat .role { display: block; font: 600 10.5px/1.3 var(--disp); letter-spacing: .1em; text-transform: uppercase; color: var(--mute); margin: 4px 0 12px; }
-.mat .nm { display: block; font: 800 22px/1.1 var(--disp); font-stretch: 85%; overflow-wrap: anywhere; }
-.mat .sc { display: block; font-size: 19px; line-height: 1.3; margin-top: 6px; }
-.mat .more { display: inline-block; margin-top: 12px; font: 700 11px/1 var(--disp); letter-spacing: .12em; text-transform: uppercase; border-bottom: 1px solid var(--ink); }
-.matdetail { margin-top: 22px; border-top: 1px solid var(--ink); padding-top: 14px; }
-.matdetail h3 { font: 800 22px/1.1 var(--disp); font-stretch: 85%; margin-bottom: 4px; }
-.matdetail h3 .sc { font: 400 20px/1.1 var(--text); }
-.matdetail h4 { font: 700 11px/1.3 var(--disp); letter-spacing: .12em; text-transform: uppercase; margin: 18px 0 6px; }
-.reading { margin: 0; padding-left: 18px; font-size: 15px; color: var(--mute); }
-.prop { display: grid; grid-template-columns: 200px 1fr; gap: 4px 20px; padding: 10px 0; border-bottom: 1px solid var(--hair); }
-.prop .k { font: 700 13px/1.3 var(--disp); letter-spacing: .04em; }
-.prop .k em { display: block; font: 400 13px/1.35 var(--text); font-style: normal; color: var(--mute); letter-spacing: 0; margin-top: 2px; }
-.prop q { font-style: italic; }
-.prop .why { font-size: 14px; color: var(--mute); margin-top: 4px; }
-.patnote { font-size: 13px; color: var(--mute); margin-top: 10px; }
-.nocomp p { max-width: 46em; }
-.candlist { list-style: none; padding: 0; margin: 10px 0 0; }
-.candlist li { padding: 8px 0; border-bottom: 1px solid var(--hair); }
+details.refs { margin-top: 10px; font-size: 14px; }
+details.refs summary { cursor: pointer; display: inline-block; font: 700 11px/1.3 var(--disp); letter-spacing: .12em; text-transform: uppercase; border-bottom: 1px solid var(--ink); }
+details.refs ul { list-style: none; margin: 8px 0 0; padding: 0; }
+details.refs li { padding: 4px 0; border-bottom: 1px solid var(--hair); overflow-wrap: anywhere; }
+.openlist { list-style: none; margin: 16px 0 0; padding: 0; font-size: 15px; max-width: 46em; }
+.openlist li { padding: 5px 0; border-bottom: 1px solid var(--hair); }
+.ea { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--g); }
+.ea ul { list-style: none; margin: 0; padding: 0; }
+.ea li { padding: 6px 0; border-bottom: 1px solid var(--hair); }
 
 /* why / decisions / brief */
-.basis { list-style: none; margin: 0; padding: 0; }
-.basis li { display: grid; grid-template-columns: 170px 1fr; gap: 4px 20px; padding: 12px 0; border-bottom: 1px solid var(--hair); }
-.basis .ax { font: 900 26px/1 var(--disp); font-stretch: 68%; text-transform: uppercase; }
-.basis .ax small { display: block; font: 600 10.5px/1.3 var(--disp); letter-spacing: .1em; color: var(--mute); margin-top: 4px; }
-.basis .rel { border-left: 3px solid var(--accent); padding-left: 10px; }
+.basis, .why { list-style: none; margin: 0; padding: 0; }
+.basis li, .why li { display: grid; grid-template-columns: 170px 1fr; gap: 4px 20px; padding: 12px 0; border-bottom: 1px solid var(--hair); }
+.basis .ax, .why .ax { font: 900 26px/1 var(--disp); font-stretch: 68%; text-transform: uppercase; }
+.basis .ax small, .why .ax small { display: block; font: 600 10.5px/1.3 var(--disp); letter-spacing: .1em; color: var(--mute); margin-top: 4px; }
+.why p { margin: 0 0 8px; font-size: 15px; }
+.why .phr { display: inline-flex; margin-top: 0; }
+.basis li.rel .ax { border-left: 3px solid var(--accent); padding-left: 10px; }
 .basis .tr { font-size: 15px; margin: 0; }
 .basis .tr.open { color: var(--mute); }
 .sources { margin-top: 22px; border-top: 1px solid var(--ink); padding-top: 10px; }
@@ -260,14 +257,12 @@ code { font: 12px/1.4 ui-monospace, Menlo, monospace; background: var(--paper); 
   .sec > h2 { grid-column: 1; display: flex; align-items: baseline; gap: 10px; }
   .sec > h2 .num { font-size: 30px; margin: 0; }
   .sec > .body { grid-column: 1; }
-  .strips { gap: 10px; }
-  .mat { grid-template-columns: 1fr; gap: 8px; }
-  .strip { width: 100%; max-width: 64px; height: 170px; }
-  .mat .slot { font-size: 22px; }
-  .mat .role { margin-bottom: 4px; }
-  .mat .nm { font-size: 16px; }
-  .mat .sc { font-size: 14px; margin-top: 4px; }
-  .prop, .basis li, .mrow { grid-template-columns: 1fr; }
+  .roles { grid-template-columns: 1fr; gap: 18px; }
+  .role { grid-template-columns: 48px 1fr; gap: 0 12px; }
+  .strip { width: 48px; height: 150px; }
+  .role .nm { font-size: 19px; }
+  .ea { grid-template-columns: 1fr; }
+  .basis li, .why li, .mrow { grid-template-columns: 1fr; }
   .option { grid-template-columns: 1fr; }
   .option .btn { width: 100%; }
   dl.kv { grid-template-columns: 1fr; gap: 0; }

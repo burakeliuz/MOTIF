@@ -25,7 +25,8 @@ from motif_spike.util import iso, utc_now
 
 from .brief import AXIS_LABELS, open_axes, template_prose, validate_prose
 
-PROMPT_VERSION = "prose-0.6"
+PROMPT_VERSION = "prose-0.6"  # legacy engine payload
+CONTINUOUS_PROMPT_VERSION = "prose-c1.0"  # continuous engine payload (kind "continuous")
 INTERPRET_VERSION = "interpret-0.1"
 DEFAULT_MODEL = "claude-sonnet-5-5"
 MAX_OUTPUT_TOKENS = 1500
@@ -48,6 +49,22 @@ SYSTEM = (
     "how the scent will be received. Name every axis listed under open_axes as open, using its label. Keep the "
     "difference between what Qloo returned (cultural descriptors) and MOTIF's creative translation visible. "
     "Plain English, at most 160 words, no headings."
+)
+
+
+SYSTEM_CONTINUOUS = (
+    "You write a short perfumer brief from a structured result produced by a deterministic engine. "
+    "Use only facts in the JSON. Qloo supplied only the literal descriptors (example_qloo_descriptors); motifs, dimensions, "
+    "and the scent architecture are MOTIF's creative translation, so never say that Qloo returned motifs or scents. "
+    "Related brands and films are entities Qloo relates to the brand; never say they share an audience, that an audience "
+    "likes or confirms anything, or that repetition proves an aesthetic. A dimension marked only_from_related_references "
+    "is a suggestion drawn from those references, not a described trait of the brand. Call a tentative dimension or a "
+    "tentative architecture role tentative. Name every dimension under open_dimensions as open to the perfumer. "
+    "lead is MOTIF's own summary: open with it in your own words and keep its emphasis. "
+    "user_intent, when present, is the user's stated purpose, shown to the reader on its own line above your text: do not "
+    "quote or restate it; it changed nothing in the result. Do not add notes, ingredients, materials, numbers, percentages, "
+    "doses, or claims about how the scent will be received; you may name only the directions, descriptors, and material "
+    "references given in scent_architecture. Plain English, at most 170 words, no headings."
 )
 
 
@@ -162,7 +179,7 @@ class AnthropicProseWriter:
             response = self.client.messages.create(
                 model=self.model,
                 max_tokens=MAX_OUTPUT_TOKENS,
-                system=SYSTEM,
+                system=SYSTEM_CONTINUOUS if payload.get("kind") == "continuous" else SYSTEM,
                 output_config={"effort": self.effort},
                 messages=[{"role": "user", "content": content}],
             )
@@ -291,10 +308,16 @@ def prose_payload(seed_name: str, result: Dict[str, Any], intent: Optional[str] 
 
 def write_prose(seed_name: str, result: Dict[str, Any], writer: Any = None, max_attempts: int = 2,
                 intent: Optional[str] = None) -> Dict[str, Any]:
-    template = template_prose(seed_name, result)
+    continuous = result.get("engine") == "continuous"
+    if continuous:
+        from . import story  # local: story imports the engine modules
+        template, check = story.template_prose(seed_name, result), story.validate_prose
+    else:
+        template, check = template_prose(seed_name, result), validate_prose
     if writer is None:
         return {"author": "template", "text": template, "llm": None, "note": "template prose (no LLM configured)"}
-    payload = prose_payload(seed_name, result, intent)
+    payload = story.prose_payload(seed_name, result, intent) if continuous else prose_payload(seed_name, result, intent)
+    describe = lambda: dict(writer.describe(), **({"prompt_version": CONTINUOUS_PROMPT_VERSION} if continuous else {}))  # noqa: E731
     feedback = None
     attempts = []
     for _ in range(max_attempts):
@@ -303,14 +326,14 @@ def write_prose(seed_name: str, result: Dict[str, Any], writer: Any = None, max_
         except Exception as exc:  # API error, refusal, budget: template prose, labelled, never shown as LLM output
             attempts.append({"error": type(exc).__name__, "detail": str(exc)[:160] if isinstance(exc, (BudgetExhausted, RuntimeError)) else None})
             break
-        problems = validate_prose(text, result, seed_name)
+        problems = check(text, result, seed_name)
         attempts.append({"problems": problems, "usage": getattr(writer, "last_usage", None)})
         if not problems:
-            return {"author": "llm", "text": text, "llm": dict(writer.describe(), attempts=attempts), "note": None}
+            return {"author": "llm", "text": text, "llm": dict(describe(), attempts=attempts), "note": None}
         feedback = "; ".join(problems)
     failed_call = any("error" in a for a in attempts)
     budget = any(a.get("error") == "BudgetExhausted" for a in attempts)
-    return {"author": "template", "text": template, "llm": dict(writer.describe(), attempts=attempts),
+    return {"author": "template", "text": template, "llm": dict(describe(), attempts=attempts),
             "note": ("LLM call budget reached; template prose shown instead" if budget
                      else "LLM call failed; template prose shown instead" if failed_call
                      else "LLM text failed validation; template prose shown instead")}

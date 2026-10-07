@@ -1,4 +1,4 @@
-# Olfactory layer: scent architecture (`olfactory-1.0`)
+# Olfactory layer: scent architecture (`olfactory-1.1`)
 
 Phase 8 of the engine refactor (2026-10-07). Config:
 `config/olfactory_directions.v1.json`. Code: `motif/olfactory.py`, called by the
@@ -86,12 +86,27 @@ the glossary data (when the git-ignored data is present).
    direction higher when a leading motif's odor imagery names its family
    (opulence, provocation, industrial only). The bonus never makes a direction
    eligible.
-5. Emphasize: up to three eligible directions that agree with a supported
+5. A direction *works with* every resolved dimension whose sign its cell
+   shares (every cell in the library is a deliberate claim of at least 0.25).
+   A role is labelled supported when its direction works with a supported
+   dimension, tentative otherwise.
+6. Emphasize: up to three eligible directions that work with a supported
    dimension. Avoid: up to three directions that work against a supported
-   dimension. A structure resting only on tentative dimensions is labelled
-   tentative and has no emphasize or avoid list.
+   dimension (by the conflict floor above). A structure resting only on
+   tentative dimensions is labelled tentative and has no emphasize or avoid list.
 
-## 5. On the 13 trial brands (offline)
+`olfactory-1.1` (2026-10-07) changed only rule 5. In 1.0, "works with" reused
+the conflict floor on target × cell; with small targets (about 0.1) a direction
+whose whole fit came from a resolved dimension was listed as working with
+nothing, and its role was labelled tentative even when that dimension was
+supported (found on the Hermès holdout brief in phase 9). Eligibility is
+unchanged, so no structure changed on the 13 trial or 4 resolved holdout
+brands; role bases, emphasize lists, and the "fits" lines can change. A
+stricter variant (any opposite-sign cell sets a direction aside) was tried and
+rejected: with five resolved dimensions it left MUJI with one role of three
+and made more brands share a structure.
+
+## 5. On the 13 trial brands (offline, `olfactory-1.1`)
 
 | Brand | Opening | Core | Drydown | Basis | Emphasize | Avoid | Legacy materials |
 |---|---|---|---|---|---|---|---|
@@ -104,7 +119,7 @@ the glossary data (when the git-ignored data is present).
 | Patagonia | Aromatic herbs | Dry woods | Earthy, mossy | supported | Aromatic herbs; Earthy, mossy; Green, leafy | Aldehydic, clean; Mineral, metallic; Watery, ozonic | none |
 | Aesop | Aromatic herbs | Dry woods | Earthy, mossy | supported | Aromatic herbs; Earthy, mossy; Green, leafy | Mineral, metallic; Aldehydic, clean; Ambery-woody molecule | Bergamot oil (Italy), HEDIONE®, HABANOLIDE® |
 | Supreme | Fresh spice (tentative) | Dry woods (tentative) | Smoke, incense (tentative) | tentative | — | — | none |
-| Gucci | open | Rich white floral | Resinous amber | supported | Resinous amber; Rich white floral | Watery, ozonic; Transparent floral | AMBROX® SUPER, HABANOLIDE® |
+| Gucci | open | Rich white floral | Resinous amber | supported | Resinous amber; Rich white floral; Ambery-woody molecule | Watery, ozonic; Transparent floral | AMBROX® SUPER, HABANOLIDE® |
 | Harley-Davidson | Fresh spice (tentative) | Smoke, incense (tentative) | Leather, animalic (tentative) | tentative | — | — | none |
 | Sanrio | Watery, ozonic (tentative) | Transparent floral (tentative) | Ambery-woody molecule (tentative) | tentative | — | — | none |
 | Balenciaga | Aldehydic, clean (tentative) | Mineral, metallic (tentative) | Ambery-woody molecule (tentative) | tentative | — | — | none |

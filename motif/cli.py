@@ -8,7 +8,8 @@
   python3 -m motif compare-engines --reference MUJI --recorded RUN [--choose ID] [--json]
 
 `run` uses the continuous engine by default (weighted motifs -> six continuous
-dimensions); `--engine legacy` runs the frozen rule engine engine-0.3 instead.
+dimensions -> scent architecture -> brief); `--engine legacy` runs the frozen rule
+engine engine-0.3 instead.
 `compare-engines` replays one recording and runs both engines on the same evidence.
 
 Live mode (no --recorded) sends real Qloo requests through motif_spike's
@@ -32,6 +33,7 @@ from motif_spike.util import data_root, iso, utc_now, write_json
 
 from . import ENGINE_VERSION
 from .agent import Controller
+from . import story
 from .brief import AXIS_LABELS, build_brief
 from .config import AXES, load_config, load_continuous_config
 from .continuous import run_continuous
@@ -103,11 +105,11 @@ def cmd_run(args) -> int:
                "requests": access.log, "network_attempts": access.network_attempts,
                "message": outcome.get("message")}
     brief = None
-    if args.engine == "legacy" and outcome.get("result") is not None and outcome["status"] == "completed":
+    if outcome.get("result") is not None and outcome["status"] == "completed":
         llm = writer_from_env(os.environ, ledger_path=root / "llm_calls.jsonl")
         session["llm_status"] = llm["status"]
         prose = write_prose(outcome["resolution"].get("name") or args.reference, outcome["result"], llm["writer"])
-        brief = build_brief(session, outcome["result"], prose)
+        brief = (story.build_brief if args.engine == "continuous" else build_brief)(session, outcome["result"], prose)
         write_json(session_dir / "brief.json", brief)
     if outcome.get("result") is not None:
         write_json(session_dir / "engine_result.json", outcome["result"])
@@ -177,7 +179,10 @@ def _print_human(session, outcome, brief, session_dir) -> None:
     result = outcome.get("result")
     if result and result.get("engine") == "continuous":
         print("\n" + "\n".join(_continuous_lines(result)))
-        print("\nThe written brief for the continuous engine comes with the scent architecture (phases 8-9).")
+        if brief:
+            print(f"\n{brief['headline']['label']}: {brief['headline']['title']}")
+            for line in brief["headline"]["lines"]:
+                print(f"  {line}")
     elif result:
         print(f"\nOutcome: {result['outcome']} — {result['outcome_meaning']}")
         print("Motifs (support before thresholds):")

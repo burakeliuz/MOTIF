@@ -111,12 +111,14 @@ class HubFlow(unittest.TestCase):
         self.assertEqual(v["data_label"], "live")
         self.assertEqual([s["key"] for s in v["steps"]], ["resolve", "own", "brand", "movie", "engine", "brief"])
         self.assertTrue(all(s["status"] in ("done", "skipped") for s in v["steps"]))
-        for axis in v["result"]["axes"]:
-            if axis["state"] != "target":
-                self.assertIsNone(axis["value"])  # nothing for the UI to place on the scale
+        self.assertEqual(v["result"]["engine"], "continuous")
+        for dim in v["result"]["dimensions"]:
+            if dim["state"] != "resolved":
+                self.assertNotIn("word", dim)  # nothing for the UI to place on the scale
+                self.assertTrue(dim["open_text"].startswith("Open to the perfumer"))
         self.assertEqual(v["brief"]["author"], "template")
-        mats = v["result"]["materials"]
-        self.assertNotEqual(mats["status_text"], mats["status"])  # every material status has plain-language copy
+        self.assertIn(v["result"]["architecture"]["status"], ("proposed", "open"))
+        self.assertNotEqual(v["result"]["outcome_text"], v["result"]["outcome"])  # every outcome has plain-language copy
         for m in v["result"]["motifs"]:
             for e in m["evidence"]:
                 self.assertEqual(e["provenance"], "qloo_observation")
@@ -486,8 +488,8 @@ class IntentAndReadings(unittest.TestCase):
         b = wait(hub, with_intent["id"])
         self.assertNotEqual(plain["id"], with_intent["id"])
         self.assertEqual(calls(hub), before)  # same reference: the Qloo cache is reused
-        self.assertEqual(a["result"]["axes"], b["result"]["axes"])
-        self.assertEqual(a["result"]["materials"], b["result"]["materials"])
+        self.assertEqual(a["result"]["dimensions"], b["result"]["dimensions"])
+        self.assertEqual(a["result"]["architecture"], b["result"]["architecture"])
         brief = hub.brief(with_intent["id"])
         self.assertEqual(brief["user_intent"]["provenance"], "user_intent")
         self.assertNotIn("a home scent", json.dumps(brief["evidence"]))
@@ -519,7 +521,8 @@ class IntentAndReadings(unittest.TestCase):
         hub.decide(r["id"], "s1", "accept")
         brief = hub.brief(r["id"])
         self.assertEqual(brief["accepted_readings"][0]["provenance"], "user_preference")
-        self.assertNotIn("shadowed", json.dumps(brief["evidence"]) + json.dumps(brief["motifs"]) + json.dumps(brief["axes"]))
+        self.assertNotIn("shadowed", json.dumps(brief["evidence"]) + json.dumps(brief["motif_scores"]) + json.dumps(brief["axes"])
+                         + json.dumps(brief["architecture"]))
         self.assertEqual(json.dumps(hub.view(r["id"])["result"], sort_keys=True), result_before)
         hub.decide(r["id"], "s1", "reject")
         self.assertEqual(hub.brief(r["id"])["accepted_readings"], [])

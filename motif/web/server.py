@@ -43,14 +43,14 @@ from motif_spike.transport import DirectTransport, direct_api_key
 from motif_spike.util import data_root, iso, utc_now, write_json
 
 from ..agent import Controller
-from ..brief import build_brief
-from ..config import AXES, EngineConfig, load_config
+from .. import story
+from ..config import AXES, ContinuousConfig, EngineConfig, load_config, load_continuous_config
 from ..interpret import suggest as suggest_readings
 from ..llm import write_prose, writer_from_env
 from ..qloo import LiveQloo, RecordedQloo
 from .access import AccessGate
 from .guard import PAUSED_NOTE, llm_guard
-from .present import candidate_view, result_view
+from .present import candidate_view, continuous_view
 from .usage import UsageError, UsageStore
 
 STATIC = Path(__file__).resolve().parent / "static"
@@ -99,8 +99,9 @@ class WebSession:
 
 class Hub:
     def __init__(self, config: EngineConfig, root: Path, recorded: Optional[List[Path]] = None,
-                 env: Optional[Dict[str, str]] = None):
-        self.config = config
+                 env: Optional[Dict[str, str]] = None, continuous: Optional[ContinuousConfig] = None):
+        self.config = config  # legacy configuration: budget and domain parameters
+        self.continuous = continuous or load_continuous_config()  # the engine the web runs
         self.env = os.environ if env is None else env  # LLM settings; tests pass their own mapping
         self.root = root
         self.recorded = recorded
@@ -140,7 +141,7 @@ class Hub:
                 "mode_label": "Recorded preview" if self.recorded else None,  # a live server shows no mode wording
                 "live_available": bool(self.recorded or self.live_ready),
                 "llm": "paused" if self._llm_paused() else "configured" if self._llm_configured() else "template",
-                "examples": EXAMPLES, "versions": self.config.versions}
+                "examples": EXAMPLES, "versions": self.continuous.versions}
 
     def create(self, body: Dict[str, Any], ip: str) -> (int, Dict[str, Any]):
         reference = str(body.get("reference", "")).strip()
@@ -220,7 +221,7 @@ class Hub:
             elif q and q["kind"] == "conflict":
                 out["question"] = {"kind": "conflict", "axis": q["axis"], "why": q["why"], "options": q["options"]}
             if o.get("result") is not None:
-                out["result"] = result_view(name, o["result"], self.config.rules, self.config.palette)
+                out["result"] = continuous_view(name, o["result"], self.continuous.library)
                 out["outcome"] = o["result"]["outcome"]
             else:
                 out["outcome"] = o.get("outcome")
@@ -365,7 +366,7 @@ class Hub:
                                                              "from_brand_itself")}
                     for item in (s.suggestions or {}).get("suggestions", []) if item.get("decision") == "accepted"]
         meta = {"data_label": s.data_label, "resolution": s.outcome["resolution"], "intent": s.params.get("intent")}
-        return build_brief(meta, s.outcome["result"], s.prose, accepted)
+        return story.build_brief(meta, s.outcome["result"], s.prose, accepted)
 
     def _run(self, s: WebSession) -> None:
         used = 0
@@ -390,7 +391,8 @@ class Hub:
 
                 access.request = tracked
                 p = s.params
-                controller = Controller(access, self.config, p["reference"], p["type"], p["choose"], overrides=p["overrides"])
+                controller = Controller(access, self.config, p["reference"], p["type"], p["choose"], overrides=p["overrides"],
+                                        engine="continuous", continuous=self.continuous)
                 s.controller = controller
                 try:
                     outcome = controller.run()

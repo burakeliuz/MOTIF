@@ -1,0 +1,142 @@
+"""Plain-language readings of a continuous result (motif/story.py) and its web view (SYNTHETIC evidence)."""
+
+try:
+    from . import _netguard  # noqa: F401
+    from .motif_fakes import AESTHETIC, STYLE, TONE, evidence_item as ev
+except ImportError:
+    import _netguard  # noqa: F401
+    from motif_fakes import AESTHETIC, STYLE, TONE, evidence_item as ev
+import json
+import unittest
+
+from motif import story
+from motif.config import load_continuous_config
+from motif.continuous import run_continuous
+from motif.llm import write_prose
+from motif.web.present import continuous_view
+
+CC = load_continuous_config()
+
+
+def result(evidence):
+    return run_continuous(evidence, CC.lexicon, CC.scoring, CC.vectors, CC.params, library=CC.library)
+
+
+# own entry: restraint and nature; related brands add opulence (a relations-only pull on weight)
+OWN_QUIET = [ev("own", "S", n, AESTHETIC) for n in ("Muted", "Understated", "Natural Materials", "Earthy")] + \
+            [ev("brand", "B1", "Muted", AESTHETIC), ev("brand", "B2", "Botanical", AESTHETIC)]
+RELATED_ONLY = [ev("brand", f"B{i}", n, AESTHETIC) for i, n in enumerate(("Lush", "Opulent", "Sumptuous", "Lavish"))] + \
+               [ev("movie", "M1", "Lush", STYLE)]
+
+
+class FakeWriter:
+    def __init__(self, text):
+        self.text, self.calls, self.payloads = text, 0, []
+
+    def describe(self):
+        return {"provider": "fake", "model": "fake-model"}
+
+    def write(self, payload, feedback=None):
+        self.calls += 1
+        self.payloads.append(payload)
+        return self.text
+
+
+class Headline(unittest.TestCase):
+    def test_own_motifs_lead_the_title(self):
+        r = result(OWN_QUIET)
+        h = story.headline("Synthquiet", r)
+        top = max(r["motif_scores"], key=lambda m: r["motif_scores"][m]["score"])
+        self.assertTrue(h["title"].startswith(story.MOTIF_LABELS[top].capitalize()))
+        self.assertIn("restraint", h["title"])
+        self.assertIn("direction", h["title"])
+        self.assertEqual(h["label"], "Scent direction")
+
+    def test_a_direction_from_references_only_never_leads_the_title(self):
+        h = story.headline("Synthlux", result(RELATED_ONLY))
+        self.assertEqual(h["title"], "A direction drawn from references Qloo relates to Synthlux.")
+        self.assertNotIn("dense", h["title"])
+
+    def test_own_motif_without_a_dimension_of_its_own_leads_and_the_references_are_named(self):
+        r = result([ev("own", "S", n, AESTHETIC) for n in ("Heritage", "Classic", "Timeless")]
+                   + [ev("brand", f"B{i}", n, AESTHETIC) for i, n in enumerate(("Precise", "Meticulous", "Tailored", "Precise"))])
+        h = story.headline("Synthold", r)
+        self.assertEqual(h["title"], "Heritage, from Synthold's own Qloo entry.")
+        self.assertIn("How to express heritage in scent is open to the perfumer.", h["lines"])
+        self.assertTrue(any(x.startswith("References Qloo relates to Synthold add") for x in h["lines"]))
+
+    def test_no_signal_says_so(self):
+        h = story.headline("Synthnone", result([ev("own", "S", "Typewriter Font", AESTHETIC)]))
+        self.assertEqual(h["label"], "No direction yet")
+
+
+class Prose(unittest.TestCase):
+    def test_template_passes_its_own_checks_and_names_every_open_dimension(self):
+        r = result(OWN_QUIET)
+        text = story.template_prose("Synthquiet", r)
+        self.assertEqual(story.validate_prose(text, r, "Synthquiet"), [])
+        for a in story.open_dims(r):
+            self.assertIn(story.DIM_NAMES[a].lower(), text.lower())
+        self.assertNotRegex(text, r"\d|%")
+
+    def test_validation_rejects_ingredients_numbers_and_claims(self):
+        r = result(OWN_QUIET)
+        opened = " ".join(story.DIM_NAMES[a] for a in story.open_dims(r)) + " are open to the perfumer."
+        self.assertTrue(any("ingredient" in p for p in story.validate_prose("Add oud and tonka. " + opened, r)))
+        self.assertTrue(any("percentage" in p for p in story.validate_prose("Use 20% of it. " + opened, r)))
+        self.assertTrue(any("claim" in p for p in story.validate_prose("Its audience loves calm. " + opened, r)))
+        self.assertEqual(story.validate_prose("Synth24 stays quiet. " + opened, r, "Synth24"), [])
+
+    def test_llm_text_is_used_only_when_it_passes(self):
+        r = result(OWN_QUIET)
+        opened = " ".join(story.DIM_NAMES[a] for a in story.open_dims(r)) + " stay open to the perfumer."
+        good = FakeWriter("A quiet, natural direction. " + opened)
+        out = write_prose("Synthquiet", r, good, intent="a scent for a reading room")
+        self.assertEqual(out["author"], "llm")
+        self.assertEqual(good.payloads[0]["kind"], "continuous")
+        self.assertEqual(good.payloads[0]["user_intent"], "a scent for a reading room")
+        self.assertEqual(out["llm"]["prompt_version"], "prose-c1.0")
+        bad = FakeWriter("Add 3 drops of oud. " + opened)
+        out = write_prose("Synthquiet", r, bad)
+        self.assertEqual(out["author"], "template")
+        self.assertEqual(bad.calls, 2)  # one controlled retry with the problems as feedback
+
+
+class View(unittest.TestCase):
+    def test_weak_signals_are_listed_when_nothing_leads(self):
+        v = continuous_view("Synthweak", result([ev("brand", "B1", "Muted", AESTHETIC)]), CC.library)
+        self.assertEqual(v["profile"], [])
+        self.assertEqual([m["motif"] for m in v["minor"]], ["restrained"])
+        self.assertEqual(v["headline"]["title"], "Weak signals only: no motif leads yet.")
+        self.assertIn("weaker signals", v["headline"]["lines"][0])
+
+    def test_open_dimensions_are_not_drawn_and_sources_are_honest(self):
+        v = continuous_view("Synthquiet", result(OWN_QUIET), CC.library)
+        for d in v["dimensions"]:
+            if d["state"] != "resolved":
+                self.assertNotIn("word", d)
+                self.assertTrue(d["open_text"].startswith("Open to the perfumer"))
+        q = v["sources"]["qloo"]
+        self.assertTrue(q["requests"])
+        self.assertNotIn("http", json.dumps(q))
+        urls = {m["url"] for r in v["architecture"]["roles"] for m in r.get("materials", []) if m.get("url")}
+        self.assertEqual({s["url"] for s in v["sources"]["suppliers"]}, urls)
+        for u in urls:
+            self.assertTrue(u.startswith("https://"))
+        self.assertEqual([r["role"] for r in v["architecture"]["roles"]], ["opening", "core", "drydown"])
+
+    def test_brief_json_keeps_user_data_apart(self):
+        r = result(OWN_QUIET)
+        brief = story.build_brief({"data_label": "live", "resolution": {"name": "Synthquiet"}, "intent": "a reading room"},
+                                  r, {"author": "template", "text": story.template_prose("Synthquiet", r)})
+        self.assertEqual(brief["schema_version"], "brief-1.0")
+        self.assertEqual(brief["user_intent"]["provenance"], "user_intent")
+        self.assertNotIn("reading room", json.dumps(brief["evidence"]) + json.dumps(brief["axes"]) + json.dumps(brief["architecture"]))
+        cited = {e["evidence_id"] for e in brief["evidence"]}
+        for w in brief["why"]:
+            for c in w["chain"]:
+                self.assertTrue(set(c["evidence_ids"]) <= cited)
+
+
+if __name__ == "__main__":
+    unittest.main()

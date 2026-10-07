@@ -155,3 +155,55 @@ PDF, and one-page PDFs. No Qloo or LLM request was made.
 - `docs/OLFACTORY_LAYER.md`; `tests/test_olfactory.py` (library rules, evidence
   consistency, trade names, IFRA names, matching, determinism, 13 brands).
 - 13 brands: 11 distinct structures (legacy: 3 material sets).
+
+## Phase 9: brief redesign on the continuous engine
+
+- The web app and the printed brief now run the continuous engine (the legacy
+  engine stays on the command line as `--engine legacy`, and as the frozen
+  baseline). The web controller fetches every configured domain and asks no
+  conflict question: an unresolved or two-way dimension is shown as open to the
+  perfumer.
+- `motif/story.py` (`brief-1.0`): plain-language readings of a continuous
+  result: the cultural profile (own-entry motifs lead), the headline (the brand's
+  own motifs lead the title; a direction drawn only from related references
+  never leads it and is said to come from "references Qloo relates to" the
+  brand), the why-chain (Qloo descriptor → motif → dimension), the template
+  prose, the prose checks (no ingredient outside the architecture, no numbers or
+  percentages, no audience or validation claims, every open dimension named),
+  and the brief JSON (user intent and accepted readings kept apart from
+  evidence).
+- `motif/llm.py`: a continuous prompt (`prose-c1.0`) and dispatch by engine;
+  same ledger, same one controlled retry, same labelled template on failure.
+- Result page and PDF sections: Cultural profile → Olfactory direction → Scent
+  architecture → Emphasize and avoid (only when a supported dimension backs it)
+  → Why: Qloo → motif → scent → The brief. Open dimensions and empty roles read
+  "Open to the perfumer"; the application context appears once, with no claim
+  that it changed anything; the Qloo source line and the request trail stay;
+  material references are examples of a class with a trade name only where
+  MOTIF read the supplier's page. The conflict question, the material dialog,
+  and the old material/how/direction blocks are removed from the page code.
+- The command line writes the continuous brief too (`run`, default engine).
+- Lists of labels that contain commas ("earthy, mossy") are joined with
+  semicolons in the brief text and the PDF.
+- Found in the recorded-data review of 17 brands (13 trial, 4 resolved
+  holdout): repeated sentences on the page (each profile row restated its
+  source sentence; the "why" chains re-quoted the profile's Qloo phrases; Nike's
+  empty profile repeated the headline). Now each Qloo phrase is quoted once on
+  the page, related-only motifs are marked "references only", and an empty
+  profile lists the weaker signals. Headline gaps: an own motif with no
+  dimension of its own now reads "Heritage, from Hermès' own Qloo entry." (not
+  a bare "Heritage."); weak signals that resolve a dimension without any leading
+  motif now say so instead of "Not enough repeated signal".
+- `olfactory-1.1` (version bump with a written reason in the library and in
+  `docs/OLFACTORY_LAYER.md`): "works with" is sign-based; eligibility is
+  unchanged, so no structure changed on the 17 brands. A stricter conflict rule
+  was tried and rejected.
+- Review of the 17 recorded brands on the final pages: one A4 page each, no
+  horizontal overflow (desktop and phone), the application context once, the Qloo
+  source line present, no internal wording, no page errors. IKEA stops at the
+  entity question (Qloo returns only stores), as in the holdout.
+- Tests: `tests/test_story.py` (headline rules, prose checks, LLM dispatch and
+  retry, view honesty, brief JSON); web, review, and browser tests updated to the
+  new sections (browser: section order from the served data, role names, "open
+  to the perfumer" on both pages, one A4 page, context once, no internal
+  wording, no extra request).

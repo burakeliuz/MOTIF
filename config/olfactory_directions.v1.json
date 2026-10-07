@@ -1,5 +1,5 @@
 {
- "library_version": "olfactory-1.0",
+ "library_version": "olfactory-1.1",
  "status": "active",
  "provenance_category": "design_rule",
  "notice": "MOTIF's MVP library of olfactory directions (accord types) for the scent architecture (docs/OLFACTORY_LAYER.md). A direction is a creative building block for a perfumer, not a formula: no doses, no proportions, no safety or regulatory statement. Its sensory cells are labelled: 'odor_data' cells come from config/candidates/odor_axis_evidence.v1.json (x2 = both rated datasets, x1 = one); 'design' cells are MOTIF's reading. Material references are examples of a class: the generic name and its descriptors come from the IFRA Fragrance Ingredient Glossary (2019) as digitized in the Pyrfume archive; a trade name appears only where MOTIF read the supplier's own page (identity and provenance only, never the sensory authority).",
@@ -1253,6 +1253,11 @@
    "version": "olfactory-1.0",
    "date": "2026-10-07",
    "reason": "Phase 8 of the engine refactor: scent architecture replaces the 7-material starting list as the product's olfactory output."
+  },
+  {
+   "version": "olfactory-1.1",
+   "date": "2026-10-07",
+   "reason": "Phase 9 review (Hermès holdout brief): 'works with' used the conflict floor on target x cell, so with small targets (value x confidence about 0.1) a direction whose whole fit came from a resolved dimension was listed as working with nothing, and its role was labelled tentative even when that dimension was supported. Every cell in this library is at least 0.25 in size (no trace cells), so 'works with' is now any resolved dimension whose sign the cell shares. Eligibility and conflicts are unchanged (conflict_floor on target x cell), so no structure changes on the 13 trial and 4 holdout brands; role bases, emphasize lists, and the 'fits' lines can change."
   }
  ],
  "matching": {
@@ -1261,6 +1266,6 @@
   "imagery_bonus": 0.1,
   "max_emphasize": 3,
   "max_avoid": 3,
-  "why": "fit = cosine similarity between the resolved commitment vector and the direction's cells; a direction that works against a resolved dimension by at least conflict_floor (target x cell) is set aside; imagery_bonus x motif score is added when a leading motif's odor imagery names the direction's family (ranking only, never eligibility)."
+  "why": "fit = cosine similarity between the resolved commitment vector and the direction's cells; a direction that works against a resolved dimension by at least conflict_floor (target x cell) is set aside; a direction works with every resolved dimension whose sign its cell shares (olfactory-1.1); imagery_bonus x motif score is added when a leading motif's odor imagery names the direction's family (ranking only, never eligibility)."
  }
 }

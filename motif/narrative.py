@@ -228,12 +228,7 @@ def open_design_questions(name: str, result: Dict[str, Any]) -> List[Dict[str, A
 
 def unread_descriptors(result: Dict[str, Any], limit: int = 12) -> List[Dict[str, Any]]:
     """Descriptors Qloo returned that no lexicon cue reads: own entry first, then repeated ones from references."""
-    read = set()
-    for info in result["motifs"].values():
-        read.update(info["support_evidence_ids"])
-        read.update(info["context_evidence_ids"])
-        read.update(info.get("negated_evidence_ids", []))
-        read.update(x["evidence_id"] for x in info.get("excluded_evidence", []))
+    read = {a["evidence_id"] for a in result["annotations"]}  # any lexicon match, whatever its role (both engines)
     groups: Dict[str, Dict[str, Any]] = {}
     for e in result["evidence"]:
         tag = e["tag_name"].strip()

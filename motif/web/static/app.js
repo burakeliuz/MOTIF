@@ -16,7 +16,6 @@ let pollTimer = null;
 let pollFailures = 0;
 let posting = false;
 let shown = { id: null, mode: null };
-let openMaterial = null;
 
 // ---------- helpers ----------
 
@@ -129,7 +128,7 @@ function renderStart() {
     ? h("p", { class: "notice", role: "status", text: "Live Qloo access is not configured on this server, so searches cannot run. Nothing is replaced with sample data." }) : null;
   swap(h("section", { class: "hero" },
       h("h1", {}, h("span", { text: "If a brand" }), h("span", { text: "were a" }), h("span", { class: "acc", text: "scent." })),
-      h("p", { class: "benefit", text: "Turn a brand's cultural references into a scent direction, starting materials, and a one-page brief for a perfumer, with every step traceable." }),
+      h("p", { class: "benefit", text: "Turn a brand's cultural references into a scent direction, a scent architecture, and a one-page brief for a perfumer, with every step traceable." }),
       notice, form),
     h("section", { class: "how", "aria-labelledby": "how-title" },
       h("h2", { class: "kicker", id: "how-title", text: "How it works" }),
@@ -137,7 +136,7 @@ function renderStart() {
         h("li", {}, h("b", { text: "01" }), h("span", { class: "st" }, src("Qloo"), " Cultural references"),
           h("span", { text: "How Qloo describes the brand, and the brands and films it relates to it." })),
         h("li", {}, h("b", { text: "02" }), h("span", { class: "st" }, src("MOTIF"), " Scent direction"),
-          h("span", { text: "Repeated motifs, translated by visible rules into a direction and verified starting materials." })),
+          h("span", { text: "Weighted motifs, translated into six sensory dimensions and an opening, core, and drydown." })),
         h("li", {}, h("b", { text: "03" }), h("span", { class: "st" }, src("MOTIF"), " Brief"),
           h("span", { text: "A one-page brief for a perfumer, every line traceable to the evidence." })))));
   window.scrollTo({ top: 0 });
@@ -213,26 +212,6 @@ function renderChoose(s) {
   focusHeading();
 }
 
-function renderConflict(s) {
-  shown = { id: s.id, mode: "conflict" };
-  const q = s.question;
-  const axis = (s.result && s.result.axes.find((a) => a.key === q.axis)) || { name: q.axis, pushes: [] };
-  swap(h("section", { class: "stage" },
-    h("p", { class: "kicker", text: "One question" }),
-    h("h1", { text: "Two ways on " + axis.name.toLowerCase() }),
-    h("p", { class: "lede", text: "Different motifs push this dimension toward opposite poles. MOTIF does not average them: choose one, or leave it open." }),
-    s.intent ? h("p", { class: "intentline", text: "Your stated purpose: " + s.intent }) : null,
-    h("ul", { class: "options" }, (axis.pushes || []).map((p) => {
-      const row = ((s.result && s.result.profile) || []).find((x) => x.motif === p.motif);
-      return h("li", { class: "option" }, h("div", {}, h("div", { class: "name", text: (row ? row.label : cap(p.motif)) + " → " + p.pole }),
-        row ? h("div", { class: "meta", text: row.strength_label + " · " + row.source_short.join(", ") }) : null));
-    })),
-    h("div", { class: "actions" }, q.options.map((opt) => h("button", { class: opt === "open" ? "btn ghost" : "btn", type: "button", "data-starts": true,
-      onclick: () => startSearch(s.reference, { choose: s.choose, parent: s.id, intent: s.intent || "",
-        resolve_conflict: Object.assign({}, s.overrides || {}, { [q.axis]: opt }) }) }, opt === "open" ? "Leave it open" : "Toward " + opt)))));
-  focusHeading();
-}
-
 // ---------- result ----------
 
 function section(num, title, ...body) {
@@ -240,72 +219,10 @@ function section(num, title, ...body) {
     h("h2", {}, h("span", { class: "num", text: num }), title), h("div", { class: "body" }, body));
 }
 
-function supplierLink(url) {
+function supplierLink(url, text) {
   let host = "";
   try { host = new URL(url).hostname; } catch (e) { return null; }
-  return h("a", { href: url, target: "_blank", rel: "noopener noreferrer", text: host });
-}
-
-function materialDetail(m, brand) {
-  const asked = m.props.filter((p) => p.requested);
-  const other = m.props.filter((p) => !p.requested);
-  const quote = (p) => h("div", { class: "prop" },
-    h("div", { class: "k", text: p.axis + ": " + p.word }),
-    h("div", {}, p.supplier_text ? h("q", { text: p.supplier_text }) : null,
-      p.source_url ? h("div", { class: "why" }, "Supplier page: ", supplierLink(p.source_url)) : null));
-  return h("div", { class: "matdetail", id: "matdetail", tabindex: "-1" },
-    h("p", { class: "kicker", text: "Suggested starting role: " + m.slot }),
-    h("h3", {}, m.name, h("span", { class: "sc", text: " · " + (m.scent || "") })),
-    h("p", { class: "mute", text: (m.plain ? cap(m.plain) + " · " : "") + (m.supplier_short || "") }),
-    h("h4", { text: "Why MOTIF chose it" }),
-    h("p", { text: "It fits " + brand + "'s proposed direction on " + m.fits.map((f) => f.toLowerCase()).join(" and ")
-      + ". A starting point for the perfumer, not a tested formula." }),
-    m.props.length ? [h("h4", { text: "Supplier's description" }), asked.map(quote), other.map(quote)] : null,
-    m.props.some((p) => p.interpretation) ? [h("h4", { text: "MOTIF's reading" }),
-      h("ul", { class: "reading" }, m.props.filter((p) => p.interpretation).map((p) => h("li", { text: p.interpretation })))] : null,
-    h("p", { class: "patnote", text: MotifStrips.NOTE }));
-}
-
-function referenceList(ref) {
-  return [h("p", { class: "intro", text: ref.note }),
-    h("ul", { class: "candlist" }, ref.items.map((m) => h("li", {},
-      h("b", { text: m.name }), " · " + (m.scent || "") + " · fits " + m.fits.map((f) => f.toLowerCase()).join(", ") + " · ",
-      m.source ? h("a", { href: m.source.url, target: "_blank", rel: "noopener noreferrer", text: m.source.supplier + " page" }) : m.supplier_short)))];
-}
-
-function materialsBlock(r, brand) {
-  const mats = r.materials;
-  if (!mats.selected.length) {
-    return h("div", { class: "nocomp" }, h("p", { text: mats.status_text }), mats.reference ? referenceList(mats.reference) : null);
-  }
-  const detailHost = h("div", {});
-  const buttons = [];
-  const select = (m, btn) => {
-    const same = openMaterial === m.id;
-    openMaterial = same ? null : m.id;
-    buttons.forEach((b) => b.setAttribute("aria-expanded", "false"));
-    detailHost.replaceChildren();
-    if (!same) { btn.setAttribute("aria-expanded", "true"); detailHost.append(materialDetail(m, brand)); }
-  };
-  const grid = h("div", { class: "strips" }, mats.selected.map((m) => {
-    const strip = h("span", { class: "strip", "aria-hidden": "true" });
-    strip.append(MotifStrips.svg(m.props));
-    const btn = h("button", { type: "button", class: "mat", "aria-expanded": "false", "aria-controls": "matdetail",
-      "aria-label": m.slot + ", suggested starting role: " + m.name + ", " + (m.scent || "") + ". Show why and sources." },
-      strip,
-      h("span", {}, h("span", { class: "slot", text: m.slot }), h("span", { class: "role", text: "suggested starting role" }),
-        h("span", { class: "nm", text: m.name }), h("span", { class: "sc", text: m.scent || "" }),
-        h("span", { class: "more", text: "Why and sources" })));
-    btn.addEventListener("click", () => select(m, btn));
-    buttons.push(btn);
-    return btn;
-  }));
-  if (openMaterial) {
-    const i = mats.selected.findIndex((x) => x.id === openMaterial);
-    if (i >= 0) { buttons[i].setAttribute("aria-expanded", "true"); detailHost.append(materialDetail(mats.selected[i], brand)); }
-  }
-  return [h("p", { class: "intro", text: mats.status_text + " Select a strip for why and the supplier's own words." }), grid, detailHost,
-    mats.empty_slots && mats.empty_slots.length ? h("p", { class: "mute small", text: "No verified material for: " + mats.empty_slots.join(", ") + "; left open to the perfumer." }) : null];
+  return h("a", { href: url, target: "_blank", rel: "noopener noreferrer", text: text || host });
 }
 
 function phraseButtons(items, motif) {
@@ -314,15 +231,99 @@ function phraseButtons(items, motif) {
 }
 
 function profileBlock(r, brand) {
-  if (!r.profile.length) return h("p", { class: "intro", text: r.headline.lines.join(" ") || r.outcome_text });
   const byMotif = Object.fromEntries(r.motifs.map((m) => [m.motif, m]));
-  return [h("p", { class: "intro" }, h("b", { text: "Cultural evidence sourced from Qloo." }), " The motifs MOTIF reads in it, strongest evidence first; motifs from " + brand + "'s own entry lead."),
-    h("ul", { class: "basis" }, r.profile.map((p) => h("li", {},
-      h("div", { class: "ax" }, p.label, h("small", { text: p.strength_label + " · " + p.source_short.join(", ") })),
-      h("div", {},
-        h("p", { class: p.basis.kind === "related_only" ? "rel" : null, text: p.basis.text }),
-        h("p", { class: "tr" + (p.state === "direction" ? "" : " open"), text: p.translation }),
-        phraseButtons(p.examples, byMotif[p.motif] || { label: p.label, strength_label: p.strength_label, rule: null })))))];
+  const rows = (ps) => h("ul", { class: "basis" }, ps.map((p) => h("li", { class: p.basis.kind === "related_only" ? "rel" : null },
+    h("div", { class: "ax" }, p.label, h("small", { text: p.strength_label + " · " + (p.basis.kind === "related_only" ? "references only: " : "") + p.source_short.join(", ") })),
+    h("div", {},
+      p.translation ? h("p", { class: "tr" + (/^Moves/.test(p.translation) ? "" : " open"), text: p.translation }) : null,
+      phraseButtons(p.examples, byMotif[p.motif] || p)))));
+  const qloo = h("b", { text: "Cultural evidence sourced from Qloo." });
+  if (!r.profile.length) return [h("p", { class: "intro" }, qloo, r.minor.length
+      ? " The weaker signals MOTIF reads in it; none is strong enough to lead." : " MOTIF reads no motif in it."),
+    r.minor.length ? rows(r.minor) : null];
+  return [h("p", { class: "intro" }, qloo, " The motifs MOTIF reads in it, strongest evidence first; motifs from " + brand + "'s own entry lead. “References only” marks a motif found only in brands and films Qloo relates to " + brand + "."),
+    rows(r.profile)];
+}
+
+function dimensionsBlock(r) {
+  const resolved = r.dimensions.filter((d) => d.state === "resolved");
+  const open = r.dimensions.filter((d) => d.state !== "resolved");
+  return h("div", { class: "dir" },
+    resolved.length ? h("div", { class: "char" }, resolved.map((d) => h("span", { class: "w" + (d.tentative ? " rel" : "") },
+      h("span", { class: "v", text: d.word }), h("small", { text: d.name + " · " + d.confidence_word })))) : h("p", { class: "none", text: "No dimension is resolved yet." }),
+    open.length ? h("ul", { class: "openlist" }, open.map((d) => h("li", {}, h("b", { text: d.name + ": " }), d.open_text))) : null,
+    resolved.some((d) => d.tentative) ? h("p", { class: "mute small", text: "Tentative leanings rest on MOTIF's design reading alone; supported ones on the brand's motifs with a medium-confidence translation." }) : null);
+}
+
+function roleDetail(role) {
+  if (!role.materials.length) return h("p", { class: "mute small", text: "No material reference is named for this direction." });
+  return h("details", { class: "refs" }, h("summary", { text: "Material references" }),
+    h("ul", {}, role.materials.map((m) => h("li", {}, h("b", { text: m.generic }),
+      m.example ? [" (e.g. ", m.url ? supplierLink(m.url, m.example) : m.example, ")"] : null,
+      m.ifra ? h("span", { class: "mute", text: " · " + m.ifra.join(", ") }) : null,
+      h("span", { class: "mute small", text: " · " + m.source })))),
+    h("p", { class: "mute small", text: "Examples of the class, not a formula: no doses or proportions. A trade name is given only where MOTIF read the supplier's page." }));
+}
+
+function architectureBlock(r) {
+  const a = r.architecture;
+  if (a.status !== "proposed") return h("p", { class: "intro", text: "No scent architecture is proposed: no dimension is resolved. The structure is open to the perfumer." });
+  return [a.tentative ? h("p", { class: "intro", text: "Tentative: every role here rests on tentative leanings." }) : null,
+    h("div", { class: "roles" }, a.roles.map((role) => {
+      if (role.open) return h("div", { class: "role open" }, h("p", { class: "kicker", text: role.name }), h("p", { class: "nm", text: "Open to the perfumer" }));
+      const strip = h("span", { class: "strip", "aria-hidden": "true" });
+      strip.append(MotifStrips.svg(role.props));
+      return h("div", { class: "role" }, strip,
+        h("div", {}, h("p", { class: "kicker", text: role.name + (role.tentative ? " · tentative" : "") }),
+          h("p", { class: "nm", text: role.label }), h("p", { class: "sc", text: role.descriptors.join(", ") }),
+          role.works_with.length ? h("p", { class: "mute small", text: "Fits the " + role.works_with.join(" and ") + "." }) : null,
+          roleDetail(role)));
+    }))];
+}
+
+function emphasizeBlock(r) {
+  const a = r.architecture;
+  const list = (items) => h("ul", {}, items.map((x) => h("li", {}, h("b", { text: x.label }), " · " + x.because.join(", "))));
+  return h("div", { class: "ea" },
+    a.emphasize.length ? h("div", {}, h("h3", { class: "kicker", text: "Emphasize" }), list(a.emphasize)) : null,
+    a.avoid.length ? h("div", {}, h("h3", { class: "kicker", text: "Avoid" }), list(a.avoid)) : null);
+}
+
+function sourcesList(r) {
+  const q = r.sources.qloo;
+  return h("div", { class: "sources" },
+    h("h3", { class: "kicker", text: "Sources" }),
+    h("ul", {},
+      h("li", {}, h("b", { text: "Cultural evidence sourced from Qloo" }), " · fetched " + q.dates.join(", ") + " · "
+        + [...new Set(q.requests.map((x) => x.what.charAt(0).toLowerCase() + x.what.slice(1)))].join(", ")
+        + ". Each phrase above opens its source; the full trail is in the technical JSON."),
+      r.sources.suppliers.map((x) => h("li", {}, h("b", { text: x.supplier }), " · " + x.material + " · ", supplierLink(x.url, "supplier page")))));
+}
+
+function whyBlock(s, r, brand) {
+  const byMotif = Object.fromEntries(r.motifs.map((m) => [m.motif, m]));
+  const res = s.resolution || {};
+  const motifRow = (m) => h("div", { class: "mrow" },
+    h("div", {}, h("h3", { text: m.label }), h("div", { class: "sp", text: m.strength_label + (m.active ? " · leads" : " · minor") + " · " + m.sources.join(", ") })),
+    h("div", {}, h("div", {}, src("Qloo"), " ", phraseButtons(m.evidence, m)), m.translation ? h("div", { class: "rl" }, src("MOTIF"), " ", m.translation) : null));
+  // Qloo phrases are quoted once on the page: motifs of the cultural profile point back to it
+  const quoted = new Set(r.profile.map((p) => p.motif));
+  const cite = (c) => {
+    if (quoted.has(c.motif)) return h("span", { class: "mute", text: " · Qloo phrases in the cultural profile" });
+    quoted.add(c.motif);
+    return [" · ", phraseButtons(c.examples, byMotif[c.motif] || c)];
+  };
+  return [h("p", { class: "intro", text: "Qloo supplied the descriptors, quoted literally. MOTIF weighs them into motifs and translates the motifs into dimensions; the scent architecture follows from the dimensions." }),
+    r.why.length ? h("ul", { class: "why" }, r.why.map((w) => h("li", {},
+      h("div", { class: "ax" }, w.name, h("small", { text: w.word + (w.confidence_word ? " · " + w.confidence_word : "") })),
+      h("div", {}, w.chain.map((c) => h("p", {}, h("b", { text: c.label }), " → " + c.toward + (c.tentative ? " (tentative)" : ""), cite(c))))))) : h("p", { text: "No dimension to explain yet." }),
+    h("details", { class: "fold", id: "how" },
+      h("summary", {}, "All motifs and sources", h("small", { text: "Every phrase opens its entity, field, request, and date" })),
+      r.motifs.map(motifRow),
+      sourcesList(r),
+      h("details", { class: "tech" }, h("summary", { text: "Full trace" }),
+        h("p", { text: "Qloo entity: " + (res.name || brand) + (s.fetched ? " · fetched " + when(s.fetched[0]) : "") }),
+        h("p", {}, "Full trail: ", h("a", { href: "/api/sessions/" + encodeURIComponent(s.id) + "/brief.json", download: "motif-brief.json", text: "technical JSON" }), ".")))];
 }
 
 function briefBlock(s) {
@@ -337,66 +338,19 @@ function briefBlock(s) {
       h("a", { class: "btn ghost", href: "/api/sessions/" + encodeURIComponent(s.id) + "/brief.json", download: "motif-brief.json", text: "Technical JSON" })));
 }
 
-function sourcesList(r) {
-  const q = r.sources.qloo;
-  return h("div", { class: "sources" },
-    h("h3", { class: "kicker", text: "Sources" }),
-    h("ul", {},
-      h("li", {}, h("b", { text: "Cultural evidence sourced from Qloo" }), " · fetched " + q.dates.join(", ") + " · "
-        + [...new Set(q.requests.map((x) => x.what.toLowerCase()))].join(", ")
-        + ". Each phrase above opens its source; the full trail is in the technical JSON."),
-      r.sources.suppliers.map((x) => h("li", {}, h("b", { text: x.supplier }), " · " + x.material + " · ",
-        h("a", { href: x.url, target: "_blank", rel: "noopener noreferrer", text: x.document || x.url }), x.accessed ? " · read " + x.accessed : ""))));
-}
-
-function howBlock(s, r, brand) {
-  const active = r.motifs.filter((m) => m.active);
-  const rest = r.motifs.filter((m) => !m.active);
-  const motifRow = (m) => h("div", { class: "mrow" },
-    h("div", {}, h("h3", { text: m.label }), h("div", { class: "sp", text: m.strength_label + (m.active ? " · used" : " · not used") + " · " + m.sources.join(", ") })),
-    h("div", {},
-      h("div", {}, src("Qloo"), " ", phraseButtons(m.evidence.slice(0, 8), m), m.evidence.some((e) => e.common_in_sample) ? h("span", { class: "tag-common", text: "some common in sample" }) : null),
-      h("div", { class: "rl" }, src("MOTIF"), " ", m.rule ? "Translated as " + m.rule.text.toLowerCase() + "." : "Not translated into a scent dimension."),
-      m.excluded.length ? h("div", { class: "rl mute", text: "Set aside by context rules: " + m.excluded.map((e) => e.tag).join(", ") }) : null));
-  const res = s.resolution || {};
-  return h("details", { class: "fold", id: "how" },
-    h("summary", {}, "How it was made", h("small", { text: "Motifs, rules, and sources; technical records inside" })),
-    h("p", { class: "intro", text: "Qloo supplied the descriptors, quoted here literally. MOTIF groups them into motifs and translates the motifs into a direction. A motif repeated across references is a pattern, not proof of an aesthetic; descriptors marked common appear for at least four of the seven brands in MOTIF's reference sample." }),
-    active.length ? active.map(motifRow) : h("p", { text: "No motif reached the threshold for use." }),
-    rest.length ? h("details", { class: "tech" }, h("summary", { text: "Seen but not used (" + rest.length + ")" }), rest.map(motifRow)) : null,
-    sourcesList(r),
-    h("details", { class: "tech" }, h("summary", { text: "Full trace" }),
-      h("p", { text: "Qloo entity: " + (res.name || brand) + (s.fetched ? " · fetched " + when(s.fetched[0]) : "") }),
-      h("p", {}, "Every phrase above opens its entity, field, request, and date. Full trail: ", h("a", { href: "/api/sessions/" + encodeURIComponent(s.id) + "/brief.json", download: "motif-brief.json", text: "technical JSON" }), ".")));
-}
-
-function directionBlock(r, brand) {
-  const words = r.direction.map((d) => h("span", { class: "w" + (d.relations_only ? " rel" : "") },
-    h("span", { class: "v", text: d.word }), h("small", { text: d.axis + (d.relations_only ? " · related references only" : "") })));
-  const axes = h("details", { class: "axes" }, h("summary", { text: "All six dimensions" }),
-    h("dl", { class: "kv" }, r.axes.map((a) => {
-      const d = r.direction.find((x) => x.key === a.key);
-      return [h("dt", { text: a.name + " (" + a.poles[0] + " / " + a.poles[1] + ")" }),
-        h("dd", { text: d ? d.word + " · " + (d.basis ? d.basis.text : "")
-          : a.state === "conflicted" ? "Open to the perfumer: the evidence points both ways." : "Open to the perfumer: the evidence does not decide it." })];
-    })));
-  return h("div", { class: "dir" },
-    words.length ? h("div", { class: "char" }, words) : h("p", { class: "none", text: "None yet." }),
-    r.still_open.length ? h("p", { class: "stillopen", text: "Open to the perfumer: " + r.still_open.map((a) => a.axis.toLowerCase()).join(", ") + "." }) : null,
-    axes);
-}
-
 function renderResult(s, opts) {
   const r = s.result;
   const brand = (s.resolution && s.resolution.name) || s.reference;
   const fresh = !(shown.id === s.id && shown.mode === "result");
-  if (fresh) openMaterial = null;
   const keepOpen = new Set([...(opts && opts.keepOpen ? [opts.keepOpen] : []), ...[...view.querySelectorAll("details[open][id]")].map((d) => d.id)]);
   shown = { id: s.id, mode: "result" };
   const made = [src("Qloo"), src("MOTIF"), s.brief && s.brief.author === "llm" ? src("Claude") : null];
   const banners = [];
   if (s.status === "stopped") banners.push(h("div", { class: "notice", role: "status" },
     h("p", {}, h("b", { text: "Research stopped early. " }), (s.message || "") + " What follows uses only what was fetched before the stop."), retryBlock(s)));
+  let n = 0;
+  const num = () => String(++n).padStart(2, "0");
+  const a = r.architecture;
   swap(h("section", { class: "res" },
     banners,
     h("div", { class: "lead" },
@@ -407,11 +361,12 @@ function renderResult(s, opts) {
       h("div", { class: "main" },
         h("p", { class: "idea", text: r.headline.title }),
         r.headline.lines.map((line) => h("p", { class: "line", text: line })))),
-    section("01", "Cultural profile", profileBlock(r, brand)),
-    section("02", "MOTIF's proposed direction", directionBlock(r, brand)),
-    section("03", "Starting materials", materialsBlock(r, brand)),
-    section("04", "Evidence", howBlock(s, r, brand)),
-    section("05", "The brief", briefBlock(s))));
+    section(num(), "Cultural profile", profileBlock(r, brand)),
+    section(num(), "Olfactory direction", dimensionsBlock(r)),
+    section(num(), "Scent architecture", architectureBlock(r)),
+    a.emphasize.length || a.avoid.length ? section(num(), "Emphasize and avoid", emphasizeBlock(r)) : null,
+    section(num(), "Why: Qloo → motif → scent", whyBlock(s, r, brand)),
+    section(num(), "The brief", briefBlock(s))));
   keepOpen.forEach((id) => { const d = document.getElementById(id); if (d) d.open = true; });
   if (fresh) { focusHeading(); say("Result ready for " + brand + "."); }
 }
@@ -431,7 +386,7 @@ function openEvidence(item, motif, kind, opener) {
     h("div", { class: "ev-part" }, h("h3", {}, src("MOTIF"), " MOTIF's reading, not from Qloo"),
       h("dl", { class: "kv" },
         h("dt", { text: "Motif" }), h("dd", { text: motif.label + " · " + motif.strength_label }),
-        h("dt", { text: "Translation" }), h("dd", { text: motif.rule ? motif.rule.text : "Not translated into a scent dimension" }))),
+        h("dt", { text: "Translation" }), h("dd", { text: motif.translation || "No sensory claim: open to the perfumer" }))),
     h("details", { class: "tech" }, h("summary", { text: "Technical record" }),
       h("dl", { class: "kv" },
         h("dt", { text: "Field" }), h("dd", {}, h("code", { text: item.tag_type })),
@@ -473,7 +428,6 @@ async function loadSession(id, opts) {
   const s = res.data;
   if (s.status === "running") { renderProgress(s); pollTimer = window.setTimeout(() => loadSession(id), 800); }
   else if (s.status === "needs_choice" && s.question && s.question.kind === "choose_entity") renderChoose(s);
-  else if (s.status === "needs_choice" && s.question && s.question.kind === "conflict") renderConflict(s);
   else if ((s.status === "completed" || s.status === "stopped") && s.result) renderResult(s, opts);
   else if (s.status === "stopped") renderProblem(s.outcome === "not_found" ? "Qloo found nothing under this name" : "The research stopped", s.message || "The research stopped.", s);
   else renderProblem("Something went wrong", s.message || "The server reported an error. No result is shown as complete.", s);

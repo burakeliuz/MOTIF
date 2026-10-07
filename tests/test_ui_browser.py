@@ -89,11 +89,19 @@ class StartResultAndBrief(unittest.TestCase):
         self.assertIsNone(self.c["result_banned"])
         self.assertFalse(self.c["result_has_suggest_block"])
         self.assertIsNone(self.c["pdf_banned"])
+        sid = next(iter(self.hub.sessions))
+        arch = self.hub.view(sid)["result"]["architecture"]
+        extra = ["Emphasize and avoid"] if arch["emphasize"] or arch["avoid"] else []
         self.assertEqual([s[2:] for s in self.c["result_sections"]],
-                         ["Cultural profile", "MOTIF's proposed direction", "Starting materials", "Evidence", "The brief"])
+                         ["Cultural profile", "Olfactory direction", "Scent architecture"] + extra
+                         + ["Why: Qloo \u2192 motif \u2192 scent", "The brief"])
         self.assertEqual([s[2:] for s in self.c["pdf_sections"]],
-                         ["Cultural profile", "MOTIF's proposed direction", "Starting materials", "Evidence", "The brief"])
+                         ["Cultural profile", "Olfactory direction", "Scent architecture"] + extra + ["Why", "The brief"])
         self.assertEqual(self.c["pdf_pages"], 1)
+
+    def test_open_dimensions_and_roles_say_so_plainly(self):
+        self.assertEqual(self.c["result_role_names"], ["Opening", "Core", "Drydown"])
+        self.assertEqual(self.c["pdf_open_count"] > 0, self.c["result_open_count"] > 0)
 
     def test_no_internal_wording_and_the_context_appears_once(self):
         self.assertIsNone(self.c["result_internal"])

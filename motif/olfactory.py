@@ -6,7 +6,8 @@ dimensions (value x confidence; open dimensions are 0, so they constrain nothing
 direction's fit is its cosine similarity with that target. A direction that works against a
 resolved dimension by more than a trace (target x cell <= -conflict_floor) is set aside; the
 others fill opening, core, and drydown in that order, best fit first, each direction at most
-once. A role with no eligible direction stays open to the perfumer. "Emphasize" and "avoid"
+once. A direction works with every resolved dimension whose sign its cell shares (every cell
+in the library is a deliberate claim of at least 0.25; olfactory-1.1). A role with no eligible direction stays open to the perfumer. "Emphasize" and "avoid"
 are given only where a supported (not tentative) dimension backs them.
 
 Material references are examples of each chosen direction's class, generic name first, with a
@@ -47,7 +48,7 @@ def score_directions(axes: Dict[str, Dict[str, Any]], motif_scores: Dict[str, Di
         dot = sum(t.get(a, 0.0) * v[a] for a in AXES)
         fit = dot / (tn * vn) if tn and vn else 0.0
         against = sorted(a for a in t if t[a] * v[a] <= -m["conflict_floor"])
-        toward = sorted(a for a in t if t[a] * v[a] >= m["conflict_floor"])
+        toward = sorted(a for a in t if t[a] * v[a] > 0)  # olfactory-1.1: every cell is a deliberate claim
         echo = sorted(mo for mo, fams in imagery.items() if fams & set(d.get("odor_families", [])))
         bonus = m["imagery_bonus"] * max((motif_scores[mo]["score"] for mo in echo), default=0.0)
         rows.append({"id": d["id"], "label": d["label"], "roles": d["roles"], "fit": round(fit, 6),

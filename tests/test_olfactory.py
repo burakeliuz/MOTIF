@@ -80,9 +80,12 @@ class Library(unittest.TestCase):
 
     @unittest.skipUnless((IFRA / "ifra_2019__behavior.csv").exists(), "IFRA glossary data not on disk (data/ is git-ignored)")
     def test_generic_names_and_descriptors_are_in_the_ifra_glossary(self):
-        beh = list(csv.DictReader((IFRA / "ifra_2019__behavior.csv").open(encoding="utf-8")))
-        mol = {r["CID"]: r["name"] for r in csv.DictReader((IFRA / "ifra_2019__molecules.csv").open(encoding="utf-8"))}
-        stim = {r["Stimulus"]: r["CID"] for r in csv.DictReader((IFRA / "ifra_2019__stimuli.csv").open(encoding="utf-8"))}
+        def table(name):
+            with (IFRA / name).open(encoding="utf-8") as f:
+                return list(csv.DictReader(f))
+        beh = table("ifra_2019__behavior.csv")
+        mol = {r["CID"]: r["name"] for r in table("ifra_2019__molecules.csv")}
+        stim = {r["Stimulus"]: r["CID"] for r in table("ifra_2019__stimuli.csv")}
         rows = [(mol.get(stim.get(b["Stimulus"], ""), ""), [b["Descriptor 1"], b["Descriptor 2"], b["Descriptor 3"]]) for b in beh]
         for d in LIB["directions"]:
             for m in d["materials"]:
@@ -114,6 +117,17 @@ class Matching(unittest.TestCase):
         a = architecture(axes(light_dense=(-0.5, 0.3, "tentative"), warm_cool=(0.25, 0.3, "tentative")), {}, CC.vectors, LIB, 0.3)
         self.assertEqual((a["emphasize"], a["avoid"]), ([], []))
         self.assertEqual(a["basis"], "tentative")
+
+    def test_a_small_supported_target_still_counts_as_works_with(self):
+        # olfactory-1.1: target x cell is below the conflict floor here (0.1 x 0.25), but the sign is shared
+        a = architecture(axes(raw_polished=(0.2, 0.5, "supported")), {}, CC.vectors, LIB, 0.3)
+        by_id = {d["id"]: d for d in LIB["directions"]}
+        for s in a["structure"].values():
+            if s:
+                self.assertGreater(_cell(by_id[s["direction"]], "raw_polished"), 0.0, s["direction"])
+                self.assertEqual((s["works_with"], s["basis"]), (["raw_polished"], "supported"), s["direction"])
+        self.assertEqual(a["basis"], "supported")
+        self.assertTrue(a["emphasize"])
 
     def test_engine_result_carries_a_deterministic_architecture(self):
         evidence = [ev("own", "S", n, AESTHETIC) for n in ("Muted", "Understated", "Natural Materials", "Earthy")]

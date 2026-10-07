@@ -18,56 +18,68 @@
     for (const kid of kids.flat(Infinity)) if (kid !== null && kid !== undefined && kid !== false) node.append(kid instanceof Node ? kid : document.createTextNode(String(kid)));
     return node;
   }
-  const cap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
-  // A quote is kept literal; a long one is cut at a word boundary and marked with an ellipsis.
-  const short = (text, max) => {
-    if (!text || text.length <= max) return text || "";
-    const cut = text.slice(0, max);
-    return cut.slice(0, cut.lastIndexOf(" ")).replace(/[ ,.;:…]+$/, "") + " …";
-  };
   const link = (url, text) => h("a", { href: url, target: "_blank", rel: "noopener noreferrer", text });
 
   function section(num, title, ...body) {
     return h("div", { class: "grid" }, h("h2", {}, h("span", { text: num }), title), h("div", {}, body));
   }
 
-  function materials(r, brand) {
-    const mats = r.materials;
-    if (!mats.selected.length) {
-      const ref = mats.reference;
-      return [h("p", { text: mats.status_text }), ref ? [h("p", { class: "note", text: ref.note }),
-        h("ul", { class: "ref" }, ref.items.map((m) => h("li", {}, h("b", { text: m.name }), " · " + (m.scent || "") + " · fits "
-          + m.fits.map((f) => f.toLowerCase()).join(", ") + " · ", m.source ? link(m.source.url, m.source.supplier) : m.supplier_short)))] : null];
-    }
-    return h("div", { class: "mats" }, mats.selected.map((m) => {
+  function profile(r) {
+    if (!r.profile.length) return h("p", { text: r.minor.length ? "Weaker signals, none strong enough to lead: "
+      + r.minor.slice(0, 4).map((p) => p.label.toLowerCase() + " (" + p.source_short.join(", ") + ")").join("; ") + "." : "MOTIF reads no motif in the Qloo descriptors." });
+    return h("ul", { class: "basis" }, r.profile.slice(0, 4).map((p) => h("li", {},
+      h("b", { text: p.label + " · " }), p.strength_label.toLowerCase() + ", " + (p.basis.kind === "related_only" ? "references only: " : "")
+        + p.source_short.join(", ") + "." + (p.translation ? " " + p.translation : "") + " Examples: ",
+      p.examples.slice(0, 3).map((e, i) => [i ? ", " : "", h("span", { class: "sc", text: e.tag }), " (" + e.entity + ")"]), ".")));
+  }
+
+  function dimensions(r) {
+    const resolved = r.dimensions.filter((d) => d.state === "resolved");
+    const open = r.dimensions.filter((d) => d.state !== "resolved");
+    return h("p", { class: "dirl" },
+      resolved.length ? resolved.map((d, i) => [i ? " · " : "", h("b", { text: d.word.toUpperCase() }), " (" + d.name.toLowerCase() + ", " + d.confidence_word + ")"]) : "No dimension resolved yet",
+      open.length ? ". Open to the perfumer: " + open.map((d) => d.name.toLowerCase() + (d.state === "balanced_open" ? " (motifs pull both ways)" : "")).join(", ") + "." : ".");
+  }
+
+  function architecture(r) {
+    const a = r.architecture;
+    if (a.status !== "proposed") return h("p", { text: "No scent architecture is proposed: the structure is open to the perfumer." });
+    return h("div", { class: "mats" }, a.roles.map((role) => {
+      if (role.open) return h("div", { class: "mat open" }, h("div", {}, h("div", { class: "s", text: role.name }), h("div", { class: "n", text: "Open to the perfumer" })));
       const strip = h("div", { class: "strip" });
-      strip.append(MotifStrips.svg(m.props));
-      const asked = m.props.filter((p) => p.requested);
-      const first = asked.find((p) => p.supplier_text) || asked[0];
+      strip.append(MotifStrips.svg(role.props));
+      const refs = role.materials.slice(0, 2);
       return h("div", { class: "mat" }, strip, h("div", {},
-        h("div", { class: "s", text: m.slot }), h("div", { class: "rl", text: "suggested starting role" }),
-        h("div", { class: "n" }, m.name, h("span", { class: "sc", text: " · " + (m.scent || "") })),
-        h("div", { class: "x", text: "Why: fits " + brand + "'s " + m.fits.map((f) => f.toLowerCase()).join(" and ") + "." }),
-        first && first.supplier_text ? h("div", { class: "q" }, "“" + short(first.supplier_text, 90) + "” ",
-          first.source_url ? link(first.source_url, m.source ? m.source.supplier : "supplier page") : null) : null));
+        h("div", { class: "s", text: role.name + (role.tentative ? " · tentative" : "") }),
+        h("div", { class: "n", text: role.label }),
+        h("div", { class: "x", text: role.descriptors.join(", ") }),
+        refs.length ? h("div", { class: "q" }, "e.g. ", refs.map((m, i) => [i ? "; " : "", m.generic,
+          m.example ? [" (", m.url ? link(m.url, m.example) : m.example, ")"] : null])) : null));
     }));
   }
 
-  function profile(r) {
-    if (!r.profile.length) return h("p", { text: r.headline.lines.join(" ") || r.outcome_text });
-    return h("ul", { class: "basis" }, r.profile.slice(0, 4).map((p) => h("li", {},
-      h("b", { text: p.label + " · " }), p.basis.text + " " + p.translation + " Examples: ",
-      p.examples.slice(0, 3).map((e, i) => [i ? ", " : "", h("span", { class: "sc", text: e.tag }), " (" + e.entity + ")"]), ".")));
+  function emphasize(r) {
+    const a = r.architecture;
+    const items = (xs) => xs.map((x) => x.label.toLowerCase()).join("; ");
+    return h("p", {}, a.emphasize.length ? [h("b", { text: "Emphasize " }), items(a.emphasize) + ". "] : null,
+      a.avoid.length ? [h("b", { text: "Avoid " }), items(a.avoid) + "."] : null);
+  }
+
+  function why(r) {
+    return h("ul", { class: "basis" }, r.why.filter((w) => w.state === "resolved").slice(0, 3).map((w) => h("li", {},
+      h("b", { text: w.name + " → " + w.word + " · " }),
+      w.chain.slice(0, 2).map((c, i) => [i ? "; " : "", c.label + (c.tentative ? " (tentative)" : ""), " from ",
+        c.examples.slice(0, 2).map((e, j) => [j ? ", " : "", h("span", { class: "sc", text: e.tag })])]), ".")));
   }
 
   function sources(r) {
     const q = r.sources.qloo;
     return h("ul", { class: "src" },
       h("li", {}, h("b", { text: "Cultural evidence sourced from Qloo" }), " · fetched " + q.dates.join(", ") + " · "
-        + [...new Set(q.requests.map((x) => x.what.toLowerCase()))].join(", ")
+        + [...new Set(q.requests.map((x) => x.what.charAt(0).toLowerCase() + x.what.slice(1)))].join(", ")
         + ". The full trail of every phrase is in the technical JSON."),
-      r.sources.suppliers.map((x) => h("li", {}, h("b", { text: x.supplier }), " · " + x.material + " · ",
-        link(x.url, x.document || x.url), x.accessed ? " · read " + x.accessed : "")));
+      r.sources.suppliers.length ? h("li", {}, h("b", { text: "Supplier pages (identity of the trade-name examples)" }), " · ",
+        r.sources.suppliers.map((x, i) => [i ? " · " : "", link(x.url, x.material)])) : null);
   }
 
   function render(s) {
@@ -76,7 +88,7 @@
     document.title = "MOTIF brief · " + brand;
     const date = s.fetched ? s.fetched[0].slice(0, 10) : "";
     const b = s.brief;
-    const dir = r.direction.map((d) => d.word.toUpperCase() + " (" + d.axis.toLowerCase() + (d.relations_only ? ", related references only" : "") + ")");
+    const a = r.architecture;
     let n = 0;
     const num = () => String(++n).padStart(2, "0");
     sheet.replaceChildren(...[
@@ -88,10 +100,10 @@
       h("p", { class: "idea", text: r.headline.title }),
       r.headline.lines.map((line) => h("p", { class: "line", text: line })),
       section(num(), "Cultural profile", profile(r)),
-      section(num(), "MOTIF's proposed direction", h("p", { class: "dirl" }, dir.length ? dir.join(" · ") : "None yet",
-        r.still_open.length ? ". Open to the perfumer: " + r.still_open.map((a) => a.axis.toLowerCase()).join(", ") + "." : ".")),
-      section(num(), "Starting materials", materials(r, brand)),
-      section(num(), "Evidence", sources(r)),
+      section(num(), "Olfactory direction", dimensions(r)),
+      section(num(), "Scent architecture", architecture(r)),
+      a.emphasize.length || a.avoid.length ? section(num(), "Emphasize and avoid", emphasize(r)) : null,
+      section(num(), "Why", why(r), sources(r)),
       b ? section(num(), "The brief",
         s.intent ? h("p", { class: "note", text: "Application context: “" + s.intent + "”" }) : null,
         h("p", { class: "prose", text: b.text.replace(/\n\s*\n+/g, "\n").trim() }),

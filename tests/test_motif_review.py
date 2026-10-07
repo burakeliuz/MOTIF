@@ -112,13 +112,11 @@ class WebAndPrintAgree(unittest.TestCase):
 
     def test_the_printed_brief_reads_the_shared_fields_and_has_no_empty_list_text(self):
         js = (STATIC / "print.js").read_text(encoding="utf-8")
-        for field in ("r.headline", "mats.reference", "r.sources", "r.direction", "r.still_open", "r.profile"):
-            self.assertIn(field, js)
-        self.assertNotIn("supplier pages (", js)
-        self.assertNotIn("Set by the evidence", js)
         app = (STATIC / "app.js").read_text(encoding="utf-8")
-        for field in ("r.headline", "mats.reference", "r.sources", "r.still_open"):
+        for field in ("r.headline", "r.architecture", "r.sources", "r.dimensions", "r.profile", "r.why"):
+            self.assertIn(field, js)
             self.assertIn(field, app)
+        self.assertNotIn("Set by the evidence", js)
         for name in ("print.js", "strips.js"):
             code = "\n".join(line for line in (STATIC / name).read_text(encoding="utf-8").splitlines()
                              if not line.lstrip().startswith(("*", "/*", "//")))

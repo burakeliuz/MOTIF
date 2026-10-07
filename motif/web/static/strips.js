@@ -1,10 +1,9 @@
-/* Scent strips: MOTIF's visual shorthand for a material's supplier-described properties.
+/* Scent strips: MOTIF's visual shorthand for an olfactory direction's sensory leanings.
  *
- * One texture per property pole. A property on a dimension the direction asks for is drawn
- * at full strength; a property on a dimension the evidence leaves open is drawn faint.
- * Both kinds of property are supplier-described and verified on the supplier's page; the
- * faint drawing only says the brand evidence did not ask for it. The texture is MOTIF's
- * interpretation, never a measurement. Everything is built with DOM methods, no HTML strings.
+ * One texture per pole the direction leans toward (MOTIF's library, olfactory-1.1). A pole on
+ * a dimension the brand's profile resolves is drawn at full strength; the direction's other
+ * leanings are drawn faint. The texture is MOTIF's interpretation, never a measurement.
+ * Everything is built with DOM methods, no HTML strings.
  */
 "use strict";
 
@@ -54,7 +53,7 @@ const MotifStrips = (() => {
     return root;
   }
 
-  const NOTE = "The strip is MOTIF's visual shorthand for the supplier's description: darker where it matches this direction, lighter on dimensions left open. An interpretation, not a measurement.";
+  const NOTE = "The strip is MOTIF's visual shorthand for the direction's leanings: darker where it fits the brand's resolved dimensions, lighter elsewhere. An interpretation, not a measurement.";
 
   return { svg, NOTE };
 })();

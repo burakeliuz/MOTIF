@@ -285,3 +285,125 @@ def sources_view(result: Dict[str, Any], materials: List[Dict[str, Any]]) -> Dic
 
 def axis_labels() -> Dict[str, str]:
     return dict(AXIS_LABELS)
+
+
+# ---------- continuous engine ----------
+
+CONTINUOUS_OUTCOME_COPY = {
+    "direction": "A scent direction from the brand's weighted motifs.",
+    "open_direction": "Motifs are supported, but every dimension is open to the perfumer.",
+    "insufficient_evidence": "Qloo returned descriptors, but none repeated enough to lead a direction.",
+    "no_descriptive_data": "Qloo returned no descriptors MOTIF can read for this brand.",
+}
+ROLE_NAMES = {"opening": "Opening", "core": "Core", "drydown": "Drydown"}
+DIRECTION_SOURCE = {"IFRA19": "IFRA Fragrance Ingredient Glossary (2019)", "PALETTE": "supplier page"}
+
+
+def _basis_text(name: str, own: bool, related: bool) -> str:
+    if own and related:
+        return f"In {poss(name)} own Qloo descriptors and in references Qloo relates to {name}."
+    if own:
+        return f"In {poss(name)} own Qloo descriptors."
+    return f"Only in references Qloo relates to {name}, not in {poss(name)} own descriptors."
+
+
+def continuous_view(name: str, result: Dict[str, Any], library: Dict[str, Any]) -> Dict[str, Any]:
+    """View model of a continuous engine result for the web page and the printed brief."""
+    from .. import story  # local: story imports the engine
+    ev = {e["evidence_id"]: e for e in result["evidence"]}
+    ann = {}
+    for a in result["annotations"]:
+        ann.setdefault((a["motif"], a["evidence_id"]), a)
+    axes = result["axes"]
+    rows = story.profile(name, result)
+
+    def examples(motif: str, n: int = 4) -> List[Dict[str, Any]]:
+        return [evidence_view(ev[e["evidence_id"]], ann.get((motif, e["evidence_id"]))) for e in story._evidence_of(result, motif)[:n]]
+
+    def translation(r: Dict[str, Any]) -> str:
+        if r["moves"]:
+            return "Moves " + story._join([m["name"].lower() + " toward " + m["word"] for m in r["moves"]]) + "."
+        if r["pulls_open"]:
+            return story._join(r["pulls_open"]) + (" stays" if len(r["pulls_open"]) == 1 else " stay") + " open: motifs pull both ways."
+        cells = (result["motif_scores"].get(r["motif"]) or {})
+        return "No sensory claim: open to the perfumer." if cells else ""
+
+    profile_rows = []
+    for r in rows:
+        kinds = set(r["source_kinds"])
+        profile_rows.append({"motif": r["motif"], "label": MOTIF_NOTES.get(r["motif"], r["motif"]), "leads": r["leads"],
+                             "own": r["own"], "strength_label": r["strength"].capitalize() + " support",
+                             "sources": [SOURCE_LABELS[k] for k in r["source_kinds"]],
+                             "source_short": [SOURCE_SHORT[k] for k in r["source_kinds"]],
+                             "basis": {"kind": "own_and_related" if r["own"] and kinds - {"own"} else "own_only" if r["own"] else "related_only",
+                                       "text": _basis_text(name, r["own"], bool(kinds - {"own"}))},
+                             "translation": translation(r), "examples": examples(r["motif"])})
+    dims = []
+    for a in AXES:
+        v = axes[a]
+        pulls = {pole: [MOTIF_NOTES.get(m, m) for m in ms] for pole, ms in v["pulls"].items() if ms}
+        row = {"key": a, "name": AXIS_NAMES[a], "poles": POLES[a], "state": v["state"]}
+        if v["state"] == "resolved":
+            share = story.own_share(v)
+            row.update(word=story.phrase(v), confidence_word=v["confidence_word"], tentative=v["confidence_word"] not in story.STRONG_WORDS,
+                       basis_text=("From references Qloo relates to the brand only." if share == 0 else
+                                   "From the brand's own motifs." if share == 1 else "From the brand's own motifs and its references."),
+                       design_only=v["evidence_basis"] == "design_inference_only")
+        elif v["state"] == "balanced_open":
+            row["open_text"] = "Open to the perfumer: " + "; ".join(f"{', '.join(ms).lower()} toward {POLE_WORDS[p]}" for p, ms in pulls.items()) + "."
+        else:
+            row["open_text"] = "Open to the perfumer."
+        dims.append(row)
+    arch = result.get("architecture") or {"status": "open", "structure": {}, "emphasize": [], "avoid": [], "basis": None}
+    roles = []
+    for role in ("opening", "core", "drydown"):
+        s = (arch.get("structure") or {}).get(role)
+        if not s:
+            roles.append({"role": role, "name": ROLE_NAMES[role], "open": True})
+            continue
+        direction = next((d for d in library["directions"] if d["id"] == s["direction"]), None) or {"vector": {}}
+        props = [{"axis": AXIS_NAMES[a], "pole": (POLES[a][0] if c["value"] < 0 else POLES[a][1]),
+                  "word": POLE_WORDS[POLES[a][0] if c["value"] < 0 else POLES[a][1]], "requested": a in s["works_with"]}
+                 for a, c in direction["vector"].items() if c]
+        roles.append({"role": role, "name": ROLE_NAMES[role], "open": False, "label": s["label"], "descriptors": s["descriptors"],
+                      "tentative": s["basis"] == "tentative", "works_with": [AXIS_NAMES[a].lower() for a in s["works_with"]],
+                      "props": props, "uncertainty": s["uncertainty"],
+                      "materials": [{"generic": m["generic"], "example": m.get("example"), "supplier": m.get("supplier"),
+                                     "url": m.get("url"), "ifra": m.get("ifra"),
+                                     "source": " + ".join(DIRECTION_SOURCE.get(x.strip(), x.strip()) for x in m["source"].split("+"))}
+                                    for m in s["materials"]]})
+    why_rows = []
+    for w in story.why(name, result):
+        why_rows.append({"name": w["name"], "word": w["word"], "state": w["state"], "confidence_word": w["confidence_word"],
+                         "chain": [{"label": MOTIF_NOTES.get(c["motif"], c["motif"]), "motif": c["motif"], "toward": c["toward"],
+                                    "tentative": c["tentative"], "own": c["own"],
+                                    "examples": [evidence_view(ev[e["evidence_id"]], ann.get((c["motif"], e["evidence_id"]))) for e in c["examples"]]}
+                                   for c in w["chain"]]})
+    motifs = [{"motif": r["motif"], "label": MOTIF_NOTES.get(r["motif"], r["motif"]), "strength_label": r["strength"].capitalize() + " support",
+               "active": r["leads"], "sources": [SOURCE_LABELS[k] for k in r["source_kinds"]], "relations_only": r["relations_only"],
+               "translation": translation(r), "evidence": examples(r["motif"], 8), "context": [], "excluded": [], "rule": None}
+              for r in rows]
+    suppliers, seen = [], set()
+    for r in roles:
+        for m in r.get("materials", []):
+            if m.get("url") and m["url"] not in seen:
+                seen.add(m["url"])
+                suppliers.append({"supplier": m["supplier"], "material": m["example"], "url": m["url"], "document": m["example"], "accessed": None})
+    head = story.headline(name, result)
+    return {
+        "engine": "continuous",
+        "outcome": result["outcome"], "outcome_text": CONTINUOUS_OUTCOME_COPY[result["outcome"]],
+        "headline": head, "idea": head["title"],
+        "profile": [p for p in profile_rows if p["leads"]],
+        "minor": [p for p in profile_rows if not p["leads"]],
+        "dimensions": dims,
+        "still_open": [{"key": a, "axis": AXIS_NAMES[a], "poles": POLES[a], "state": axes[a]["state"]} for a in AXES if axes[a]["state"] != "resolved"],
+        "architecture": {"status": arch["status"], "tentative": arch.get("basis") == "tentative", "roles": roles,
+                         "emphasize": [{"label": x["label"], "because": [AXIS_NAMES[a].lower() for a in x["because"]]} for x in arch["emphasize"]],
+                         "avoid": [{"label": x["label"], "because": [AXIS_NAMES[a].lower() for a in x["because"]]} for x in arch["avoid"]]},
+        "why": why_rows,
+        "motifs": motifs,
+        "sources": dict(sources_view(result, []), suppliers=suppliers),
+        "versions": dict(result["versions"], engine=result["engine_version"]),
+    }
+

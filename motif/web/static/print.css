@@ -20,7 +20,6 @@ h1 { margin: 4mm 0 0; font: 900 28pt/.9 var(--disp); font-stretch: 68%; text-tra
 .dirl { font-size: 8.6pt; margin: 0; }
 .note { font-size: 7.6pt; color: var(--mute); margin: 1mm 0 0; }
 .prose { font-size: 7.9pt; line-height: 1.36; white-space: pre-wrap; margin: 0; }
-.ref { margin: 1mm 0 0; padding-left: 4mm; }
 .src { margin: 0; padding: 0; list-style: none; font-size: 7.4pt; }
 .src li { margin-bottom: .6mm; overflow-wrap: anywhere; }
 a { color: inherit; text-decoration-color: var(--accent); text-underline-offset: 1.5pt; }
@@ -33,12 +32,11 @@ p { margin: 0 0 1.4mm; }
 .strip { position: relative; width: 9mm; height: 34mm; border: .8pt solid var(--ink); clip-path: polygon(0 0, 100% 0, 100% 90%, 50% 100%, 0 90%); }
 .strip svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .mat .s { font: 900 10pt/1 var(--disp); font-stretch: 62%; text-transform: uppercase; }
-.mat .rl { font: 600 5.6pt/1.3 var(--disp); letter-spacing: .1em; text-transform: uppercase; color: var(--mute); }
 .mat .n { font: 800 9.6pt/1.15 var(--disp); font-stretch: 85%; margin: .6mm 0; }
-.mat .n .sc { font: 400 8.4pt var(--text); }
-.mat .q { font-size: 7.8pt; font-style: italic; margin-top: .8mm; }
+.mat .q { font-size: 7.6pt; margin-top: .8mm; overflow-wrap: anywhere; }
+.mat.open { display: block; border-top: .5pt dashed var(--mute); padding-top: 1mm; }
+.mat.open .n { color: var(--mute); }
 .mat .x { font-size: 7.6pt; margin-top: .8mm; }
-.mat .x b { font: 800 6pt var(--disp); letter-spacing: .1em; text-transform: uppercase; border-bottom: 1.2pt solid var(--accent); }
 .basis { margin: 0; padding: 0; list-style: none; }
 .basis li { margin-bottom: 1.2mm; }
 .basis b { font: 800 8.6pt var(--disp); font-stretch: 80%; text-transform: uppercase; letter-spacing: .03em; }
