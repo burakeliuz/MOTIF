@@ -1,45 +1,46 @@
 # MOTIF
 
 MOTIF translates a brand's cultural context, as returned by Qloo, into an
-explainable olfactory direction for a perfumer. The pipeline is: Qloo
-evidence → motif → sensory target → material suggestion → brief.
+explainable scent direction and a one-page brief for a perfumer. The pipeline:
+Qloo evidence → weighted motifs → six continuous sensory dimensions → scent
+architecture (opening, core, drydown) → brief.
 
-- **The deterministic engine** decides classification, sensory targets, and
-  material choices. The same evidence and versions give the same result.
+- **Qloo is the evidence:** the brand's own descriptors and those of the brands
+  and films Qloo relates to it, each traceable to its request.
+- **MOTIF is the translation:** a deterministic, versioned engine. The same
+  evidence and versions give the same result; unknown stays "open to the
+  perfumer"; low-confidence leanings are labelled tentative.
 - **An optional LLM** (default `claude-sonnet-5-5`) only writes the brief's
-  prose. The prose is validated against the engine result; if the call fails or
+  prose from the finished result. The text is validated; if the call fails or
   the text fails validation, a labelled template is shown instead.
 - **The output is a creative direction:** not a formula, not a dosage, and
   not a prediction that anyone will like the scent.
 
-**Status (after the 6B review, 2026-10-07; on the session branch, not yet on `main`):**
+**Status (engine refactor, 2026-10-07):**
 
-- Hosted demo (behind a review password): <https://motif-pxh8.onrender.com>. It runs
-  `main`, which does not yet include stage 6A/6B or this review.
-- A web interface (`python3 -m motif.web`) runs the real research flow: brand and
-  an optional application context (both with quick picks that only fill the
-  field), entity choice, live research steps, and a result in five parts: the
-  cultural profile with clickable evidence, MOTIF's proposed direction, Top/Heart/
-  Base starting materials drawn as scent strips, the evidence ("How it was made"),
-  and the brief (printable as one A4 page with clickable sources). A failed Qloo
-  request can be retried once.
-- Seven of eight palette materials have properties verified against the
-  supplier's own full page (palette-0.3). ISO E SUPER stays unverified: the
-  supplier site blocked automated access (HTTP 403), so it is never used live.
-- Lexicon-0.3 adds general context rules (technique nouns in film tags; "lush"
-  only with a design context). These changes were made after the held-out check
-  (T1), so Le Labo and Patagonia are no longer independent validation.
-- Hosting is prepared for a free Render web service (`render.yaml`); see
-  [Hosting](#hosting).
+- The product runs the continuous engine (`continuous-1.0`) and a 23-direction
+  scent architecture (`olfactory-1.1`). The earlier rule engine (`engine-0.3`,
+  five draft rules R1–R5) is kept unchanged as the legacy baseline
+  (`--engine legacy`). On 13 trial brands the final outputs went from 3 distinct
+  material sets to 11 distinct architectures; see [`docs/VALIDATION.md`](docs/VALIDATION.md)
+  for what that does and does not show, including the negative findings.
+- Hosted demo (behind a review password): <https://motif-pxh8.onrender.com>. The
+  owner deploys `main` manually.
+- The web interface (`python3 -m motif.web`) runs the real research flow: brand
+  and an optional application context (quick picks only fill the field), entity
+  choice when Qloo returns several brands, live research steps, and a result in
+  six parts: cultural profile (clickable Qloo phrases), olfactory direction,
+  scent architecture, emphasize and avoid (only when a supported dimension backs
+  it), why (Qloo → motif → scent), and the brief (one A4 page with sources). A
+  failed Qloo request can be retried once.
 - Key documents:
-  - [`MOTIF_BUILD_SPEC.md`](MOTIF_BUILD_SPEC.md) (rev 0.5)
-  - [`docs/STAGE_6A_DECISIONS.md`](docs/STAGE_6A_DECISIONS.md) (decisions; §0.3 rule/material package, §0.4 paid persistence)
-  - [`reports/trial_6b.md`](reports/trial_6b.md) (pre-registered trials: two brands, then four)
+  - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) (how it works) and [`docs/VALIDATION.md`](docs/VALIDATION.md) (what was checked)
+  - [`docs/REFACTOR_LOG.md`](docs/REFACTOR_LOG.md) (phase by phase), [`docs/ENGINE_REDESIGN.md`](docs/ENGINE_REDESIGN.md)
+  - [`docs/SENSORY_MODEL_RESEARCH.md`](docs/SENSORY_MODEL_RESEARCH.md), [`docs/MOTIF_SCORING.md`](docs/MOTIF_SCORING.md), [`docs/OLFACTORY_LAYER.md`](docs/OLFACTORY_LAYER.md)
+  - [`reports/final_validation.md`](reports/final_validation.md), [`reports/continuous_engine_analysis.md`](reports/continuous_engine_analysis.md), [`reports/continuous_holdout.md`](reports/continuous_holdout.md) (pre-registered)
+  - [`docs/STAGE_6A_DECISIONS.md`](docs/STAGE_6A_DECISIONS.md) (decisions; §0.5 the refactor, §0.4 paid persistence)
   - [`docs/DEVPOST_SUBMISSION.md`](docs/DEVPOST_SUBMISSION.md) (copy-ready submission texts)
-  - [`reports/holdout_t1.md`](reports/holdout_t1.md) (held-out brands and the post-hoc lexicon-0.3 re-run)
-  - [`reports/design_examples.md`](reports/design_examples.md)
-  - [`reports/feasibility.md`](reports/feasibility.md)
-  - [`docs/SUBMISSION_NOTES.md`](docs/SUBMISSION_NOTES.md)
+  - [`MOTIF_BUILD_SPEC.md`](MOTIF_BUILD_SPEC.md) (rev 0.6; §0e explains which engine sections now describe the legacy engine), [`reports/trial_6b.md`](reports/trial_6b.md), [`reports/holdout_t1.md`](reports/holdout_t1.md), [`reports/feasibility.md`](reports/feasibility.md), [`docs/SUBMISSION_NOTES.md`](docs/SUBMISSION_NOTES.md)
 
 ## Web interface
 
@@ -59,8 +60,9 @@ response. Guards against repeated calls:
 
 - The same request (reference, choice, conflict answer, mode) within 30 minutes
   returns the existing session, so reload, back, and double clicks send nothing.
-- Answering a question (choosing an entity, resolving a conflict) reuses the
-  first session's Qloo cache, so the search is not repeated.
+- Answering the entity question reuses the first session's Qloo cache, so the
+  search is not repeated. The web app asks no conflict question: a dimension the
+  motifs pull both ways is shown as open to the perfumer.
 - Changing only the application context reuses the brand's Qloo cache: no request is repeated.
 - Quick picks on the start page only fill a field; nothing is requested until the user submits.
 - A search stopped by a failed Qloo request can be retried once: requests that
@@ -75,8 +77,8 @@ response. Guards against repeated calls:
 
 What the user adds is kept apart from the evidence: the application context is
 recorded as the user's purpose (brief only), and an accepted interpretation as
-the user's note. Neither changes motifs, directions, materials, or scores; the same
-evidence, choices, and versions give the same engine result.
+the user's note. Neither changes motifs, scores, dimensions, or the scent
+architecture; the same evidence, choices, and versions give the same engine result.
 
 **Temporary review gate.** While the hosted demo is under private review, every
 page and API except `/healthz` and the sign-in page needs a password
@@ -100,19 +102,27 @@ python3 -m unittest            # offline; recorded-data tests skip when data/ is
 python3 -m motif_spike check                                  # must say READY
 python3 -m motif run --reference "MUJI" --type brand          # 4 Qloo requests at most for a resolved brand
 python3 -m motif run --reference "Le Labo" --choose <QLOO_ID>  # answer an entity question with a returned ID
-python3 -m motif run --reference "MUJI" --allow-unverified-materials   # DESIGN PREVIEW of materials (labelled)
+python3 -m motif run --reference "MUJI" --engine legacy     # the frozen rule engine engine-0.3 (baseline)
+python3 -m motif run --reference "MUJI" --engine legacy --allow-unverified-materials   # legacy DESIGN PREVIEW (labelled)
 python3 -m motif llm-check                                    # one real API call: is the configured model available?
 
 # Recorded: replays a stored live run from data/ and sends nothing
 python3 -m motif run --reference "MUJI" --recorded <RUN_ID_OR_PATH>
 python3 -m motif compare --reference "MUJI" --recorded <RUN_ID_OR_PATH>   # own description only vs plus relations
+python3 -m motif compare-engines --reference "MUJI" --recorded <RUN_ID_OR_PATH>   # legacy vs continuous on the same evidence
+
+# Offline analyses on the stored recordings (data/ is git-ignored; a new clone has none)
+python3 tools/validation_report.py --write reports/final_validation.md
+python3 tools/engine_compare.py analysis
+python3 tools/legacy_baseline.py
 ```
 
 **Options:**
 
 - `--type brand|movie|artist|any`
 - `--include-artist`: music is off by default.
-- `--resolve-conflict AXIS=POLE|open`
+- `--engine continuous|legacy`: continuous by default.
+- `--resolve-conflict AXIS=POLE|open`: legacy engine only.
 - `--max-requests N`: the session budget, counting every network attempt.
 - `--json`: prints the brief JSON.
 
@@ -131,7 +141,7 @@ error, budget, or a missing recording) · 2 usage error.
 | Recorded | A stored run under `data/` | `RECORDED · Qloo data from run …` (web: "Recorded preview"); never shown as live |
 | Template prose | Nothing, or `MOTIF_LLM_PROVIDER=off` | `Brief (template)` / "Template prose" |
 | LLM prose | `MOTIF_ANTHROPIC_API_KEY` and `pip install anthropic` | `Brief (llm)` / "LLM prose"; a failed call or invalid text falls back to the template with a note |
-| Design preview | `--allow-unverified-materials` (CLI only) | `DESIGN PREVIEW: material properties are not verified …` |
+| Design preview | `--engine legacy --allow-unverified-materials` (CLI only) | `DESIGN PREVIEW: material properties are not verified …` |
 
 ### Environment variables (names only; never commit values)
 
@@ -155,8 +165,10 @@ HOST=, PORT=                    # web server bind address (default 127.0.0.1:800
 
 The Qloo base URL is fixed in `config/manifest.json`, because hackathon keys
 only work against `https://hackathon.api.qloo.com`. Design rules are versioned
-in `config/` (`motif_lexicon.json`, `draft_rules.json`, `material_palette.json`,
-`engine_params.json`).
+in `config/`: `motif_lexicon.json`, `motif_scoring.v1.json`,
+`motif_sensory_vectors.v1.json`, `continuous_params.v1.json`,
+`olfactory_directions.v1.json`, and for the legacy engine `draft_rules.json`,
+`material_palette.json`, `engine_params.json`.
 
 ## Hosting
 
@@ -307,20 +319,23 @@ output. See [`docs/EVIDENCE_CONTRACT.md`](docs/EVIDENCE_CONTRACT.md).
 - Seeds resolve only on an exact name match (case and accents folded). Ambiguity is reported, never guessed.
 - Overlaps use returned IDs only. Scores are never averaged across requests or called "lift".
 - The six sensory axes, 12 candidate motifs, and the five draft rules live in
-  `config/draft_rules.json` as an **inactive** registry. The spike does not apply them.
+  `config/draft_rules.json` as an **inactive** registry. The spike does not apply them
+  (the engine's legacy mode does; the continuous engine uses its own models).
 
 ## Layout
 
 ```
-motif/              engine: evidence, classify, translate, materials, brief, llm, qloo access, agent (controller), CLI
+motif/              engine: evidence, classify, scoring, continuous, olfactory, story, llm, qloo access, agent (controller), CLI;
+                    legacy rule engine: translate, materials, brief, narrative
+tools/              offline analyses: legacy baseline, engine comparison, holdout, sensory evidence and review, validation
 motif/web/          web server (stdlib), view model, and static UI (HTML, CSS, vanilla JS)
 render.yaml         Render Blueprint for the hosted demo (no secret values)
 motif_spike/        stage 1-2 playground: adapter, transports, runner, normalize, compare, facts, CLI
-config/             manifest.json, draft_rules.json, motif_lexicon.json, material_palette.json, engine_params.json
+config/             manifest, lexicon, scoring, sensory model, continuous params, olfactory library; legacy rules, palette, params
 fixtures/synthetic/ invented scenarios and harness-shaped outputs
 data/               run and session outputs (git-ignored; live Qloo data stays here)
-reports/            feasibility.md, evidence_excerpt.md, design_examples.md, holdout_t1.md
-docs/               evidence contract, Qloo access notes, deferred design, submission notes, examples
+reports/            validation, engine analyses, holdouts, trials, feasibility, evidence excerpt, legacy baseline
+docs/               architecture, validation, refactor log, models, evidence contract, Qloo access notes, decisions, submission
 tests/              unittest suite (network blocked; synthetic fakes; recorded-data tests skip without data/)
 ```
 

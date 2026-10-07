@@ -1,6 +1,6 @@
 # MOTIF build specification
 
-Revision 0.5 · 2026-10-07 · rev 0.2 accepted for stage 4; rev 0.3 records stage 5 (section 0b); rev 0.4 records the owner's 6B decisions (section 0c); rev 0.5 records the post-6B review (section 0d) · Owner: Burak Eliuz
+Revision 0.6 · 2026-10-07 · rev 0.2 accepted for stage 4; rev 0.3 records stage 5 (section 0b); rev 0.4 records the owner's 6B decisions (section 0c); rev 0.5 records the post-6B review (section 0d); rev 0.6 records the engine refactor (section 0e) · Owner: Burak Eliuz
 
 This document turns the stage-2 findings (`reports/feasibility.md`,
 recommendation **narrow**) into a buildable MVP. It is the contract for
@@ -79,6 +79,26 @@ Where a later section still says otherwise, this section wins.
 | Errors | One controlled retry (`POST /api/sessions/<id>/retry`) after `stopped_request_failed` or a server error, never after a credential error; successes are served from the session cache; a fresh budget is reserved |
 | Spending | `MOTIF_LLM_BUDGET_GUARD` (`auto` default, `provider`, `off`): on Render, Claude only when the data directory sits on its own persistent mount, unless the owner confirms a provider-side spend limit; otherwise the labelled template and no suggestions |
 | Rules and palette | Still unchanged. Decision package revised (`docs/STAGE_6A_DECISIONS.md` §0.3): R6 and the checked frankincense oil are not applied; candidate text in `config/candidates/r6_and_olibanum.json` (not loaded) |
+
+## 0e. Revision 0.6: engine and product refactor (2026-10-07)
+
+The owner's refactor brief replaced the product engine. Where a later section
+describes the five draft rules, the material palette as the olfactory output,
+the conflict question, or the five-part result, it now describes the **legacy
+engine** (`engine-0.3`, kept unchanged as a baseline, `--engine legacy`).
+
+| Topic | Before (rev 0.5) | Rev 0.6 |
+|---|---|---|
+| Motif support | moderate / strong labels from source kinds | `scoring-1.0`: bounded, saturating 0–1 scores, own entry weighed most |
+| Translation | five binary rules R1–R5 | `sensory-1.0`: a 12 × 6 model (23 cells; open odor data and labelled design readings), aggregated into six continuous dimensions with the trace |
+| Olfactory output | Top/Heart/Base from 7 verified materials | `olfactory-1.1`: opening/core/drydown from 23 accord-type directions; materials are IFRA-named references, trade names only from supplier pages read |
+| Two-way dimensions | a question to the user | "open to the perfumer" (motifs pull both ways) |
+| Result and brief | five parts | cultural profile → olfactory direction → scent architecture → emphasize and avoid → why → brief (`brief-1.0`, prose prompt `prose-c1.0`) |
+
+Unchanged: Qloo access and provenance (section 5), entity choice (section 6),
+the lexicon (section 7, now lexicon-0.3), the LLM's prose-only role, the review
+gate, budgets, and recorded-mode rules. Architecture: `docs/ARCHITECTURE.md`;
+validation: `docs/VALIDATION.md`; decisions: `docs/STAGE_6A_DECISIONS.md` §0.5.
 
 ## 1. Decision
 

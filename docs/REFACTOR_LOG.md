@@ -229,3 +229,16 @@ PDF, and one-page PDFs. No Qloo or LLM request was made.
   agree. Agreement is not validation.
 - Full suite: 228 tests, all pass (network blocked; browser and PDF included).
   Secret scan of tracked files: only the existing test sentinels.
+
+## Phase 11: documentation
+
+- New: `docs/ARCHITECTURE.md` (roles, pipeline, steps, web app, versions,
+  legacy engine R1–R5, repository map).
+- Updated: `CLAUDE.md` (phase line, commands, non-negotiables for the continuous
+  engine; R1–R5 as legacy), `README.md`, `MOTIF_BUILD_SPEC.md` (rev 0.6, §0e),
+  `docs/ENGINE_REDESIGN.md` (phases 8–10, goals against outcome),
+  `docs/SENSORY_MODEL_RESEARCH.md` §9, `docs/MOTIF_SCORING.md`,
+  `docs/OLFACTORY_LAYER.md` (`olfactory-1.1`, phase 9), `docs/VALIDATION.md`,
+  `docs/STAGE_6A_DECISIONS.md` §0.5 (refactor decisions E1–E8),
+  `docs/SUBMISSION_NOTES.md` §2g and limits, `docs/DEVPOST_SUBMISSION.md`
+  (drafts rewritten for the continuous engine; nothing entered on Devpost).

@@ -1,8 +1,11 @@
 # Engine redesign: from five binary rules to a continuous sensory model
 
-Status: phase 2 of the engine and product refactor (2026-10-07). This document
-fixes the baseline and the goals before any new model is built. Later phases
-add their results to the sections marked "filled in later".
+Status: written in phase 2 of the engine and product refactor (2026-10-07) to
+fix the baseline and the goals before any new model was built; results of
+phases 6–10 are in §5. The continuous engine is now the product engine; the
+rule engine (`engine-0.3`, R1–R5) is kept unchanged as the legacy baseline
+(`--engine legacy`, `reports/baselines/legacy_engine_0.3.json`). Overview:
+`docs/ARCHITECTURE.md`; validation: `docs/VALIDATION.md`.
 
 ## 1. Baseline (frozen)
 
@@ -140,5 +143,30 @@ Candidate fixes, not applied (each needs a version bump and a new holdout):
 typed brand search with a fallback; context rules for "industrial design" and
 film-technique phrases; a commonness reference set that is not fashion-heavy;
 a lead-level floor before a minor motif can resolve a dimension; wider lexicon
-coverage (geometry, modular, vibrant, nostalgic). Phase 10 adds the final
-validation.
+coverage (geometry, modular, vibrant, nostalgic).
+
+**Phase 8, scent architecture** (`docs/OLFACTORY_LAYER.md`): 23 accord-type
+directions matched deterministically from the continuous profile. 11 distinct
+structures on the 13 trial brands (legacy: 3 material sets). `olfactory-1.1`
+(phase 9) fixed a scale error in "works with" without changing any structure.
+
+**Phase 10, final validation** (`docs/VALIDATION.md`, `reports/final_validation.md`):
+deterministic across interpreters; final outputs 3 → 11 distinct; one
+descriptor left out changes the architecture in 4% of 523 runs. Negative
+findings: without the tentative design cells 11 → 7 architectures; literal Qloo
+descriptor overlap barely predicts output overlap; weak profiles converge
+(LEGO = Coca-Cola = Ralph Lauren share one tentative structure).
+
+Goals of §3 against the outcome:
+
+| Goal (§3) | Outcome |
+|---|---|
+| 1. Graded motif support | met: `scoring-1.0`, bounded and saturating, own entry and references weighed separately |
+| 2. Several dimensions per motif, or none | met: 23 of 72 cells claimed (5 medium confidence, the R1–R5 relations; 13 low design readings; 5 low through odor imagery, family → pole from open odor data); heritage, melancholy, and romance claim none |
+| 3. Continuous aggregation with the trace | met: contributors, agreement, and two-way pulls kept; a near-cancellation is "open: motifs pull both ways" |
+| 4. No collapse of different evidence | met with a limit: profiles 7 → 11, final outputs 3 → 11; without the tentative cells, 7 architectures |
+| 5. Traceable, no LLM in the chain | met: 13 of 13 trial brands and 4 of 4 resolved holdout brands |
+| 6. An olfactory layer instead of 7 materials | met: `olfactory-1.1`, 23 directions; materials are references with their source |
+
+Not met: coverage of brands whose own descriptors fall outside the lexicon
+(LEGO, Coca-Cola), and the misreads of the holdout (8%).

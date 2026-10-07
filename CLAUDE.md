@@ -1,8 +1,8 @@
 # MOTIF working notes for Claude Code
 
-Current phase: **post-6B review done on the session branch** (2026-10-07: result lead from the brand's own cultural profile, one controlled retry, LLM budget guard, one-page brief with sources; spec rev 0.5; second pre-registered trial with four brands in `reports/trial_6b.md` §3; Devpost drafts in `docs/DEVPOST_SUBMISSION.md`). Hosted demo: https://motif-pxh8.onrender.com (behind the review password; deploys from `main` by the owner; `main` does not include 6A/6B yet). Pending owner decisions: the `main` merge and Render deploy; decision 1, rule R6 + one material (`docs/STAGE_6A_DECISIONS.md` §0.3, recommended: not now); decision 2, Claude spending on the free host (§0.4); the gate at judging time. Next: stage 6 (clean-environment test, final checks on Oct 27–28, Devpost edits by the owner).
+Current phase: **engine refactor (phases 0–13) done on the session branch** (2026-10-07: the product runs the continuous engine `continuous-1.0` (weighted motif scores, a researched motif-to-sensory model from open odor data, six continuous dimensions), a 23-direction scent architecture (`olfactory-1.1`), the redesigned one-page brief, and a final validation; the rule engine `engine-0.3` with R1–R5 is kept as the frozen legacy baseline. Read `docs/REFACTOR_LOG.md`, `docs/ARCHITECTURE.md`, `docs/VALIDATION.md`). Hosted demo: https://motif-pxh8.onrender.com (behind the review password; deploys from `main` by the owner). Pending owner decisions: the Render deploy; decision 2, Claude spending on the free host (`docs/STAGE_6A_DECISIONS.md` §0.4); the gate at judging time; the candidate engine fixes listed in `docs/ENGINE_REDESIGN.md` §5 (each needs a version bump and a new holdout). Decision 1 (R6 + one material) concerns only the legacy engine now. Next: stage 6 (clean-environment test, final checks on Oct 27–28, Devpost edits by the owner).
 Read `MOTIF_QLOO_FEASIBILITY.md` (rev 0.2) and `MOTIF_BUILD_SPEC.md` before
-changing anything. Then read `README.md`, `docs/QLOO_ACCESS_NOTES.md`,
+changing anything. Then read `README.md`, `docs/ARCHITECTURE.md`, `docs/VALIDATION.md`, `docs/QLOO_ACCESS_NOTES.md`,
 `reports/feasibility.md`, `reports/design_examples.md`, and `reports/holdout_t1.md`.
 
 ## Communication with the project owner
@@ -27,6 +27,7 @@ One Claude Code cloud session per stage; each stage ends with tests, a push to t
 4. Engine and agentic flow, end to end from the command line.
 5. Interface and hosting: done; deployed by the owner at https://motif-pxh8.onrender.com.
    6A/6B. Product review and the chosen experience: done on the session branch (see `docs/STAGE_6A_DECISIONS.md`).
+   6R. Engine and product refactor, phases 0–13: done (see `docs/REFACTOR_LOG.md`).
 6. Clean-environment setup test, demo, and Devpost texts.
 
 Every stage adds to `docs/SUBMISSION_NOTES.md`, mapped to the six items of the kit's submission guide (see `docs/QLOO_ACCESS_NOTES.md`).
@@ -35,7 +36,8 @@ Every stage adds to `docs/SUBMISSION_NOTES.md`, mapped to the six items of the k
 
 - `python3 -m unittest`: run before every commit.
 - `python3 -m motif.web [--recorded RUN_DIR ...]` (local preview: `--recorded` replays stored runs, labelled; never in the public demo) and `python3 -m motif llm-check` (one real Anthropic call)
-- `python3 -m motif run --reference NAME [--type brand|any] [--choose ID] [--recorded RUN] [--include-artist] [--allow-unverified-materials]` and `python3 -m motif compare --reference NAME --recorded RUN`
+- `python3 -m motif run --reference NAME [--type brand|any] [--choose ID] [--recorded RUN] [--include-artist] [--engine continuous|legacy] [--allow-unverified-materials]` (continuous is the default; the materials flag and `--resolve-conflict` apply to legacy only), `python3 -m motif compare --reference NAME --recorded RUN`, and `python3 -m motif compare-engines --reference NAME --recorded RUN`
+- Offline analyses (need the git-ignored recordings): `python3 tools/validation_report.py [--write reports/final_validation.md]`, `python3 tools/engine_compare.py analysis`, `python3 tools/legacy_baseline.py`, `python3 tools/holdout_run.py evaluate RUN_DIR`, `python3 tools/sensory_model_review.py`
 - `python3 -m motif_spike check | plan --plan pilot | run --mode synthetic | run --mode live --plan pilot|full | renormalize --run latest-live | excerpt --run latest-live`
 
 ## Non-negotiables
@@ -45,22 +47,22 @@ Every stage adds to `docs/SUBMISSION_NOTES.md`, mapped to the six items of the k
 - Never fall back from a failed live call to fixtures, another endpoint, or another credential.
 - Keep `qloo_observation`, `motif_annotation`, `design_rule`, and `synthetic_fixture` separate. Synthetic data is never evidence.
 - Copy returned values literally with their raw pointer. Do not infer cultural traits from entity names or model memory.
-- Keep the six axes and pole order. Unknown axes are `null`. Five draft rules only; no `restrained → intimate`.
+- Keep the six axes and pole order. Unknown or contested dimensions stay open ("open to the perfumer"; `null` in the legacy engine). The five draft rules R1–R5 belong to the frozen legacy engine (`engine-0.3`, `--engine legacy`, baseline in `reports/baselines/`); the product runs `continuous-1.0`. No `restrained → intimate`, and none of the cells listed under `forbidden_without_owner_decision` in `config/motif_sensory_vectors.v1.json` without the owner's decision.
 - Scores are reported as returned: no percentages, no cross-request averaging, no "lift".
 - The spec was accepted for stage 4 (rev 0.2). Build in its order: interface and hosting in stage 5, without changing engine decisions in the UI. `motif_spike/` stays intact.
 - Research control is a deterministic state machine (`motif/agent.py`). The LLM writes validated prose only; giving it tool choice needs the owner's approval.
 - LLM: key only from `MOTIF_ANTHROPIC_API_KEY`; default `claude-sonnet-5-5`; never switch models silently; every real call goes through the ledger (`data/llm_calls.jsonl`). A failed call or invalid text shows the labelled template, never as LLM output.
 - Web review gate (`motif/web/access.py`): password only from `MOTIF_ACCESS_PASSWORD`; protection on by default and fail-closed; every page and API except `/healthz` and the sign-in page is behind it. Open it (`MOTIF_ACCESS_PROTECTION=off`) only on the owner's word.
 - Brief purpose (creative intent) and accepted LLM readings are user data (`user_intent`, `user_preference`): never evidence, never change motifs, axes, materials, or scores. The LLM may suggest readings only on the user's request, at most three, validated in `motif/interpret.py`.
-- The result's headline comes from `narrative.headline`: the brand's own motifs lead; a direction drawn only from related references never leads the title.
+- The result's headline comes from `story.headline` (`narrative.headline` for the legacy engine): the brand's own motifs lead; a direction drawn only from related references never leads the title.
 - Wording: related brands and films are "references Qloo relates to" a brand; never claim anything about audiences.
 - Budget counters (`data/web_usage.json`, `data/llm_calls.jsonl`) reserve before spending and fail closed; do not bypass them. `MOTIF_LLM_BUDGET_GUARD` (default `auto`) pauses Claude on Render unless the data directory is on a persistent mount or the owner confirms a provider-side spend limit (`provider`); do not weaken it.
 - Recorded mode is for local development and tests only: refused on Render, never labelled or shown as live, and a live server shows no recorded wording.
 - Web: keys stay server-side; the UI never builds HTML from data; no fake progress; identical requests and answers must not repeat Qloo or LLM calls.
-- Live matching uses only material properties with `verified_full_page`; unverified ones appear only in the labelled design preview.
-- Held-out brands used once (T1: Le Labo, Patagonia) are no longer independent validation.
-- `config/motif_lexicon.json`, `config/material_palette.json`, and `config/draft_rules.json` are versioned design rules: change them only with a version bump and a written reason. Material profiles are MOTIF's creative mapping; supplier descriptors stay in `source` and are not verified in full until task T2.
-- Results of the engine are a creative direction, never a formula, dosage, or preference prediction. Unknown or conflicted axes stay `null`.
+- Scent architecture: material references are examples of a direction's class (IFRA 2019 glossary generic names); a trade name appears only where MOTIF read the supplier's full page (`verified_full_page` in the palette). Legacy matching uses only `verified_full_page` properties; unverified ones appear only in the labelled design preview.
+- Held-out brands used once are no longer independent validation: T1 (Le Labo, Patagonia) and the phase-7 continuous holdout (IKEA, Hermès, Bang & Olufsen, LEGO, Coca-Cola; its architectures were added post hoc).
+- Versioned design rules: `config/motif_lexicon.json`, `config/motif_scoring.v1.json`, `config/motif_sensory_vectors.v1.json`, `config/continuous_params.v1.json`, `config/olfactory_directions.v1.json`, and (legacy) `config/material_palette.json`, `config/draft_rules.json`, `config/engine_params.json`. Change them only with a version bump and a written reason; the legacy files are hash-checked against the frozen baseline. Material profiles are MOTIF's creative mapping; supplier descriptors stay in `source`.
+- Results of the engine are a creative direction, never a formula, dosage, or preference prediction. Tentative leanings (low-confidence design cells only) are labelled tentative.
 
 ## Live access facts (organizer email, 2026-10-05)
 

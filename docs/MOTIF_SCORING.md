@@ -97,3 +97,7 @@ Known limits:
   brands, then frozen for the pre-registered holdout (phase 7).
 
 The full per-brand table (every motif, score, own cue groups, related entities, cue groups, source kinds, legacy strength, and the largest change when one related entity is removed) is `reports/motif_scores.md`.
+
+After phase 10 (`docs/VALIDATION.md`): leaving one annotated descriptor out
+changes the resolved labels in 6% of 523 runs and one related entity in 7% of
+260 runs; scoring stays `scoring-1.0`, unchanged since the holdout.

@@ -163,6 +163,29 @@ expires after 30 days, before judging ends; not recommended. Recommended: **B**,
 because it is free, the cap is enforced by Anthropic, and MOTIF changes nothing
 but one variable; **C** if the owner wants MOTIF's own daily caps to hold too.
 
+### 0.5 Engine and product refactor (2026-10-07): decisions taken under the refactor brief
+
+The owner's refactor brief (phases 0–13) asked for the smallest defensible
+choice at each step, documented, and an owner question only for paid
+resources, keys and security, or a choice the evidence cannot support. These
+were taken on that basis; details in `docs/REFACTOR_LOG.md`.
+
+| ID | Decision | Why | Where |
+|---|---|---|---|
+| E1 | The product runs the continuous engine (`continuous-1.0`); the rule engine `engine-0.3` with R1–R5 stays unchanged as the legacy baseline (`--engine legacy`) | the rule engine collapsed 13 brands to 3 material sets | `docs/ENGINE_REDESIGN.md` |
+| E2 | The motif-to-sensory model is built from open odor-descriptor datasets (Dravnieks 1985, Keller & Vosshall 2016, Leffingwell, IFRA 2019 via Pyrfume) and labelled design readings; heritage, romance, and melancholy carry no claim; the five forbidden pairs stay forbidden | academic hosts are blocked in this environment; open data was reachable | `docs/SENSORY_MODEL_RESEARCH.md` |
+| E3 | Scoring weights and saturation set by inspection on the 13 trial brands, then frozen before a pre-registered five-brand holdout | no ground truth to fit against | `docs/MOTIF_SCORING.md`, `reports/continuous_holdout.md` |
+| E4 | The web app asks no conflict question: a dimension the motifs pull both ways is shown "open to the perfumer" | an undecidable choice is the perfumer's, not the user's | `motif/agent.py` |
+| E5 | Scent architecture from a 23-direction library; material references are IFRA glossary generic names, trade names only from supplier pages MOTIF read; `olfactory-1.1` fixed a scale error | the 7-material palette was the last collapse stage | `docs/OLFACTORY_LAYER.md` |
+| E6 | The LLM writes prose only (`prose-c1.0`), validated; it chooses nothing | unchanged authority rule (D9: L0) | `motif/llm.py`, `motif/story.py` |
+| E7 | No new LLM call for the LLM-only baseline; the four structured stage-6B answers are reused | 11 of the 20-call daily cap already used | `docs/VALIDATION.md` |
+| E8 | Candidate engine fixes from the holdout (typed search, "industrial design" context rule, a non-fashion commonness set, a lead-level floor, wider lexicon) are listed, not applied | each would need a version bump and a new holdout | `docs/ENGINE_REDESIGN.md` §5 |
+
+Effect on earlier decisions: decision 1 (§0.3, R6 + olibanum) concerns only the
+legacy engine now; the continuous model already lets provocation lean raw
+(tentatively), so the recommendation is to close it as not applied. Decision 2
+(§0.4, Claude spending on the free host) is unchanged and still the owner's.
+
 ## 1. Competition basis (search-index text, not full pages)
 
 On 2026-10-06 the official pages <https://qloo.devpost.com/> and
@@ -476,6 +499,7 @@ Files (private, git-ignored): `data/design_preview/stage6a/prototype-A-editorial
 | D11 | One-page brief + PDF export; JSON stays separate | proposed |
 | D12 | Art direction A or B (or B with A's mobile patterns) | awaiting approval |
 | D13 | Remove the review gate before submission | awaiting approval (at submission time) |
+| E1–E8 | Engine and product refactor decisions (§0.5) | current on the session branch |
 
 ## 9. Acceptance conditions for 6B
 

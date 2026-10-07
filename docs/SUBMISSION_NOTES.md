@@ -265,6 +265,27 @@ until the owner approves them; no engine or deployment change was made.
   luxury brands; the checked frankincense oil supports "warm" only and changes
   nothing. Neither is applied.
 
+## 2g. Engine and product refactor (2026-10-07)
+
+- **Engine:** the product runs the continuous engine `continuous-1.0`: weighted
+  motif scores (`scoring-1.0`), a motif-to-sensory model built from open
+  odor-descriptor data and labelled design readings (`sensory-1.0`), six
+  continuous dimensions with the full trace, and a scent architecture from 23
+  accord-type directions (`olfactory-1.1`). The rule engine `engine-0.3`
+  (R1–R5) is kept as the legacy baseline. `docs/ARCHITECTURE.md`.
+- **What Qloo demonstrably adds:** the brand's own entry and the references
+  Qloo relates to it, weighed separately; every motif and dimension traces to a
+  Qloo request and JSON pointer (13 of 13 trial brands, 4 of 4 resolved
+  holdout brands).
+- **Brief:** cultural profile → olfactory direction → scent architecture →
+  emphasize and avoid (only when supported) → why (Qloo → motif → scent) → the
+  brief; one A4 page; open dimensions read "open to the perfumer".
+- **Validation** (`docs/VALIDATION.md`): deterministic across interpreters; 3 →
+  11 distinct final outputs on 13 trial brands; a pre-registered five-brand
+  holdout without structural failure. Negative findings kept: without the
+  tentative design cells 11 → 7 architectures; brands outside the lexicon get
+  thin, similar results; 8% of supporting descriptors misread on the holdout.
+
 ## 3. Redacted request-to-result explanation
 
 Example from the full live run `live-20261006T103307Z-660d` (request `req 0011`; the credential is never stored):
@@ -448,4 +469,16 @@ Known from the feasibility stage (`reports/feasibility.md`):
   - **Hosting limits.** On the free instance, sessions live in memory and are
     lost when the service sleeps; daily caps restart with the process; the
     per-IP limit trusts the first `X-Forwarded-For` entry (best effort).
+- Engine refactor additions (2026-10-07):
+  - **Design readings.** 18 of the 23 cells of the motif-to-sensory model are
+    low-confidence design readings; leanings that rest only on them are labelled
+    tentative, and about a third of the differences between architectures
+    depend on them.
+  - **Coverage.** Brands whose own descriptors fall outside the lexicon (LEGO,
+    Coca-Cola) get thin, similar results; weak profiles converge on one
+    structure.
+  - **Misreads.** "Industrial design" and film-technique phrases can be read as
+    an aesthetic (8% of supporting descriptors on the holdout).
+  - **Untyped search.** A name can return only shops (IKEA); MOTIF then stops at
+    the entity question.
 - Limitations of the final product: TBD (stage 6)

@@ -261,3 +261,14 @@ monographs; the IFRA fragrance ingredient glossary. Opening
 environment's network settings would allow this. Owner decisions that would
 change the model: any of the five forbidden pairs; whether heritage, romance, or
 melancholy should carry a sensory claim at all.
+
+## 9. After validation (phase 10)
+
+The model is the product's sensory layer now (`continuous-1.0`, scent
+architecture `olfactory-1.1`). The final validation (`docs/VALIDATION.md`) shows
+what rests on it: removing its 18 low-confidence cells leaves 9 of 11 distinct
+profiles and 7 of 11 distinct architectures on the 13 trial brands, so a third
+of the architectural differences come from MOTIF's design readings, which the
+product labels "tentative". The tentative dry lean (9 of 13 brands) remains. No
+cell was changed after phase 3's revision; any change needs a new version and a
+new holdout.
