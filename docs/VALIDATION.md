@@ -144,14 +144,14 @@ showed that Qloo's own entries carry character MOTIF's lexicon does not read yet
 
 | Gate | State |
 |---|---|
-| All tests pass (unit, web, browser, PDF) | see the phase 10 entry in `docs/REFACTOR_LOG.md` |
+| All tests pass (unit, web, browser, PDF) | yes: 228 tests, network blocked (2026-10-07) |
 | Deterministic engine | yes (§2.1) |
 | No collapse regression | yes: 3 → 11 architectures, 7 → 11 profiles |
 | Holdout without structural failure | yes |
 | No debug or internal wording on the pages | yes (17 recorded brands; browser test) |
-| No secret in the repository | checked before the merge |
+| No secret in the repository | yes: tracked files scanned; only the existing test sentinels |
 | No paid infrastructure | none created |
-| Review password works | `tests/test_motif_web.py` access tests; the gate is unchanged |
+| Review password works | yes: the access tests in `tests/test_motif_web.py` pass; the gate is unchanged |
 
 ## 5. Not claimed
 

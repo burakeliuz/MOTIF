@@ -260,3 +260,14 @@ PDF, and one-page PDFs. No Qloo or LLM request was made.
   profile" on every line (now said once); "Fits the impression and sweetness
   and temperature" (now a proper list); dimension names capitalized mid-sentence;
   the footer's legacy wording "rule by rule".
+
+## Phase 13: main
+
+- Gates (`docs/VALIDATION.md` §4): 228 tests pass; deterministic; no collapse
+  regression; holdout without structural failure; no internal wording; secret
+  scan clean (test sentinels only); no paid infrastructure; the review gate's
+  tests pass and the gate is unchanged.
+- `main` fast-forwarded (no force) to the commit that adds this entry.
+- Render: no authenticated deploy path from this environment (no Render key; the
+  host is not reachable through the network policy). The owner deploys `main`
+  manually, keeping `MOTIF_ACCESS_PROTECTION=on` and the password.
