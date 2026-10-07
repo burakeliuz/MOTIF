@@ -1,0 +1,628 @@
+{
+  "lexicon_version": "lexicon-0.4",
+  "status": "active",
+  "engine": "continuous engine (the product). The frozen legacy engine engine-0.3 keeps lexicon-0.3 in config/motif_lexicon.json, hash-checked against its baseline.",
+  "provenance_category": "design_rule (classification rule, human-authored)",
+  "notice": "Authored in stage 3 after reading the five stage-2 seeds; it is therefore tuned on them and must be checked on held-out brands (MOTIF_BUILD_SPEC.md, stage-4 task T1). Cue words are classification rules, not Qloo labels. Weights and thresholds are design parameters, not validated statistics. lexicon-0.4 adds two motifs (energy, technology) and two precision cues, all chosen from words Qloo returned for the recorded brands, and a narrative-tone context rule; those brands are therefore not independent validation of lexicon-0.4.",
+  "match": {
+    "normalization": "lowercase; '-' and non-letters become spaces; whole-word phrase match of any variant inside the tag name",
+    "namespaces": {
+      "own": [
+        "urn:tag:aesthetic_property:qloo",
+        "urn:tag:personal_style:qloo",
+        "urn:tag:emotional_tone:qloo"
+      ],
+      "brand": [
+        "urn:tag:aesthetic_property:qloo",
+        "urn:tag:emotional_tone:qloo"
+      ],
+      "movie": [
+        "urn:tag:style:qloo"
+      ],
+      "artist": [
+        "urn:tag:style:qloo"
+      ]
+    },
+    "ignore_tag_names": [
+      "null"
+    ],
+    "exclude_patterns": [
+      "\\b(pop|rock|rap|hip hop|soul|folk|r b|jazz|electronic|punk|wave|funk|synth|indie|trap|boom bap|chillwave)\\b",
+      "\\bcombat\\b"
+    ],
+    "exclude_patterns_note": "First pattern: music genre names inside urn:tag:style:qloo (for example 'Baroque Pop' is a genre, not opulence); applied to every source for simplicity. Second: 'close quarter combat' is not closeness.",
+    "bare_pole_word_tags_are_not_cues": [
+      "warm",
+      "cool",
+      "light",
+      "dense",
+      "raw",
+      "polished",
+      "natural",
+      "synthetic",
+      "projecting",
+      "sweet",
+      "dry"
+    ],
+    "bare_pole_word_note": "A tag whose whole name is a single axis pole word (for example 'Raw', 'Polished', 'Warm') never counts as a cue; dimensions move only through motifs. 'Intimate' is exempt because it is a motif name; it is a common cue in the reference set anyway. Phrases such as 'Natural Materials' remain cues.",
+    "negators": [
+      "not",
+      "no",
+      "non",
+      "without",
+      "anti",
+      "never"
+    ],
+    "negation_window_tokens": 2,
+    "context_rules": {
+      "note": "General context rules (lexicon-0.3, narrative tone added in lexicon-0.4). They never name a brand. A cue that cannot be read safely is recorded as excluded_context with its reason and never counts.",
+      "technique_nouns": {
+        "sources": [
+          "movie",
+          "artist"
+        ],
+        "nouns": [
+          "editing",
+          "edit",
+          "edits",
+          "interviewing",
+          "interview",
+          "interviews",
+          "framing",
+          "camera",
+          "camerawork",
+          "cinematography",
+          "take",
+          "takes",
+          "montage",
+          "cuts",
+          "cutting",
+          "pacing",
+          "choreography",
+          "shot",
+          "shots",
+          "close up",
+          "close ups",
+          "handheld",
+          "narration",
+          "sound design",
+          "mixing",
+          "voiceover"
+        ]
+      },
+      "narrative_tone": {
+        "sources": [
+          "movie",
+          "artist"
+        ],
+        "motifs": [
+          "restrained",
+          "precise",
+          "opulent",
+          "natural",
+          "experimental",
+          "industrial",
+          "technological"
+        ],
+        "nouns": [
+          "humanism",
+          "humor",
+          "humour",
+          "storytelling",
+          "story",
+          "stories",
+          "narrative",
+          "narratives",
+          "drama",
+          "dramas",
+          "melodrama",
+          "performance",
+          "performances",
+          "acting",
+          "dialogue",
+          "dialogues",
+          "character",
+          "characters",
+          "characterization",
+          "emotion",
+          "emotions",
+          "emotional",
+          "sentiment",
+          "sentimentality",
+          "satire",
+          "comedy",
+          "wit",
+          "irony"
+        ],
+        "why": "In film and artist style tags, a look or material word that qualifies the story or the acting ('Understated humanism', 'Restrained performances') describes the narrative tone, not the look. The listed motifs are translated from a look or a material, so such a cue does not count. The tone motifs (intimacy, melancholy, romance, playfulness, provocation, energy) are translated from a tone, so a story told that way still carries them. Visual phrases ('Understated period detail', 'Sparse futurism', 'Muted palette') still count."
+      },
+      "ambiguous_cues": {
+        "lush": {
+          "requires_any": [
+            "costume",
+            "costumes",
+            "production design",
+            "set",
+            "sets",
+            "interior",
+            "interiors",
+            "decor",
+            "fabric",
+            "fabrics",
+            "textile",
+            "textiles",
+            "ornament",
+            "ornaments",
+            "wardrobe"
+          ],
+          "why": "'lush' describes vegetation and landscapes as often as richness; without a design context it cannot be read safely"
+        }
+      }
+    }
+  },
+  "cue_groups": {
+    "restrained": [
+      {
+        "cue_id": "restrained",
+        "variants": [
+          "restrained"
+        ]
+      },
+      {
+        "cue_id": "understated",
+        "variants": [
+          "understated"
+        ]
+      },
+      {
+        "cue_id": "muted",
+        "variants": [
+          "muted"
+        ]
+      },
+      {
+        "cue_id": "reserved",
+        "variants": [
+          "reserved"
+        ]
+      },
+      {
+        "cue_id": "sparse",
+        "variants": [
+          "sparse"
+        ]
+      },
+      {
+        "cue_id": "unshowy",
+        "variants": [
+          "unshowy"
+        ]
+      },
+      {
+        "cue_id": "minimalist",
+        "variants": [
+          "minimalist",
+          "minimalism"
+        ]
+      },
+      {
+        "cue_id": "unpretentious",
+        "variants": [
+          "unpretentious"
+        ]
+      }
+    ],
+    "intimate": [
+      {
+        "cue_id": "intimate",
+        "variants": [
+          "intimate",
+          "intimacy"
+        ]
+      },
+      {
+        "cue_id": "confessional",
+        "variants": [
+          "confessional"
+        ]
+      }
+    ],
+    "precise": [
+      {
+        "cue_id": "precise",
+        "variants": [
+          "precise",
+          "precision"
+        ]
+      },
+      {
+        "cue_id": "meticulous",
+        "variants": [
+          "meticulous",
+          "meticulously"
+        ]
+      },
+      {
+        "cue_id": "tailoring",
+        "variants": [
+          "tailoring",
+          "tailored"
+        ]
+      },
+      {
+        "cue_id": "clean lines",
+        "variants": [
+          "clean lines"
+        ]
+      },
+      {
+        "cue_id": "architectural",
+        "variants": [
+          "architectural"
+        ]
+      },
+      {
+        "cue_id": "geometric",
+        "variants": [
+          "geometric"
+        ]
+      },
+      {
+        "cue_id": "symmetry",
+        "variants": [
+          "symmetry"
+        ]
+      },
+      {
+        "cue_id": "structured",
+        "variants": [
+          "structured"
+        ]
+      },
+      {
+        "cue_id": "sleek",
+        "variants": [
+          "sleek",
+          "sleekness"
+        ]
+      },
+      {
+        "cue_id": "streamlined",
+        "variants": [
+          "streamlined"
+        ]
+      }
+    ],
+    "opulent": [
+      {
+        "cue_id": "opulent",
+        "variants": [
+          "opulent"
+        ]
+      },
+      {
+        "cue_id": "lush",
+        "variants": [
+          "lush"
+        ]
+      },
+      {
+        "cue_id": "luxurious",
+        "variants": [
+          "luxurious"
+        ]
+      },
+      {
+        "cue_id": "baroque",
+        "variants": [
+          "baroque"
+        ]
+      },
+      {
+        "cue_id": "lavish",
+        "variants": [
+          "lavish"
+        ]
+      },
+      {
+        "cue_id": "ornate",
+        "variants": [
+          "ornate"
+        ]
+      },
+      {
+        "cue_id": "sumptuous",
+        "variants": [
+          "sumptuous"
+        ]
+      }
+    ],
+    "natural": [
+      {
+        "cue_id": "natural materials",
+        "variants": [
+          "natural materials"
+        ]
+      },
+      {
+        "cue_id": "natural tones",
+        "variants": [
+          "natural tones"
+        ]
+      },
+      {
+        "cue_id": "earthy",
+        "variants": [
+          "earthy"
+        ]
+      },
+      {
+        "cue_id": "handcrafted",
+        "variants": [
+          "handcrafted"
+        ]
+      },
+      {
+        "cue_id": "organic",
+        "variants": [
+          "organic"
+        ]
+      },
+      {
+        "cue_id": "botanical",
+        "variants": [
+          "botanical"
+        ]
+      }
+    ],
+    "experimental": [
+      {
+        "cue_id": "experimental",
+        "variants": [
+          "experimental"
+        ]
+      },
+      {
+        "cue_id": "avant garde",
+        "variants": [
+          "avant garde"
+        ]
+      },
+      {
+        "cue_id": "deconstructed",
+        "variants": [
+          "deconstructed",
+          "deconstruction"
+        ]
+      },
+      {
+        "cue_id": "conceptual",
+        "variants": [
+          "conceptual"
+        ]
+      }
+    ],
+    "provocative": [
+      {
+        "cue_id": "provocative",
+        "variants": [
+          "provocative"
+        ]
+      },
+      {
+        "cue_id": "subversive",
+        "variants": [
+          "subversive"
+        ]
+      },
+      {
+        "cue_id": "edgy",
+        "variants": [
+          "edgy"
+        ]
+      },
+      {
+        "cue_id": "rebellious",
+        "variants": [
+          "rebellious"
+        ]
+      }
+    ],
+    "heritage": [
+      {
+        "cue_id": "heritage",
+        "variants": [
+          "heritage"
+        ]
+      },
+      {
+        "cue_id": "classic",
+        "variants": [
+          "classic"
+        ]
+      },
+      {
+        "cue_id": "timeless",
+        "variants": [
+          "timeless"
+        ]
+      }
+    ],
+    "playful": [
+      {
+        "cue_id": "playful",
+        "variants": [
+          "playful"
+        ]
+      },
+      {
+        "cue_id": "whimsical",
+        "variants": [
+          "whimsical"
+        ]
+      }
+    ],
+    "melancholic": [
+      {
+        "cue_id": "melancholic",
+        "variants": [
+          "melancholic",
+          "melancholy"
+        ]
+      }
+    ],
+    "romantic": [
+      {
+        "cue_id": "romantic",
+        "variants": [
+          "romantic"
+        ]
+      }
+    ],
+    "industrial": [
+      {
+        "cue_id": "industrial",
+        "variants": [
+          "industrial"
+        ]
+      }
+    ],
+    "energetic": [
+      {
+        "cue_id": "energetic",
+        "variants": [
+          "energetic",
+          "energy"
+        ]
+      },
+      {
+        "cue_id": "dynamic",
+        "variants": [
+          "dynamic",
+          "dynamism"
+        ]
+      },
+      {
+        "cue_id": "sporty",
+        "variants": [
+          "sporty",
+          "sport",
+          "athletic",
+          "athleticism"
+        ]
+      }
+    ],
+    "technological": [
+      {
+        "cue_id": "technological",
+        "variants": [
+          "technological",
+          "technology",
+          "high tech",
+          "hi tech"
+        ]
+      },
+      {
+        "cue_id": "technical",
+        "variants": [
+          "technical"
+        ]
+      },
+      {
+        "cue_id": "futuristic",
+        "variants": [
+          "futuristic",
+          "futurism",
+          "futurist"
+        ]
+      }
+    ]
+  },
+  "commonness": {
+    "rule": "A cue group is 'common' when it matches descriptors (own or related, scope above) for at least common_cue_min_seeds of the reference seeds. Common cues are shown as context and never count toward motif support (the continuous engine counts them lightly, and only for a motif with other support: config/motif_scoring.v1.json).",
+    "common_cue_min_seeds": 4,
+    "reference_set": "stage-2 full run live-20261006T103307Z-660d, seeds a24, muji, cdg, nike, ralph_lauren",
+    "common_cue_groups_in_reference_set": [
+      "dynamic",
+      "energetic",
+      "intimate",
+      "minimalist",
+      "playful"
+    ],
+    "note": "Frozen per lexicon version so that a single user query is scored against a fixed reference, not against itself.",
+    "recomputed": {
+      "lexicon": "lexicon-0.4",
+      "date": "2026-10-07",
+      "method": "Readable matches only (not negated, not excluded by a context rule) in the own, brand, film, and artist descriptors of the five seeds, replayed offline; the same procedure reproduces the lexicon-0.3 set exactly.",
+      "note": "New common groups: 'energetic' and 'dynamic' (all five seeds). Not common: 'sporty', 'sleek', 'streamlined', and the three technology groups (one seed each). The lexicon-0.3 groups keep their status."
+    }
+  },
+  "support": {
+    "source_kinds": [
+      "own",
+      "brand",
+      "movie",
+      "artist"
+    ],
+    "anchor_sources": [
+      "own",
+      "brand"
+    ],
+    "counting": "Support counts distinct source kinds with at least one non-common cue match. Repeats of the same cue or tag ID inside one source kind add no support. Several entities in one domain are one source kind.",
+    "strength": {
+      "strong": "anchored and >= 3 source kinds",
+      "moderate": "anchored and >= 2 source kinds, or own source with >= 2 distinct non-common cue groups",
+      "weak": "some non-common evidence but below moderate (for example media domains only)",
+      "context_only": "only common cues matched"
+    },
+    "activation": "A motif is active when its strength is strong or moderate.",
+    "independence_note": "Distinct source kinds are not proof of independent evidence; the label is a design parameter.",
+    "parameters": {
+      "strong_min_source_kinds": 3,
+      "moderate_min_source_kinds": 2,
+      "own_route_min_cue_groups": 2,
+      "anchor_sources": [
+        "own",
+        "brand"
+      ]
+    },
+    "synonym_note": "Variants inside one cue group are treated as one descriptor. Different cue groups of one motif (for example 'muted' and 'understated') are treated as distinct descriptors; MOTIF has no wider synonym model (known limitation)."
+  },
+  "changes": [
+    {
+      "version": "lexicon-0.2",
+      "date": "2026-10-06",
+      "before_t1": true,
+      "changes": [
+        "Negation guard: a cue preceded within two tokens by not/no/non/without/anti/never is recorded as negated and never counts as support (owner requirement, stage 4).",
+        "Own-only route to 'moderate' counts distinct cue groups instead of distinct tag IDs, so the same cue word in two own tags (for example 'Classic Tailoring' and 'Classic') is not counted twice."
+      ],
+      "effect_on_stage3_examples": "No sensory target changes for the five reference seeds; Ralph Lauren seed-only 'heritage' (an unmapped motif) drops from moderate to weak."
+    },
+    {
+      "version": "lexicon-0.3",
+      "date": "2026-10-06",
+      "before_t1": false,
+      "changes": [
+        "Technique rule: in movie and artist style tags, a cue does not count when the tag names a production technique (editing, interviewing, framing, takes, choreography, close ups, ...).",
+        "Ambiguity rule: the cue 'lush' counts only with a design context (costume, set, interior, ...).",
+        "Commonness recomputed on the same five reference seeds under these rules (see commonness)."
+      ],
+      "trigger": "Misreads seen on the T1 held-out brand Patagonia ('Lush' mountain films, 'Sparse interviewing'). Le Labo and Patagonia are therefore not independent validation of lexicon-0.3."
+    },
+    {
+      "version": "lexicon-0.4",
+      "date": "2026-10-07",
+      "before_t1": false,
+      "engine": "continuous only; the legacy engine keeps lexicon-0.3 (config/motif_lexicon.json)",
+      "changes": [
+        "Two motifs from words Qloo returned for the recorded brands: energetic (energetic, dynamic, sporty/athletic) and technological (technological/high-tech, technical, futuristic). Their sensory translations are creative design decisions (sensory-1.1).",
+        "Precision reads two design words: 'sleek' and 'streamlined'.",
+        "Narrative-tone rule: in film and artist style tags, a cue of a look or material motif does not count when the tag qualifies the story or the acting (humanism, storytelling, performances, ...).",
+        "Commonness recomputed on the same five reference seeds (see commonness).",
+        "Considered and left out: 'clean' (in the recordings it mostly qualifies typography, layouts, and interfaces of related brands, and read that way it turned A24's provocation-led result polished and cool; 'clean lines' stays), 'kinetic' (only in film style tags, where it describes camera movement and cutting), 'bold' (graphic weight and contrast as often as energy), 'vibrant' (colour intensity), 'innovative' (a general claim, not technology), tone words such as 'confident', 'empowering', 'analytical', 'intellectual', and 'polished' (the texture pole word itself, so reading it would move the dimension by its own name)."
+      ],
+      "trigger": "Owner review of the Adidas and OpenAI results (reports/adidas_openai_review.md): Qloo returned well over a hundred descriptors per brand, and lexicon-0.3 read a few of them; the film tag 'Understated humanism' counted as restraint. No brand-specific rule; every recorded brand is replayed with the same lexicon, and none of them is independent validation of lexicon-0.4."
+    }
+  ]
+}

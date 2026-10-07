@@ -15,11 +15,11 @@ direction and a one-page brief for a perfumer. Roles are fixed:
 Qloo search → brand entity → own entry + related brands + related films      motif/agent.py, motif/qloo.py
    │  every value copied literally with request ID and JSON pointer           motif/evidence.py
    ▼
-lexicon cues (47 cues, 12 motifs, context rules)   lexicon-0.3                motif/classify.py
+lexicon cues (55 cues, 14 motifs, context rules)   lexicon-0.4                motif/classify.py
    ▼
-weighted motif scores (12 motifs, 0–1)             scoring-1.0                motif/scoring.py
+weighted motif scores (14 motifs, 0–1)             scoring-1.0                motif/scoring.py
    ▼
-six continuous dimensions                          sensory-1.0, continuous-params-1.0   motif/continuous.py
+six continuous dimensions                          sensory-1.1, continuous-params-1.0   motif/continuous.py
    (temperature, weight, texture, impression, projection, sweetness;
     resolved with a confidence word, or open / pulled both ways)
    ▼
@@ -44,11 +44,14 @@ or another credential.
 source kind (`own`, `brand`, `movie`), tag, request ID, and JSON pointer.
 Category: `qloo_observation`.
 
-**Lexicon.** Versioned cue groups map descriptors to 12 candidate motifs
-(restraint, precision, naturalness, opulence, intimacy, experimentation,
-provocation, heritage, industrial character, playfulness, romance, melancholy).
-Context rules drop technique nouns in film tags. Cue groups common to the
-reference set count only at a reduced weight. Category: `motif_annotation`.
+**Lexicon** (`config/motif_lexicon.v1.json`; the legacy engine keeps its frozen
+`config/motif_lexicon.json`). Versioned cue groups map descriptors to 14 candidate
+motifs (restraint, precision, naturalness, opulence, intimacy, experimentation,
+provocation, heritage, industrial character, playfulness, romance, melancholy,
+energy, technology). Context rules drop technique nouns in film tags, and look or
+material words that qualify a film's story or acting ("Understated humanism").
+Cue groups common to the reference set count only at a reduced weight. Category:
+`motif_annotation`.
 
 **Motif scores** (`config/motif_scoring.v1.json`). A noisy-OR over channels with
 saturation: the brand's own entry, related brands, related films, and the
@@ -58,7 +61,8 @@ supported only by common cues is shown as context, never as a lead.
 
 **Dimensions** (`config/motif_sensory_vectors.v1.json`,
 `config/continuous_params.v1.json`). Each motif has a signed cell per dimension
-or none (23 of 72 cells; 5 medium-confidence, 18 low). Per dimension, the
+or none (25 of 84 cells; 5 medium-confidence, 20 low; the energy and technology
+cells are MOTIF's creative design decisions). Per dimension, the
 score-weighted contributions give a value, a mass, and an agreement; below the
 thresholds the dimension stays open, and when motifs cancel out it is "open:
 motifs pull both ways". A resolved dimension carries a confidence word capped
@@ -76,12 +80,13 @@ empty role is "open to the perfumer". `docs/OLFACTORY_LAYER.md`.
 **Readings and brief** (`motif/story.py`). The headline leads with the brand's
 own motifs; a direction drawn only from references Qloo relates to the brand
 never leads the title. The why-chain links each resolved dimension to its
-motifs and their Qloo phrases. Open dimensions are told once, grouped by why
-they are open (no read motif speaks to them, too weak to decide, or motifs pull
-both ways), with how many of the returned descriptors MOTIF reads. "In scent"
-reads the proposal in one sentence and adds what the chosen accords themselves
-bring to the open dimensions, from their library cells; it is labelled as MOTIF's
-creative proposal and changes no dimension. The brief JSON (`brief-1.0`) keeps the user's
+motifs and their Qloo phrases. The scent idea (the proposal in one sentence)
+leads the page, labelled as MOTIF's creative proposal; the chosen accords' own
+character for the open dimensions, from their library cells, follows the role
+strips and changes no dimension. Open dimensions are one short sentence; why they
+are open (no read motif speaks to them, too weak to decide, or motifs pull both
+ways) and how many of the returned descriptors MOTIF reads are a closed "Method
+detail". The brief JSON (`brief-1.0`) keeps the user's
 application context and accepted readings apart from the evidence (categories
 `user_intent`, `user_preference`); they change nothing.
 
@@ -105,7 +110,7 @@ reuse within 30 minutes. Recorded mode is local only and refused on Render.
 
 The same evidence and versions give the same result (checked across
 interpreters, `docs/VALIDATION.md`). Every result carries its versions:
-`lexicon-0.3`, `scoring-1.0`, `sensory-1.0`, `continuous-params-1.0`,
+`lexicon-0.4`, `scoring-1.0`, `sensory-1.1`, `continuous-params-1.0`,
 `olfactory-1.1`, `continuous-1.0`, `brief-1.0`, and the prose prompt. Config
 changes need a version bump and a written reason.
 
@@ -119,7 +124,7 @@ as a baseline: `python3 -m motif run --engine legacy`,
 checked by `tests/test_legacy_baseline.py`). R1 restraint → light,
 R2 intimacy → close-wearing, R3 precision → smooth-finished, R4 opulence →
 dense, R5 naturalness → natural-feeling; their relations survive as the five
-medium-confidence cells of `sensory-1.0`.
+medium-confidence cells of `sensory-1.0` (unchanged in `sensory-1.1`).
 
 ## 6. Repository map
 

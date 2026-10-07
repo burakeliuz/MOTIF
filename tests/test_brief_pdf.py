@@ -87,10 +87,17 @@ class Download(unittest.TestCase):
             self.assertIn("Cultural evidence sourced from", text)
             self.assertEqual(text.count("A hotel lobby"), 1)
             self.assertNotRegex(text, r"(?i)technical json|engine-\d|lexicon-\d|draft rule")
-            # open dimensions in one paragraph, and the evidence apart from the creative proposal
+            # open dimensions in one short sentence, the reasons as method detail, the evidence apart from the proposal
             self.assertNotRegex(text, r"(Temperature|Weight|Texture|Impression|Projection|Sweetness): Open to the perfumer")
             self.assertIn("QLOO EVIDENCE", text)
             self.assertRegex(text, r"CREATIVE\s+PROPOSAL")
+            flat = " ".join(text.split())
+            r = self.srv.hub.view(sid)["result"]
+            if r["scent_story"]:
+                self.assertIn("SCENT IDEA · MOTIF'S CREATIVE PROPOSAL " + r["scent_story"], flat)
+            if r["open_summary"]:
+                self.assertIn(r["open_summary"]["line"], flat)
+                self.assertEqual(flat.count("Method detail."), 1)
 
     def test_unknown_session_and_missing_brief_answer_plainly(self):
         cookie = self.signed_in()

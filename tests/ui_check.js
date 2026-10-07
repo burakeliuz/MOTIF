@@ -74,9 +74,14 @@ const { chromium } = require(MODULE);
   out.checks.result_context_line = await p.textContent(".intentline").catch(() => null);
   out.checks.result_role_names = await p.$$eval(".roles .role .kicker", (ks) => ks.map((x) => x.textContent.split(" · ")[0]));
   out.checks.result_open_count = count(resultText, "Open to the perfumer");
-  // open dimensions are told once, in one block, not one line per dimension
+  // open dimensions are told once, in one short sentence, not one line per dimension
   out.checks.result_per_dimension_open = (resultText.match(/(Temperature|Weight|Texture|Impression|Projection|Sweetness): Open to the perfumer/g) || []).length;
-  out.checks.result_open_boxes = await p.$$eval("#sec-02 .openbox", (xs) => xs.length);
+  out.checks.result_open_lines = await p.$$eval("#sec-02 .openline", (xs) => xs.map((x) => x.textContent));
+  // why they are open, and the descriptor counts, sit in a closed method detail
+  out.checks.result_method = await p.$eval("#method", (d) => ({ open: d.open, text: d.textContent })).catch(() => null);
+  out.checks.result_visible_counts = (resultText.match(/reads \d+ of the \d+ descriptors/g) || []).length;
+  // the scent idea leads, marked as MOTIF's proposal
+  out.checks.result_scent_idea = await p.$eval(".lead .scentidea", (x) => x.innerText).catch(() => null);
   out.checks.result_provenance = await p.$$eval(".sec .prov", (xs) => xs.map((x) => x.textContent));
   // every motif row shares one label column: the same label and description edges in every row
   out.checks.profile_columns = await p.$$eval("#sec-01 .basis li", (ls) => [...new Set(ls.map((li) =>
@@ -113,6 +118,8 @@ const { chromium } = require(MODULE);
   out.checks.pdf_sections = await pr.$$eval(".grid h2", (hs) => hs.map((x) => x.textContent));
   out.checks.pdf_open_count = count(pdfText, "Open to the perfumer");
   out.checks.pdf_per_dimension_open = (pdfText.match(/(Temperature|Weight|Texture|Impression|Projection|Sweetness): Open to the perfumer/g) || []).length;
+  out.checks.pdf_scent_idea = await pr.$eval(".scent", (x) => x.innerText).catch(() => null);
+  out.checks.pdf_method = count(pdfText, "Method detail.");
   await pr.emulateMedia({ media: "print" });
   const pdf = await pr.pdf({ format: "A4", printBackground: true, preferCSSPageSize: true, path: SHOTS ? `${SHOTS}/brief.pdf` : undefined });
   out.checks.pdf_pages = (pdf.toString("latin1").match(/\/Type\s*\/Page[^s]/g) || []).length;

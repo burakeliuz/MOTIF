@@ -286,6 +286,19 @@ until the owner approves them; no engine or deployment change was made.
   tentative design cells 11 → 7 architectures; brands outside the lexicon get
   thin, similar results; 8% of supporting descriptors misread on the holdout.
 
+## 2h. Delivery fixes after the Adidas/OpenAI review (2026-10-07)
+
+- **Lexicon `lexicon-0.4`** (continuous engine only): energy and technology
+  motifs and two precision words, all from words Qloo returned for the recorded
+  brands; a context rule so that a film tag about narrative tone ("Understated
+  humanism") no longer counts as a visual motif. No brand exception.
+- **Model `sensory-1.1`**: one weak cell each (energy → diffusive, technology →
+  synthetic-feeling), documented as MOTIF's creative design decisions.
+- **Page and PDF**: the scent idea leads, labelled MOTIF's creative proposal;
+  open dimensions in one short sentence; the reasons and descriptor counts in a
+  closed method detail. 7 of 19 recorded brands change resolved dimensions;
+  Adidas and OpenAI no longer share a structure; not independently validated.
+
 ## 3. Redacted request-to-result explanation
 
 Example from the full live run `live-20261006T103307Z-660d` (request `req 0011`; the credential is never stored):

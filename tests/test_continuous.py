@@ -126,7 +126,56 @@ class ShippedModel(unittest.TestCase):
         self.assertIsNone(CC.vectors["motifs"]["restrained"]["cells"]["intimate_projecting"])
 
     def test_every_lexicon_motif_has_an_entry(self):
-        self.assertEqual(set(CC.vectors["motifs"]), set(CONFIG.lexicon["cue_groups"]))
+        self.assertEqual(set(CC.vectors["motifs"]), set(CC.lexicon["cue_groups"]))
+
+    def test_the_two_creative_motifs_claim_one_weak_cell_each(self):
+        # sensory-1.1: energy and technology are MOTIF's creative design decisions, never more than tentative
+        for motif, axis, direction in (("energetic", "intimate_projecting", "projecting"),
+                                       ("technological", "natural_synthetic", "synthetic")):
+            cells = {a: c for a, c in CC.vectors["motifs"][motif]["cells"].items() if c}
+            self.assertEqual(list(cells), [axis], motif)
+            self.assertEqual((cells[axis]["direction"], cells[axis]["confidence"], cells[axis]["strength"]),
+                             (direction, "low", "weak"))
+            self.assertIn("creative design decision", CC.vectors["motifs"][motif]["design_status"].lower())
+
+
+class Lexicon04(unittest.TestCase):
+    """lexicon-0.4 is the continuous engine's own; the legacy engine keeps lexicon-0.3 untouched."""
+
+    def test_versions_and_shared_namespaces(self):
+        self.assertEqual(CC.lexicon["lexicon_version"], "lexicon-0.4")
+        self.assertEqual(CONFIG.lexicon["lexicon_version"], "lexicon-0.3")
+        self.assertNotIn("energetic", CONFIG.lexicon["cue_groups"])
+        self.assertEqual(CC.lexicon["match"]["namespaces"], CONFIG.lexicon["match"]["namespaces"])
+
+    def test_energy_and_technology_words_are_read(self):
+        r = run([ev("own", "S", "Sporty", AESTHETIC), ev("own", "S", "Technological Design", AESTHETIC),
+                 ev("brand", "B1", "Sleek Silhouettes", AESTHETIC), ev("movie", "M1", "Retro futuristic", STYLE)])
+        self.assertTrue(r["motif_scores"]["energetic"]["own"])
+        self.assertTrue(r["motif_scores"]["technological"]["own"])
+        self.assertIn("technological", r["axes"]["natural_synthetic"]["pulls"]["synthetic"])
+        self.assertIn("energetic", r["axes"]["intimate_projecting"]["pulls"]["projecting"])
+        self.assertEqual(r["motif_scores"]["precise"]["cue_groups"], ["sleek"])
+
+    def test_common_energy_words_count_only_with_other_support(self):
+        r = run([ev("brand", f"B{i}", n, AESTHETIC) for i, n in enumerate(("Energetic", "Dynamic Imagery", "Energetic"))])
+        self.assertTrue(r["motif_scores"]["energetic"]["common_only"])
+        self.assertEqual(r["axes"]["intimate_projecting"]["contributors"], [])
+
+    def test_narrative_tone_in_film_tags_is_not_a_look(self):
+        r = run([ev("movie", "M1", "Understated humanism", STYLE), ev("movie", "M2", "Restrained performances", STYLE),
+                 ev("movie", "M3", "Understated period detail", STYLE), ev("movie", "M4", "Confessional storytelling", STYLE)])
+        roles = {(a["motif"], a["role"]) for a in r["annotations"]}
+        restraint = [a for a in r["annotations"] if a["motif"] == "restrained"]
+        excluded = {a["evidence_id"] for a in restraint if a["role"] == "excluded_context"}
+        self.assertEqual(len(excluded), 2)
+        self.assertTrue(all("story's tone" in a["reason"] for a in restraint if a["role"] == "excluded_context"))
+        # the visual phrase still counts, and a tone motif told as a story keeps its tone
+        self.assertEqual([a["role"] for a in restraint if a["evidence_id"] not in excluded], ["support"])
+        self.assertIn(("intimate", "support"), roles)
+        # the same words on a brand's own entry are not film narration
+        own = run([ev("own", "S", "Understated humanism", TONE)])
+        self.assertEqual([a["role"] for a in own["annotations"]], ["support"])
 
 
 if __name__ == "__main__":

@@ -81,7 +81,7 @@ Examples (stored live Qloo responses of 2026-10-06/07, current engine):
   related films within a budget, stops on a failed request with what it has, and
   offers one controlled retry.
 - **The engine** (Python standard library), every part versioned: a lexicon of
-  twelve motifs; saturating motif scores; a motif-to-sensory model built from
+  fourteen motifs; saturating motif scores; a motif-to-sensory model built from
   open odor-descriptor datasets (Dravnieks, Keller & Vosshall, Leffingwell, the
   IFRA glossary, via Pyrfume) and labelled design readings; continuous
   aggregation that keeps every contributor; a 23-direction olfactory library.

@@ -272,3 +272,21 @@ of the architectural differences come from MOTIF's design readings, which the
 product labels "tentative". The tentative dry lean (9 of 13 brands) remains. No
 cell was changed after phase 3's revision; any change needs a new version and a
 new holdout.
+
+## 10. `sensory-1.1`: two motifs as creative design decisions (2026-10-07)
+
+`lexicon-0.4` reads energy and technology words that Qloo returned for the
+recorded brands, so the model gains two motifs. At the owner's request their
+translations are documented as MOTIF's creative design decisions, not
+researched: no odor data was sought, and each motif claims one weak,
+low-confidence cell, so a dimension resting on it alone reads "tentative".
+
+| Motif | Cell | Reading | Left open (why) |
+|---|---|---|---|
+| energy (energetic, dynamic, sporty) | projection → diffusive | movement outward, a presence that reaches others | temperature (heat as easily as freshness), weight (quick and light or forceful and dense) |
+| technology (technological, technical, futuristic) | impression → synthetic-feeling | an engineered, abstract impression (an impression, not ingredient origin) | temperature ("cold technology" is a cliché; metal is temperature-neutral in odor data), texture (rugged utility or seamless finish) |
+
+No odor imagery is assigned to either. The twelve `sensory-1.0` motifs and the
+five forbidden pairs are unchanged; technology → synthetic-feeling is not the
+forbidden industrial = synthetic pair, which reads exposed materials. The
+model now claims 25 of 84 cells (5 medium, 20 low).

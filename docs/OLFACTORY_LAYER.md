@@ -134,9 +134,10 @@ on tentative dimensions and say so; Nike has no structure (insufficient evidence
 
 ## 5b. Reading the proposal (presentation, no matching change)
 
-The result page and the brief describe the chosen structure in one sentence
-("In scent: watery and ozonic to open, a transparent floral core and a powdery
-iris and violet drydown") and say what the chosen accords bring to the
+The result page and the brief lead with the chosen structure in one sentence,
+the scent idea ("Watery and ozonic to open, a transparent floral core and a
+powdery iris and violet drydown"), and after the role strips say what the
+chosen accords bring to the
 dimensions the evidence leaves open, from their cells in this library: a
 dimension all chosen accords lean the same way on is named with that lean
 ("slightly" when no cell is stronger than 0.25); one they disagree on is

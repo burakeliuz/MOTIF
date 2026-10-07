@@ -166,7 +166,7 @@ class _Brief:
 
     # -- blocks ---------------------------------------------------------------------------------------
 
-    def header(self, brand: str, label: str, title: str, lines: List[str], top_note: str) -> None:
+    def header(self, brand: str, label: str, title: str, lines: List[str], top_note: str, scent: Optional[str] = None) -> None:
         pdf = self.pdf
         y = MT
         pdf.set_font("logo", size=12)
@@ -197,6 +197,11 @@ class _Brief:
         for line in lines:
             self.gap(0.9)
             self.flow([self.seg(line, size=8.6)], ML, 170)
+        if scent:  # the scent idea up front, marked as MOTIF's proposal (as on the page)
+            self.gap(2.6)
+            self.flow([self.seg("SCENT IDEA · MOTIF'S CREATIVE PROPOSAL", "semi", 6.2, MUTE)], ML, 170, lh=1.3)
+            self.gap(0.6)
+            self.flow([self.seg(scent, size=10.4)], ML, 170, lh=1.3)
 
     def section(self, num: str, title: str) -> float:
         """Rule, number, and title in the left column; returns the y where the right column starts."""
@@ -296,7 +301,7 @@ def _build(view: Dict[str, Any], scale: float):
     pdf.set_title(f"MOTIF brief · {brand}")
     head = r["headline"]
     top = ("Recorded preview · " if view.get("data_label") == "recorded" else "") + "Cultural evidence sourced from Qloo" + (f" · {date}" if date else "")
-    b.header(brand, head["label"], head["title"], head.get("lines") or [], top)
+    b.header(brand, head["label"], head["title"], head.get("lines") or [], top, r.get("scent_story"))
     x, w = b.right_x, b.rw
     n = 0
 
@@ -338,10 +343,9 @@ def _build(view: Dict[str, Any], scale: float):
     segs.append(b.seg(".", size=8.6))
     b.flow(segs, x, w)
     o = r.get("open_summary")
-    if o:  # every open dimension in one paragraph, grouped by why it is open
+    if o:  # the open dimensions in one short sentence; why they are open is the method detail under Why
         b.gap(1.2)
-        b.flow([b.seg("Open to the perfumer. ", "strong", 8), b.seg(" ".join(line["text"] for line in o["lines"]) + " ", size=8),
-                b.seg(o["coverage"], size=8, color=MUTE)], x, w)
+        b.flow([b.seg(o["line"], size=8.6)], x, w)
     b.end_section()
 
     # 03 scent architecture
@@ -350,8 +354,6 @@ def _build(view: Dict[str, Any], scale: float):
     if a["status"] != "proposed":
         b.flow([b.seg("No scent architecture is proposed: the structure is open to the perfumer.")], x, w)
     else:
-        b.flow([b.seg("In scent: ", "strong", 8.6), b.seg(r["scent_story"] + (" " + r["accord_character"] if r.get("accord_character") else ""), size=8.6)], x, w)
-        b.gap(1.6)
         col = (w - 2 * 3) / 3
         top_y = pdf.get_y()
         bottoms = []
@@ -388,6 +390,9 @@ def _build(view: Dict[str, Any], scale: float):
                 b.flow(segs, tx, tw)
             bottoms.append(max(pdf.get_y(), top_y + strip_h))
         pdf.set_y(max(bottoms) if bottoms else top_y)
+        if r.get("accord_character"):
+            b.gap(1.8)
+            b.flow([b.seg(r["accord_character"], size=8)], x, w)
     b.end_section()
 
     # 04 emphasize and avoid (only when supported)
@@ -411,6 +416,9 @@ def _build(view: Dict[str, Any], scale: float):
                 segs += [b.seg(", " if j else ""), b.seg(e["tag"].upper(), size=7.7)]
         segs.append(b.seg("."))
         b.flow(segs, x, w)
+        b.gap(1.2)
+    if o:  # the page's closed "Method detail"
+        b.flow([b.seg("Method detail. ", "strong", 7.4), b.seg(" ".join(line["text"] for line in o["lines"]) + " " + o["coverage"], size=7.4, color=MUTE)], x, w)
         b.gap(1.2)
     q = r["sources"]["qloo"]
     kinds = list(dict.fromkeys(_lower_first(rq["what"]) for rq in q["requests"]))

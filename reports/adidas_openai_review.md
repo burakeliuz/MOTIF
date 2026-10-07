@@ -131,3 +131,26 @@ in the lexicon. Making them differ inside the olfactory layer would be forcing.
 
 Proposals 2 and 3 make Adidas' result thinner but more honest; proposal 1 is the
 one that adds information. None is applied without the owner's decision.
+
+## 7. Applied on the owner's decision (2026-10-07)
+
+Proposals 1 and 2 were applied as `lexicon-0.4` and `sensory-1.1`, limited to
+energy, technology, and design words, with no brand exception; proposal 3 was
+not. Differences from the proposal text above: "Polished" (the texture pole word
+itself), "Clean" (mostly typography and interface words of related brands),
+"bold", "kinetic", "analytical", and "innovative" were left out; the new cells
+are creative design decisions, not researched (owner's instruction); the
+narrative-tone rule covers look and material motifs only, so intimacy told as a
+story still counts. Replayed offline from the same recordings:
+
+| | Adidas | OpenAI |
+|---|---|---|
+| Leading motifs | energy, technology (own entry), precision (references) | precision (own entry), restraint, technology (references) |
+| Resolved | smooth-finished texture; slightly diffusive; slightly synthetic-feeling | slightly cool; light; smooth-finished; slightly synthetic-feeling |
+| Open to the perfumer | temperature, weight, sweetness | projection, sweetness |
+| Scent idea | aldehydic and clean / powdery iris and violet / creamy woods | watery and ozonic / transparent floral / powdery iris and violet |
+
+"Understated humanism" is now excluded as narrative tone; Adidas' restraint is
+context only and its weight is open. The two structures differ because what
+MOTIF reads of the two brands differs, not because difference was a target.
+Effect on all 19 recorded brands: `docs/REFACTOR_LOG.md`.

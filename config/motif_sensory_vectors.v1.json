@@ -1,9 +1,9 @@
 {
-  "model_version": "sensory-1.0",
+  "model_version": "sensory-1.1",
   "status": "active",
-  "revision": "r2: the one revision after the phase 3 review (docs/SENSORY_MODEL_RESEARCH.md section 7)",
+  "revision": "r2 of sensory-1.0 (docs/SENSORY_MODEL_RESEARCH.md section 7), plus the two lexicon-0.4 motifs (energetic, technological) as creative design decisions (section 10)",
   "provenance_category": "design_rule",
-  "notice": "MOTIF's creative mapping from 12 motifs to 6 sensory dimensions (docs/SENSORY_MODEL_RESEARCH.md). Not perception science and not a formula. null = MOTIF makes no claim (it contributes nothing, never zero). A non-null cell without odor-step sources is MOTIF's design opinion only.",
+  "notice": "MOTIF's creative mapping from 14 motifs to 6 sensory dimensions (docs/SENSORY_MODEL_RESEARCH.md). Not perception science and not a formula. null = MOTIF makes no claim (it contributes nothing, never zero). A non-null cell without odor-step sources is MOTIF's design opinion only.",
   "encoding": {
     "warm_cool": {"-1": "warm", "+1": "cool"},
     "light_dense": {"-1": "light", "+1": "dense"},
@@ -256,10 +256,51 @@
       },
       "null_notes": {"natural_synthetic": "Forbidden without an owner decision (industrial = synthetic).",
                      "warm_cool": "The common association metal = cold is not supported: D85 METALLIC is temperature-neutral."}
+    },
+    "energetic": {
+      "cues": "energetic, energy, dynamic, sporty, athletic",
+      "design_status": "Creative design decision (sensory-1.1, owner request of 2026-10-07): added with lexicon-0.4; no odor data was sought for it.",
+      "imagery": [],
+      "imagery_note": "No odor imagery: a citrus or sport-fresh reading would be a convention, not something the cue words say.",
+      "cells": {
+        "warm_cool": null,
+        "light_dense": null,
+        "raw_polished": null,
+        "natural_synthetic": null,
+        "intimate_projecting": {"direction": "projecting", "strength": "weak", "value": 0.25, "confidence": "low", "evidence_type": "motif_design_inference",
+                                "rationale": "Energetic, dynamic, sporty: movement outward, translated as a presence that radiates and reaches others.",
+                                "design_origin": "MOTIF creative design decision (sensory-1.1)", "odor_step_sources": [],
+                                "uncertainty": "Design opinion only; intended presence, not measured performance. Energy can also be contained and close."},
+        "sweet_dry": null
+      },
+      "null_notes": {"warm_cool": "Energy reads as heat (spice, fire) as easily as freshness (citrus, air); the cues do not decide.",
+                     "light_dense": "Energy can be quick and light or forceful and dense; the cues do not decide.",
+                     "all": "Only projection is claimed; the other dimensions are left open to the perfumer."}
+    },
+    "technological": {
+      "cues": "technological, technology, high-tech, technical, futuristic, futurism",
+      "design_status": "Creative design decision (sensory-1.1, owner request of 2026-10-07): added with lexicon-0.4; no odor data was sought for it.",
+      "imagery": [],
+      "imagery_note": "No odor imagery: metallic or ozonic notes would be MOTIF's association, not the cue words; metal is temperature-neutral in odor data (see industrial).",
+      "cells": {
+        "warm_cool": null,
+        "light_dense": null,
+        "raw_polished": null,
+        "natural_synthetic": {"direction": "synthetic", "strength": "weak", "value": 0.25, "confidence": "low", "evidence_type": "motif_design_inference",
+                              "rationale": "Technological, futuristic: an engineered, abstract impression, translated as synthetic-feeling (an impression, not ingredient origin).",
+                              "design_origin": "MOTIF creative design decision (sensory-1.1)", "odor_step_sources": [],
+                              "uncertainty": "Design opinion only; technical brands also use natural materials. Not the forbidden 'industrial = synthetic' pair, which reads exposed materials; this reads engineering and futurism."},
+        "intimate_projecting": null,
+        "sweet_dry": null
+      },
+      "null_notes": {"warm_cool": "'Cold technology' is a cliché the cues do not state; metal is temperature-neutral in odor data (see industrial).",
+                     "raw_polished": "Technical can mean rugged utility as well as a seamless finish; the cues do not decide.",
+                     "all": "Only the impression is claimed; the other dimensions are left open to the perfumer."}
     }
   },
   "changes": [
     {"version": "sensory-1.0", "date": "2026-10-07", "reason": "Phase 3 of the engine refactor: first researched motif-to-sensory model; candidate, not loaded by the engine. r1 was reviewed from three lenses (method, perfumer, engine); r2 applies the one revision."},
-    {"version": "sensory-1.0", "date": "2026-10-07", "reason": "Phase 5: promoted unchanged from config/candidates/ and loaded by the continuous engine (motif/config.py load_continuous_config)."}
+    {"version": "sensory-1.0", "date": "2026-10-07", "reason": "Phase 5: promoted unchanged from config/candidates/ and loaded by the continuous engine (motif/config.py load_continuous_config)."},
+    {"version": "sensory-1.1", "date": "2026-10-07", "reason": "Owner request after the Adidas/OpenAI review: lexicon-0.4 reads energy and technology words, so the model gains two motifs, each with one weak, low-confidence cell (energetic -> projecting, technological -> synthetic). Both are documented as MOTIF's creative design decisions; no odor data was sought. The twelve sensory-1.0 motifs are unchanged."}
   ]
 }

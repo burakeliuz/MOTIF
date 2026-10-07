@@ -14,8 +14,9 @@ appears exactly there (MUJI = Aesop). `docs/ENGINE_REDESIGN.md` §2.
 
 ## 2. What is counted
 
-The lexicon is unchanged (`lexicon-0.3`): the same annotations, the same
-context exclusions and negations. Only roles `support` (in full) and
+The lexicon was unchanged at phase 4 (`lexicon-0.3`); since 2026-10-07 the
+continuous engine reads `lexicon-0.4` (energy and technology motifs, a
+narrative-tone context rule; scoring unchanged). Only roles `support` (in full) and
 `context_common_cue` (at a reduced weight) count; `negated` and
 `excluded_context` never count.
 
@@ -24,7 +25,7 @@ context exclusions and negations. Only roles `support` (in full) and
 | Own entry: distinct supporting cue groups | 1 unit each (the brand's own description is the anchor) |
 | Related brands / films / artists: distinct supporting entities | 1 unit each, per source kind |
 | Supporting tags beyond those groups or entities | 0.25 unit each (more tags on the same entity add a little) |
-| Common cue groups (frozen lexicon-0.3 commonness: intimate, minimalist, playful) | 0.3 unit per group in the own entry; 0.1 unit per related entity whose only match is common |
+| Common cue groups (frozen commonness: intimate, minimalist, playful; `lexicon-0.4` adds energetic, dynamic) | 0.3 unit per group in the own entry; 0.1 unit per related entity whose only match is common |
 | Diversity: distinct supporting cue groups and distinct source kinds | (groups − 1) + (kinds − 1) units in a separate channel |
 | Related artists | only when the session fetched them (off by default) |
 

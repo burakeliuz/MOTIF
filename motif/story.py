@@ -26,6 +26,7 @@ MOTIF_LABELS = {
     "restrained": "restraint", "precise": "precision", "natural": "naturalness", "opulent": "opulence",
     "intimate": "intimacy", "experimental": "experimentation", "provocative": "provocation", "heritage": "heritage",
     "industrial": "industrial character", "playful": "playfulness", "romantic": "romance", "melancholic": "melancholy",
+    "energetic": "energy", "technological": "technology",
 }
 STRONG_WORDS = ("supported", "firm")
 DISCLAIMER = ("A creative direction for a perfumer, not a formula: nothing has been smelled or balanced, there are no "
@@ -204,8 +205,9 @@ def coverage(name: str, result: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def open_summary(name: str, result: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-    """One short account of the dimensions the evidence leaves open, grouped by why: no read motif speaks to
-    them, the lean is too weak to decide, or motifs pull both ways. Descriptive only; nothing is filled in."""
+    """The dimensions the evidence leaves open: one short sentence for the page ('line'), and the method detail
+    behind it, grouped by why (no read motif speaks to them, the lean is too weak to decide, or motifs pull both
+    ways) with how much of Qloo's vocabulary MOTIF reads ('lines', 'coverage'). Descriptive only; nothing is filled in."""
     axes = result["axes"]
     opened = open_dims(result)
     if not opened:
@@ -247,7 +249,8 @@ def open_summary(name: str, result: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         text += ("; " + poss(name) + " own " if cov["unread_own"] else "; others such as ") + _join(quoted) + " are not in it yet."
     else:
         text += "."
-    return {"dims": [DIM_NAMES[a] for a in opened], "lines": lines, "coverage": text, "counts": cov}
+    return {"dims": [DIM_NAMES[a] for a in opened], "line": "Open to the perfumer: " + names(opened) + ".",
+            "lines": lines, "coverage": text, "counts": cov}
 
 
 def scent_story(result: Dict[str, Any]) -> Optional[str]:

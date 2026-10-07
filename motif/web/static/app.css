@@ -128,6 +128,7 @@ button { font: inherit; cursor: pointer; color: inherit; }
 .char .w small { font: 600 10.5px/1.3 var(--disp); letter-spacing: .1em; text-transform: uppercase; color: var(--mute); margin-top: 6px; }
 .char .w.rel .v { text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 3px; text-underline-offset: 6px; }
 .dir .none { font-size: 18px; }
+.dir .char + .mute.small { margin: 14px 0 0; }
 .stillopen { font-size: 15px; color: var(--mute); margin: 12px 0 0; }
 details.axes { margin-top: 6px; font-size: 15px; }
 details.axes summary { cursor: pointer; display: inline-block; padding: 6px 0 2px; text-decoration: underline; text-underline-offset: 3px; }
@@ -160,11 +161,15 @@ details.refs { margin-top: 10px; font-size: 14px; }
 details.refs summary { cursor: pointer; display: inline-block; font: 700 11px/1.3 var(--disp); letter-spacing: .12em; text-transform: uppercase; border-bottom: 1px solid var(--ink); }
 details.refs ul { list-style: none; margin: 8px 0 0; padding: 0; }
 details.refs li { padding: 4px 0; border-bottom: 1px solid var(--hair); overflow-wrap: anywhere; }
-.openbox { margin-top: 18px; border-top: 1px solid var(--hair); padding-top: 10px; max-width: 46em; }
-.openbox .kicker { margin: 0 0 6px; }
-.openbox p { margin: 0 0 6px; font-size: 15px; }
-.story { font: 400 18px/1.5 var(--text); max-width: 46em; margin: 0 0 4px; }
-.story + .mute.small { margin: 0 0 18px; }
+.openline { margin: 16px 0 0; font-size: 16px; max-width: 46em; }
+.character { margin: 20px 0 0; font-size: 15px; max-width: 46em; }
+/* the scent idea up front (MOTIF's creative proposal) */
+.scentidea { margin-top: 22px; border-top: 1px solid var(--ink); padding-top: 10px; max-width: 40em; }
+.scentidea .kicker { margin: 0 0 6px; }
+.scentidea .prov { color: var(--mute); }
+.scentidea .story { font: 400 clamp(19px, 1.7vw, 23px)/1.4 var(--text); margin: 0; }
+.method { max-width: 46em; padding: 6px 0 14px; }
+.method p { margin: 0 0 8px; font-size: 15px; }
 .ea { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--g); }
 .ea ul { list-style: none; margin: 0; padding: 0; }
 .ea li { padding: 6px 0; border-bottom: 1px solid var(--hair); }

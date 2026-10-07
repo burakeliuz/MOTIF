@@ -116,6 +116,9 @@ class OpenDimensionsAndStory(unittest.TestCase):
         self.assertEqual({a: r["axes"][a]["state"] for a in r["axes"]}, states)  # reading changes nothing
         self.assertLessEqual(o["counts"]["read"], o["counts"]["returned"])
         self.assertIn(f"reads {o['counts']['read']} of the {o['counts']['returned']} descriptors", o["coverage"])
+        # the page shows one short sentence; the reasons and the counts are the method detail
+        self.assertEqual(o["line"], "Open to the perfumer: " + story._join([d.lower() for d in o["dims"]]) + ".")
+        self.assertNotRegex(o["line"], r"\d")
 
     def test_a_faint_lean_is_named_but_stays_open(self):
         r = result([ev("brand", "B1", "Clean Lines", AESTHETIC)])

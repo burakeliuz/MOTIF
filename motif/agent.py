@@ -251,7 +251,8 @@ class Controller:
 
     def _add_evidence(self, kind: str, rec: Dict[str, Any]) -> None:
         request = {"request_id": rec["request_id"], "fetched_at": rec["fetched_at"], "path": rec["path"], "params": rec["params"]}
-        self.evidence.extend(items_from_body(kind, rec["body"], request, self.config.lexicon["match"]["namespaces"]))
+        lexicon = self.continuous.lexicon if self.engine == "continuous" else self.config.lexicon
+        self.evidence.extend(items_from_body(kind, rec["body"], request, lexicon["match"]["namespaces"]))
 
     @staticmethod
     def _summary(result: Dict[str, Any]) -> str:

@@ -102,9 +102,29 @@ class StartResultAndBrief(unittest.TestCase):
     def test_open_dimensions_and_roles_say_so_plainly(self):
         self.assertEqual(self.c["result_role_names"], ["Opening", "Core", "Drydown"])
         self.assertEqual(self.c["pdf_open_count"] > 0, self.c["result_open_count"] > 0)
-        # told once, grouped by why; never one line per dimension
+        # one short sentence; never one line per dimension
         self.assertEqual((self.c["result_per_dimension_open"], self.c["pdf_per_dimension_open"]), (0, 0))
-        self.assertLessEqual(self.c["result_open_boxes"], 1)
+        self.assertLessEqual(len(self.c["result_open_lines"]), 1)
+        for line in self.c["result_open_lines"]:
+            self.assertRegex(line, r"^Open to the perfumer: [a-z ,]+\.$")
+
+    def test_the_reasons_and_counts_wait_in_a_closed_method_detail(self):
+        if not self.c["result_open_lines"]:
+            self.skipTest("this synthetic result leaves no dimension open")
+        self.assertFalse(self.c["result_method"]["open"])
+        self.assertRegex(self.c["result_method"]["text"], r"reads \d+ of the \d+ descriptors")
+        self.assertEqual(self.c["result_visible_counts"], 0)
+        self.assertEqual(self.c["pdf_method"], 1)
+
+    def test_the_scent_idea_leads_as_motifs_proposal(self):
+        sid = next(iter(self.hub.sessions))
+        story = self.hub.view(sid)["result"]["scent_story"]
+        if not story:
+            self.assertIsNone(self.c["result_scent_idea"])
+            return
+        for shown in (self.c["result_scent_idea"], self.c["pdf_scent_idea"]):
+            self.assertIn(story, shown)
+            self.assertRegex(shown, r"(?i)motif's creative proposal")
 
     def test_evidence_and_creative_proposal_are_labelled_apart(self):
         self.assertEqual(self.c["result_provenance"][:3], ["Qloo evidence", "MOTIF's translation", "MOTIF's creative proposal"])

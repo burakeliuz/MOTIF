@@ -169,10 +169,10 @@ HOST=, PORT=                    # web server bind address (default 127.0.0.1:800
 
 The Qloo base URL is fixed in `config/manifest.json`, because hackathon keys
 only work against `https://hackathon.api.qloo.com`. Design rules are versioned
-in `config/`: `motif_lexicon.json`, `motif_scoring.v1.json`,
+in `config/`: `motif_lexicon.v1.json`, `motif_scoring.v1.json`,
 `motif_sensory_vectors.v1.json`, `continuous_params.v1.json`,
-`olfactory_directions.v1.json`, and for the legacy engine `draft_rules.json`,
-`material_palette.json`, `engine_params.json`.
+`olfactory_directions.v1.json`, and for the legacy engine `motif_lexicon.json`
+(frozen `lexicon-0.3`), `draft_rules.json`, `material_palette.json`, `engine_params.json`.
 
 ## Hosting
 

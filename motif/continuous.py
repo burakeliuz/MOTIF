@@ -1,7 +1,7 @@
 """The continuous sensory engine: weighted motifs -> six continuous sensory dimensions.
 
-Pipeline (no LLM anywhere): Qloo evidence -> lexicon annotations (lexicon-0.3, unchanged)
--> weighted motif scores (motif/scoring.py) -> per-dimension aggregation through the
+Pipeline (no LLM anywhere): Qloo evidence -> lexicon annotations (lexicon-0.4; the legacy engine keeps
+lexicon-0.3) -> weighted motif scores (motif/scoring.py) -> per-dimension aggregation through the
 researched motif-to-sensory model (config/motif_sensory_vectors.v1.json) -> olfactory
 structure (motif/olfactory.py).
 

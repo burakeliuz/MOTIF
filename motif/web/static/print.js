@@ -45,15 +45,19 @@
     return [h("p", { class: "dirl" },
       resolved.length ? resolved.map((d, i) => [i ? " · " : "", h("b", { text: d.word.toUpperCase() }), " (" + d.name.toLowerCase() + ", " + d.confidence_word + ")"]) : "No dimension resolved yet",
       "."),
-      o ? h("p", { class: "open" }, h("b", { text: "Open to the perfumer. " }), o.lines.map((line) => line.text).join(" ") + " ",
-        h("span", { class: "cov", text: o.coverage })) : null];
+      o ? h("p", { class: "open", text: o.line }) : null];
+  }
+
+  // the page's closed "Method detail": why the open dimensions are open, and how much MOTIF reads
+  function method(r) {
+    const o = r.open_summary;
+    return o ? h("p", { class: "method" }, h("b", { text: "Method detail. " }), o.lines.map((line) => line.text).join(" ") + " " + o.coverage) : null;
   }
 
   function architecture(r) {
     const a = r.architecture;
     if (a.status !== "proposed") return h("p", { text: "No scent architecture is proposed: the structure is open to the perfumer." });
-    return [h("p", { class: "story" }, h("b", { text: "In scent: " }), r.scent_story + (r.accord_character ? " " + r.accord_character : "")),
-      h("div", { class: "mats" }, a.roles.map((role) => {
+    return [h("div", { class: "mats" }, a.roles.map((role) => {
       if (role.open) return h("div", { class: "mat open" }, h("div", {}, h("div", { class: "s", text: role.name }), h("div", { class: "n", text: "Open to the perfumer" })));
       const strip = h("div", { class: "strip" });
       strip.append(MotifStrips.svg(role.props));
@@ -64,7 +68,8 @@
         h("div", { class: "x", text: role.descriptors.join(", ") }),
         refs.length ? h("div", { class: "q" }, "e.g. ", refs.map((m, i) => [i ? "; " : "", m.generic,
           m.example ? [" (", m.url ? link(m.url, m.example) : m.example, ")"] : null])) : null));
-    }))];
+    })),
+    r.accord_character ? h("p", { class: "character", text: r.accord_character }) : null];
   }
 
   function emphasize(r) {
@@ -108,11 +113,13 @@
       h("p", { class: "lbl", text: r.headline.label }),
       h("p", { class: "idea", text: r.headline.title }),
       r.headline.lines.map((line) => h("p", { class: "line", text: line })),
+      r.scent_story ? h("div", { class: "scent" }, h("p", { class: "k", text: "Scent idea · MOTIF's creative proposal" }),
+        h("p", { class: "st", text: r.scent_story })) : null,
       section(num(), "Cultural profile", profile(r)),
       section(num(), "Olfactory direction", dimensions(r)),
       section(num(), "Scent architecture", architecture(r)),
       a.emphasize.length || a.avoid.length ? section(num(), "Emphasize and avoid", emphasize(r)) : null,
-      section(num(), "Why", why(r), sources(r)),
+      section(num(), "Why", why(r), method(r), sources(r)),
       b ? section(num(), "The brief",
         s.intent ? h("p", { class: "note", text: "Application context: “" + s.intent + "”" }) : null,
         h("p", { class: "prose", text: b.text.replace(/\n\s*\n+/g, "\n").trim() }),

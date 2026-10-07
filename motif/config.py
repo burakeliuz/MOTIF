@@ -1,5 +1,6 @@
-"""Versioned design configuration: the legacy rule engine (lexicon, rules, palette, parameters) and the
-continuous engine (lexicon, motif scoring, motif-to-sensory model, aggregation parameters)."""
+"""Versioned design configuration: the legacy rule engine (lexicon-0.3 in motif_lexicon.json, rules, palette,
+parameters; frozen) and the continuous engine (its own lexicon in motif_lexicon.v1.json, motif scoring,
+motif-to-sensory model, aggregation parameters, olfactory library)."""
 
 from __future__ import annotations
 
@@ -70,7 +71,7 @@ class ContinuousConfig:
 def load_continuous_config(config_dir: Optional[Path] = None) -> ContinuousConfig:
     base = Path(config_dir) if config_dir else CONFIG_DIR
     config = ContinuousConfig(
-        lexicon=read_json(base / "motif_lexicon.json"),
+        lexicon=read_json(base / "motif_lexicon.v1.json"),
         scoring=read_json(base / "motif_scoring.v1.json"),
         vectors=read_json(base / "motif_sensory_vectors.v1.json"),
         params=read_json(base / "continuous_params.v1.json"),

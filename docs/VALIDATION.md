@@ -5,6 +5,8 @@ Phase 10 of the engine refactor (2026-10-07). Numbers come from
 --write reports/final_validation.md`), `reports/continuous_engine_analysis.md`
 (phase 6), and `reports/continuous_holdout.md` (phase 7, pre-registered). All
 checks here are offline: stored Qloo responses, no Qloo request, no LLM call.
+The phase-10 numbers are for `lexicon-0.3` and `sensory-1.0`; §2.6 gives the
+effect of `lexicon-0.4` and `sensory-1.1`, which were not validated anew.
 
 **What validation can and cannot say.** There is no ground truth for "the right
 scent of a brand". Nothing here claims that a direction is correct, preferred,
@@ -122,6 +124,17 @@ the continuous engine commits where its evidence and model reach and leaves the
 rest open. Where both commit they mostly agree. This agreement is not
 validation of either: both can share the same cultural associations.
 
+### 2.6 After `lexicon-0.4` and `sensory-1.1` (2026-10-07)
+
+Energy and technology motifs, two precision words, and a narrative-tone context
+rule (`docs/REFACTOR_LOG.md`), replayed offline on the 19 recorded brands:
+resolved dimensions change for 7, the architecture for 5; Nike, previously
+without a direction, gets one; distinct architectures 12 → 15; MUJI, Aesop,
+Le Labo, A24, Supreme, Sanrio, Balenciaga, and Hermès are unchanged. Not a
+validation: the new words were chosen by reading these same recordings, and no
+new holdout was run. Two near-threshold side effects are reported as found
+(Harley-Davidson's drydown, Coca-Cola's impression).
+
 ## 3. Where Qloo adds what a plain LLM does not
 
 - **Traceable evidence.** Every motif, dimension, and direction traces to a Qloo
@@ -135,7 +148,7 @@ validation of either: both can share the same cultural associations.
   fills them from memory.
 
 What Qloo does not supply by itself: the translation into scent. That step is
-MOTIF's model (`sensory-1.0`, `olfactory-1.1`), partly backed by open odor
+MOTIF's model (`sensory-1.1`, `olfactory-1.1`), partly backed by open odor
 data and partly design opinion, and labelled as such. The stage-6B trial also
 showed that Qloo's own entries carry character MOTIF's lexicon does not read yet
 (LEGO, Coca-Cola, Harley-Davidson's "Rugged" and "Chrome Details").

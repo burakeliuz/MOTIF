@@ -70,6 +70,7 @@ MOTIF_NOTES = {
     "restrained": "Restraint", "precise": "Precision", "natural": "Naturalness", "opulent": "Opulence",
     "intimate": "Intimacy", "experimental": "Experimentation", "provocative": "Provocation", "heritage": "Heritage",
     "industrial": "Industrial character", "playful": "Playfulness", "romantic": "Romance", "melancholic": "Melancholy",
+    "energetic": "Energy", "technological": "Technology",
 }
 
 

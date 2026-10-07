@@ -316,3 +316,46 @@ PDF, and one-page PDFs. No Qloo or LLM request was made.
   stack every row the same way (EXPERIMENTATION no longer gets its own layout).
 - Engine proposals for the owner (not applied): lexicon coverage, narrative-tone
   context rule, common-word unlocking, no olfactory-layer change.
+
+## Lexicon-0.4, sensory-1.1, and a scent-first page (2026-10-07)
+
+Owner request after the review: apply the lexicon proposal limited to energy,
+technology, and design words already in the recordings, fix narrative-tone
+misreads by context, no brand exception, no new research.
+
+- **`lexicon-0.4`** (`config/motif_lexicon.v1.json`, the continuous engine's own
+  file; the legacy engine keeps `lexicon-0.3` in `config/motif_lexicon.json`,
+  hash-checked as before): two motifs, *energy* (energetic, dynamic,
+  sporty/athletic) and *technology* (technological/high-tech, technical,
+  futuristic); two precision words (sleek, streamlined); a narrative-tone rule
+  (in film and artist tags, a look or material cue qualifying the story or the
+  acting does not count: "Understated humanism", "Understated humor"). Commonness
+  recomputed on the same five reference seeds by the same rule: "energetic" and
+  "dynamic" are common. Tried and left out, with reasons in the file: "clean"
+  (mostly typography and interface words of related brands; it turned A24
+  polished and cool), "kinetic" (film camera and cutting only), "bold",
+  "vibrant", "innovative", tone words, "polished".
+- **`sensory-1.1`**: one weak, low-confidence cell each, documented as MOTIF's
+  creative design decisions (no odor data sought): energy → projecting,
+  technology → synthetic-feeling. The twelve `sensory-1.0` motifs are unchanged;
+  no forbidden pair is touched.
+- **Effect on the 19 recorded brands** (offline replay, no Qloo or LLM call):
+  resolved dimensions change for 7 (Nike, Patagonia, Harley-Davidson, LEGO,
+  Coca-Cola, Adidas, OpenAI), the architecture for 5; Nike gets its first
+  direction (energy and technology); distinct architectures 12 → 15. Adidas:
+  energy and technology lead, restraint becomes context only, weight opens;
+  Adidas and OpenAI no longer share a structure (not a target; it follows from
+  what is read). MUJI, Aesop, Le Labo, A24, Supreme, Sanrio, Balenciaga, and
+  Hermès are unchanged. Two near-threshold side effects are kept as found:
+  Harley-Davidson's drydown moves from animalic leather to woody amber (one
+  related "Sleek Silhouettes" and one "Sporty Interior Finishes"), and a weak
+  opposing pull resolves Coca-Cola's impression as slightly natural-feeling.
+  Every recorded brand helped choose the words, so none is independent
+  validation of `lexicon-0.4`.
+- **Page and PDF**: the scent idea leads, under the title, labelled MOTIF's
+  creative proposal; open dimensions are one short sentence in the olfactory
+  direction; why they are open and how many of the returned descriptors MOTIF
+  reads moved to a closed "Method detail" under Why (in the PDF and the printed
+  brief, the same text in small print at the same place); the accords'
+  character follows the role strips. Evidence and proposal labels and the shared
+  label column are unchanged.

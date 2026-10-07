@@ -34,6 +34,10 @@ class Lexicon:
         technique = context.get("technique_nouns", {})
         self.technique_sources = set(technique.get("sources", []))
         self.technique_nouns = {tuple(n.split()) for n in technique.get("nouns", [])}
+        narrative = context.get("narrative_tone", {})  # lexicon-0.4; absent from the frozen lexicon-0.3
+        self.narrative_sources = set(narrative.get("sources", []))
+        self.narrative_motifs = set(narrative.get("motifs", []))
+        self.narrative_nouns = {tuple(n.split()) for n in narrative.get("nouns", [])}
         self.ambiguous = {cue: {tuple(w.split()) for w in rule["requires_any"]}
                           for cue, rule in context.get("ambiguous_cues", {}).items()}
         self.params = lexicon["support"]["parameters"]
@@ -54,13 +58,17 @@ class Lexicon:
                 hits.append(" ".join(phrase))
         return sorted(hits)
 
-    def context_exclusion(self, tag_name: str, source_kind: str, cue_id: str) -> str:
+    def context_exclusion(self, tag_name: str, source_kind: str, cue_id: str, motif: str = "") -> str:
         """Reason a matched cue cannot be read safely in this tag, or '' when it can."""
         tokens = normalize_text(tag_name)
         if source_kind in self.technique_sources:
             nouns = self._contains(tokens, self.technique_nouns)
             if nouns:
                 return f"describes production technique ({', '.join(nouns)}), not the look or tone"
+        if source_kind in self.narrative_sources and motif in self.narrative_motifs:
+            nouns = self._contains(tokens, self.narrative_nouns)
+            if nouns:
+                return f"describes the story's tone ({', '.join(nouns)}), not the look or material"
         if cue_id in self.ambiguous and not self._contains(tokens, self.ambiguous[cue_id]):
             return f"'{cue_id}' is ambiguous here (no design context such as costume, set, or interior)"
         return ""
@@ -101,7 +109,7 @@ def classify(evidence: Sequence[Dict[str, Any]], lexicon: Lexicon) -> Dict[str, 
             unmatched += 1
             continue
         for motif, cue_id, negated in result["matches"]:
-            excluded = lexicon.context_exclusion(item["tag_name"], item["source_kind"], cue_id)
+            excluded = lexicon.context_exclusion(item["tag_name"], item["source_kind"], cue_id, motif)
             if negated:
                 role = "negated"
             elif excluded:

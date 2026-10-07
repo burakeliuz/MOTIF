@@ -259,16 +259,15 @@ function dimensionsBlock(r) {
     resolved.length ? h("div", { class: "char" }, resolved.map((d) => h("span", { class: "w" + (d.tentative ? " rel" : "") },
       h("span", { class: "v", text: d.word }), h("small", { text: d.name + " · " + d.confidence_word })))) : h("p", { class: "none", text: "No dimension is resolved yet." }),
     resolved.some((d) => d.tentative) ? h("p", { class: "mute small", text: "Tentative leanings rest on MOTIF's design reading alone; supported ones on the brand's motifs with a medium-confidence translation." }) : null,
-    openBlock(r.open_summary));
+    r.open_summary ? h("p", { class: "openline", text: r.open_summary.line }) : null);
 }
 
-// Every dimension the evidence leaves open, in one place, grouped by why it is open.
-function openBlock(o) {
+// Why the open dimensions are open, and how much of Qloo's vocabulary MOTIF reads: method detail, closed by default.
+function methodDetail(o) {
   if (!o) return null;
-  return h("div", { class: "openbox" },
-    h("p", { class: "kicker", text: "Open to the perfumer" }),
-    o.lines.map((line) => h("p", { text: line.text })),
-    h("p", { class: "mute small", text: o.coverage }));
+  return h("details", { class: "fold", id: "method" },
+    h("summary", {}, "Method detail", h("small", { text: "Why some dimensions stay open, and how much of what Qloo returned MOTIF reads" })),
+    h("div", { class: "method" }, o.lines.map((line) => h("p", { text: line.text })), h("p", { class: "mute", text: o.coverage })));
 }
 
 function andList(xs) {
@@ -288,8 +287,7 @@ function roleDetail(role) {
 function architectureBlock(r) {
   const a = r.architecture;
   if (a.status !== "proposed") return h("p", { class: "intro", text: "No scent architecture is proposed: no dimension is resolved. The structure is open to the perfumer." });
-  return [h("p", { class: "story" }, h("b", { text: "In scent: " }), r.scent_story, r.accord_character ? " " + r.accord_character : ""),
-    h("p", { class: "mute small", text: "MOTIF's creative proposal, built from the olfactory direction above; not Qloo evidence, and nothing has been smelled."
+  return [h("p", { class: "intro", text: "MOTIF's creative proposal, built from the olfactory direction above; not Qloo evidence, and nothing has been smelled."
       + (a.tentative ? " Every role here rests on tentative leanings." : "") }),
     h("div", { class: "roles" }, a.roles.map((role) => {
       if (role.open) return h("div", { class: "role open" }, h("p", { class: "kicker", text: role.name }), h("p", { class: "nm", text: "Open to the perfumer" }));
@@ -300,7 +298,8 @@ function architectureBlock(r) {
           h("p", { class: "nm", text: role.label }), h("p", { class: "sc", text: role.descriptors.join(", ") }),
           role.works_with.length ? h("p", { class: "mute small", text: "Fits the " + andList(role.works_with) + "." }) : null,
           roleDetail(role)));
-    }))];
+    })),
+    r.accord_character ? h("p", { class: "character", text: r.accord_character }) : null];
 }
 
 function emphasizeBlock(r) {
@@ -339,6 +338,7 @@ function whyBlock(s, r, brand) {
     r.why.length ? h("ul", { class: "why" }, r.why.map((w) => h("li", {},
       h("div", { class: "ax" }, w.name, h("small", { text: w.word + (w.confidence_word ? " · " + w.confidence_word : "") })),
       h("div", {}, w.chain.map((c) => h("p", {}, h("b", { text: c.label }), " → " + c.toward + (c.tentative ? " (tentative)" : ""), cite(c))))))) : h("p", { text: "No dimension to explain yet." }),
+    methodDetail(r.open_summary),
     h("details", { class: "fold", id: "how" },
       h("summary", {}, "All motifs and sources", h("small", { text: "Every phrase opens its entity, field, request, and date" })),
       r.motifs.map(motifRow),
@@ -386,7 +386,11 @@ function renderResult(s, opts) {
         h("div", { class: "made" }, made)),
       h("div", { class: "main" },
         h("p", { class: "idea", text: r.headline.title }),
-        r.headline.lines.map((line) => h("p", { class: "line", text: line })))),
+        r.headline.lines.map((line) => h("p", { class: "line", text: line })),
+        // the scent idea up front, marked as MOTIF's proposal so it never reads as Qloo evidence
+        r.scent_story ? h("div", { class: "scentidea" },
+          h("p", { class: "kicker" }, "Scent idea", h("span", { class: "prov", text: " · MOTIF's creative proposal" })),
+          h("p", { class: "story", text: r.scent_story })) : null)),
     section(num(), "Cultural profile", profileBlock(r, brand)),
     section(num(), "Olfactory direction", dimensionsBlock(r)),
     section(num(), "Scent architecture", architectureBlock(r)),
