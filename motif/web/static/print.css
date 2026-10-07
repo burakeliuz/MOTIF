@@ -47,18 +47,26 @@ p { margin: 0 0 1.4mm; }
 ol { margin: 0; padding-left: 4.5mm; } li { margin-bottom: .8mm; }
 .ft { margin-top: 4mm; border-top: .5pt solid var(--hair); padding-top: 1.8mm; font-size: 6.9pt; color: var(--mute); display: grid; grid-template-columns: 1fr auto; gap: 4mm; }
 .ft a { color: inherit; }
+/* step-down levels chosen by print.js so that one brief always fits one A4 page */
+.sheet.measure { font-size: 9.4pt; }
+.sheet.fit1 { font-size: 8.8pt; } .fit1 .idea { font-size: 13pt; } .fit1 .prose, .fit1 .src { font-size: 7.3pt; } .fit1 .grid { margin-top: 2.4mm; }
+.sheet.fit2 { font-size: 8.2pt; } .fit2 .idea { font-size: 12pt; } .fit2 .prose, .fit2 .src, .fit2 .mat .q, .fit2 .mat .x { font-size: 7pt; }
+.fit2 .grid { margin-top: 2mm; padding-top: 1.6mm; } .fit2 .line, .fit2 .dirl { font-size: 7.8pt; }
+.sheet.fit3 { font-size: 7.6pt; } .fit3 .idea { font-size: 11pt; } .fit3 .prose, .fit3 .src, .fit3 .mat .q, .fit3 .mat .x, .fit3 .note { font-size: 6.8pt; }
+.fit3 .grid { margin-top: 1.6mm; padding-top: 1.4mm; } .fit3 .line, .fit3 .dirl { font-size: 7.2pt; } .fit3 .strip { height: 28mm; }
+.sheet.measure { position: absolute; left: -10000px; top: 0; width: 210mm; max-width: none; margin: 0; padding: 11mm 13mm 10mm; visibility: hidden; }
 @media print {
   body { background: #fff; }
   .bar { display: none; }
   .sheet { margin: 0; padding: 0; max-width: none; }
 }
-@media screen and (max-width: 720px) {
+@media screen and (max-width: 720px) {  /* the A4 measurement copy (.measure) keeps the print layout */
   body { font-size: 15px; }
-  .sheet { margin: 0; padding: 16px; }
-  .grid { grid-template-columns: 1fr; }
-  .mats { grid-template-columns: 1fr; gap: 12px; }
-  .mat { grid-template-columns: 40px 1fr; }
-  .strip { width: 40px; height: 120px; }
-  h1 { font-size: 40px; } .idea { font-size: 24px; }
-  .mat .q, .mat .x, .note, .ft, .line, .dirl, .prose, .src { font-size: 13px; }
+  .sheet:not(.measure) { margin: 0; padding: 16px; font-size: 15px; }
+  .sheet:not(.measure) .grid { grid-template-columns: 1fr; }
+  .sheet:not(.measure) .mats { grid-template-columns: 1fr; gap: 12px; }
+  .sheet:not(.measure) .mat { grid-template-columns: 40px 1fr; }
+  .sheet:not(.measure) .strip { width: 40px; height: 120px; }
+  .sheet:not(.measure) h1 { font-size: 40px; } .sheet:not(.measure) .idea { font-size: 24px; }
+  .sheet:not(.measure) :is(.mat .q, .mat .x, .note, .ft, .line, .dirl, .prose, .src) { font-size: 13px; }
 }

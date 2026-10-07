@@ -107,7 +107,7 @@
       section(num(), "Starting materials", materials(r, brand)),
       section(num(), "Cultural profile", profile(r)),
       section(num(), "Open decisions", decisions(r, brand)),
-      b ? section(num(), "In words", h("p", { class: "prose", text: b.text }),
+      b ? section(num(), "In words", h("p", { class: "prose", text: b.text.replace(/\n\s*\n+/g, "\n").trim() }),
         h("p", { class: "note", text: b.author === "llm" ? "Written by Claude (" + b.model + ") from the result and checked against it; it chose nothing."
           : "Written by MOTIF's fixed template." })) : null,
       accepted.length ? section(num(), "Your notes", h("ol", {}, accepted.map((x) => h("li", { text: x.descriptor + ": " + x.reading + " (accepted by you; not Qloo evidence; no rule applied)" })))) : null,
@@ -116,6 +116,26 @@
         h("span", { text: "A creative direction, not a formula: not smelled or balanced, no proportions, no prediction of who will like it. "
           + "MOTIF " + r.versions.engine + " · " + r.versions.lexicon + " · rules " + r.versions.rules + " · " + r.versions.palette + "." }),
         h("span", { text: "1 / 1" }))].flat(Infinity).filter(Boolean));
+    (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(fit);  // measure with the real fonts
+  }
+
+  // Keep the brief on one A4 page: measure an off-screen copy laid out at A4 width and step
+  // the type down (never below about 7 pt) until the content fits the printable height.
+  function fit() {
+    const page = 276 * 96 / 25.4;  // printable height in CSS px: 297 mm minus 21 mm of margins
+    const probe = sheet.cloneNode(true);
+    probe.removeAttribute("id");
+    document.body.append(probe);
+    let chosen = "";
+    for (const level of ["", "fit1", "fit2", "fit3"]) {
+      probe.className = ("sheet measure " + level).trim();
+      const style = getComputedStyle(probe);
+      const inner = probe.scrollHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom);
+      chosen = level;
+      if (inner <= page) break;
+    }
+    probe.remove();
+    sheet.className = ("sheet " + chosen).trim();
   }
 
   async function load() {
