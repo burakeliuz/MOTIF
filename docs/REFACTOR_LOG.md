@@ -78,3 +78,21 @@ PDF, and one-page PDFs. No Qloo or LLM request was made.
   `tests/test_sensory_model.py` runs it.
 - Gate: no near-identical vectors, guesses labelled and capped, not R1–R5 alone.
 - No engine behaviour changed; no Qloo or LLM request.
+
+## Phase 4: weighted motif scoring
+
+- `motif/scoring.py`, `config/motif_scoring.v1.json` (`scoring-1.0`): bounded,
+  saturating noisy-OR over channels (own entry, related brands, related films,
+  related artists only when fetched, diversity of cue groups and source kinds),
+  common-cue penalty, own-entry anchor. Deterministic.
+- `docs/MOTIF_SCORING.md`; `reports/motif_scores.md` (13 brands, offline);
+  `tests/test_motif_scoring.py` (bounds, monotonicity, saturation, own anchor,
+  source and cue diversity, artist only when fetched, common and negated cues,
+  order independence; the six named checks when recordings exist).
+- Checks: A24 0.699 vs Comme des Garçons 0.863 (provocation), Gucci 0.643 vs
+  Balenciaga 0.838, MUJI led by restraint vs Aesop led by precision, heritage
+  for Ralph Lauren 0.669 and Harley-Davidson 0.556 (its top motif), Sanrio
+  playfulness 0.719. One related entity removed: at most 0.233 (a motif on one
+  related brand), at most 0.195 for motifs at the lead level, median 0.056.
+- Gate: graded differences where the legacy labels were equal, no instability
+  beyond single-entity minor signals. Not wired into the product yet.

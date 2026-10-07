@@ -1,0 +1,27 @@
+{
+  "scoring_version": "scoring-1.0",
+  "status": "design_parameters",
+  "provenance_category": "design_rule",
+  "notice": "Weighted motif scores for the continuous engine (docs/MOTIF_SCORING.md). Design parameters chosen by MOTIF and calibrated by inspection on the 13 trial brands (reports/continuous_engine_analysis.md); they are not statistical estimates, probabilities, or measures of how strongly a brand 'is' a motif.",
+  "reads": "lexicon-0.3 annotations: role 'support' counts in full; role 'context_common_cue' counts at the common-cue weight; 'negated' and 'excluded_context' never count.",
+  "formula": {
+    "score": "1 - prod over channels c of (1 - weight_c * s_c); bounded to [0, 1)",
+    "saturation": "s_c = 1 - exp(-units_c / tau_c)",
+    "units_own": "distinct supporting cue groups + extra_item_weight * (supporting tags - those cue groups) + common_cue_weight.own * common-only cue groups",
+    "units_related": "distinct supporting entities + extra_item_weight * (supporting tags - those entities) + common_cue_weight.related * entities with common cues only",
+    "units_diversity": "(distinct supporting cue groups - 1) + (distinct source kinds with supporting tags - 1): a motif named in one word by one kind of source gets no diversity credit"
+  },
+  "channels": {
+    "own": {"weight": 0.7, "tau": 1.0, "why": "the brand's own Qloo entry describes the brand itself (the anchor); one cue group already carries most of its weight"},
+    "brand": {"weight": 0.55, "tau": 3.0, "why": "related brands are the second anchor; a pattern needs several of the ten related brands"},
+    "movie": {"weight": 0.35, "tau": 3.0, "why": "related films corroborate; film 'style' tags describe the films, not the brand"},
+    "artist": {"weight": 0.3, "tau": 3.0, "why": "related music artists corroborate; counted only when the session fetched them (off by default)"}
+  },
+  "diversity": {"weight": 0.2, "tau": 3.0, "why": "the same motif named in several different words, or by several kinds of source, is a broader pattern than one word repeated in one place"},
+  "extra_item_weight": 0.25,
+  "common_cue_weight": {"own": 0.3, "related": 0.1, "why": "cue groups common in the frozen reference set (lexicon-0.3 commonness) say little about one brand; in the brand's own entry they still describe the brand, so they keep more weight there"},
+  "rounding_digits": 6,
+  "changes": [
+    {"version": "scoring-1.0", "date": "2026-10-07", "reason": "Phase 4 of the engine refactor: replace binary activation (count of source kinds) with a graded, saturating score so that very different amounts of support no longer get the same label."}
+  ]
+}
