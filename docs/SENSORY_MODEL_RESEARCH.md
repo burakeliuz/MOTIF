@@ -1,7 +1,8 @@
 # Sensory model research: 12 motifs × 6 dimensions (`sensory-1.0`)
 
 Phase 3 of the engine refactor (2026-10-07). Outputs:
-`config/candidates/motif_sensory_vectors.v1.json` (the model, revision r2) and
+`config/motif_sensory_vectors.v1.json` (the model, revision r2; promoted from
+`config/candidates/` unchanged in phase 5 and loaded by the continuous engine) and
 `config/candidates/odor_axis_evidence.v1.json` (the odor-family evidence it
 cites). Tools: `tools/sensory_evidence.py` computes the evidence from open
 datasets; `tools/sensory_model_review.py` checks the model (rules, data agreement,

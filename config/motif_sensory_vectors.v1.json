@@ -1,6 +1,6 @@
 {
   "model_version": "sensory-1.0",
-  "status": "candidate_not_loaded",
+  "status": "active",
   "revision": "r2: the one revision after the phase 3 review (docs/SENSORY_MODEL_RESEARCH.md section 7)",
   "provenance_category": "design_rule",
   "notice": "MOTIF's creative mapping from 12 motifs to 6 sensory dimensions (docs/SENSORY_MODEL_RESEARCH.md). Not perception science and not a formula. null = MOTIF makes no claim (it contributes nothing, never zero). A non-null cell without odor-step sources is MOTIF's design opinion only.",
@@ -259,6 +259,7 @@
     }
   },
   "changes": [
-    {"version": "sensory-1.0", "date": "2026-10-07", "reason": "Phase 3 of the engine refactor: first researched motif-to-sensory model; candidate, not loaded by the engine. r1 was reviewed from three lenses (method, perfumer, engine); r2 applies the one revision."}
+    {"version": "sensory-1.0", "date": "2026-10-07", "reason": "Phase 3 of the engine refactor: first researched motif-to-sensory model; candidate, not loaded by the engine. r1 was reviewed from three lenses (method, perfumer, engine); r2 applies the one revision."},
+    {"version": "sensory-1.0", "date": "2026-10-07", "reason": "Phase 5: promoted unchanged from config/candidates/ and loaded by the continuous engine (motif/config.py load_continuous_config)."}
   ]
 }

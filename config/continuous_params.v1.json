@@ -1,0 +1,82 @@
+{
+  "params_version": "continuous-params-1.0",
+  "status": "design_parameters",
+  "provenance_category": "design_rule",
+  "notice": "Aggregation thresholds and wording bins of the continuous engine (docs/ENGINE_REDESIGN.md, docs/MOTIF_SCORING.md). Design parameters, not calibrated perceptual thresholds.",
+  "default_domains": [
+    "brand",
+    "movie"
+  ],
+  "optional_domains": [
+    "artist"
+  ],
+  "fetch_policy": "Every default domain is fetched (budget and access permitting): under graded scoring any related domain can change a motif score, so no domain is provably irrelevant.",
+  "confidence_weights": {
+    "high": 1.0,
+    "medium": 0.7,
+    "low": 0.4
+  },
+  "aggregation": {
+    "value": "sum(w * v) / sum(w) over motifs with a non-null cell on the axis, w = motif score * confidence weight of the cell",
+    "support": "sum(w) over the same motifs (reported)",
+    "mass": "sum(w * |v|): the directional evidence behind the axis",
+    "agreement": "|sum(w * v)| / mass; 1 = all contributors point the same way, 0 = they cancel",
+    "confidence": "(1 - exp(-mass / mass_tau)) * agreement",
+    "min_mass": 0.05,
+    "mass_tau": 0.2,
+    "min_agreement": 0.3333,
+    "states": {
+      "open": "mass below min_mass: not enough directional evidence on this axis (one weak, low-confidence cell needs a motif score of at least 0.5 to show a tentative leaning)",
+      "balanced_open": "enough mass but agreement below min_agreement (one side does not outweigh the other two to one): left open, never averaged into a confident middle",
+      "resolved": "enough mass and agreement; the value is described in words"
+    },
+    "common_only": "motifs supported only by common cues (lexicon-0.3 commonness) never contribute; they are listed as context"
+  },
+  "wording_bins": [
+    {
+      "below": 0.35,
+      "word": "slightly"
+    },
+    {
+      "below": 0.65,
+      "word": ""
+    },
+    {
+      "below": 1.01,
+      "word": "very"
+    }
+  ],
+  "confidence_words": [
+    {
+      "below": 0.35,
+      "word": "tentative"
+    },
+    {
+      "below": 0.65,
+      "word": "supported"
+    },
+    {
+      "below": 1.01,
+      "word": "firm"
+    }
+  ],
+  "lead": {
+    "min_score": 0.3,
+    "why": "a motif leads the result only when its score reaches this level; below it, it is shown as a minor signal"
+  },
+  "rounding_digits": 6,
+  "changes": [
+    {
+      "version": "continuous-params-1.0",
+      "date": "2026-10-07",
+      "reason": "Phase 5 of the engine refactor: first parameters of the continuous sensory engine."
+    }
+  ],
+  "wording_note": "'balanced' is used only for evidenced neutrality (contributing cells of value 0); a weak tendency keeps its pole ('slightly cool').",
+  "confidence_word_cap": {
+    "low": "tentative",
+    "medium": "supported",
+    "high": "firm"
+  },
+  "confidence_word_cap_why": "The confidence word measures how much Qloo evidence stands behind the motifs; it is capped by the best confidence of the motif-to-dimension cells involved, so a dimension that rests only on low-confidence cells (MOTIF design opinion) always reads 'tentative'."
+}

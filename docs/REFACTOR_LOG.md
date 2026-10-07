@@ -96,3 +96,26 @@ PDF, and one-page PDFs. No Qloo or LLM request was made.
   related brand), at most 0.195 for motifs at the lead level, median 0.056.
 - Gate: graded differences where the legacy labels were equal, no instability
   beyond single-entity minor signals. Not wired into the product yet.
+
+## Phase 5: continuous sensory engine (primary engine from the command line)
+
+- `motif/continuous.py` (`continuous-1.0`) + `config/continuous_params.v1.json`:
+  per dimension, contributions = motif score × cell confidence weight × cell
+  value over non-null cells only; value = weighted mean; mass, agreement,
+  confidence; states open / balanced_open (contributors pull both ways; never a
+  confident middle) / resolved. Motifs supported only by common cues are context,
+  never pulls. The confidence word is capped by the best cell behind it (low cells
+  alone → "tentative"); each dimension records its evidence basis and each
+  contributor its rationale and uncertainty: evidence → motif → score →
+  contribution → dimension, no LLM.
+- `config/motif_sensory_vectors.v1.json`: promoted unchanged from candidates.
+- `motif/agent.py`: `engine="continuous"` fetches every configured domain and asks
+  no conflict question; `engine="legacy"` (default inside the web server until
+  phase 9) is unchanged. `python3 -m motif run` defaults to the continuous engine
+  (`--engine legacy` keeps the baseline); `python3 -m motif compare-engines`
+  runs both on the same recorded evidence.
+- Tests: `tests/test_continuous.py` (null cells, opposite pulls, weighted mean,
+  weak evidence, tentative wording, common cues as context, trace, determinism,
+  shipped-model consistency), two controller tests in `tests/test_motif_agent.py`.
+- Engine changes taken from the phase 3 review: common-cue exclusion, word cap,
+  evidence basis, 'balanced' only for evidenced neutrality.

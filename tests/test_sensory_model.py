@@ -19,7 +19,7 @@ import sensory_evidence  # noqa: E402
 import sensory_model_review  # noqa: E402
 
 CANDIDATES = ROOT / "config" / "candidates"
-MODEL = json.loads((CANDIDATES / "motif_sensory_vectors.v1.json").read_text(encoding="utf-8"))
+MODEL = json.loads((ROOT / "config" / "motif_sensory_vectors.v1.json").read_text(encoding="utf-8"))
 EVIDENCE = json.loads((CANDIDATES / "odor_axis_evidence.v1.json").read_text(encoding="utf-8"))
 
 

@@ -17,6 +17,13 @@ fetched only if it can still change the engine output:
 
 The same request is never sent twice in a session (session cache), and a
 missing cue is never "retried" with another query.
+
+Engines: `continuous` (the primary engine: weighted motif scores and a continuous
+six-dimension profile, motif/continuous.py) or `legacy` (the frozen rule engine
+engine-0.3, kept as a baseline). Under graded scoring every related domain can change
+a motif score, so the continuous engine fetches every configured domain (budget and
+access permitting) and never asks a conflict question: a dimension whose motifs pull
+both ways stays open.
 """
 
 from __future__ import annotations
@@ -27,7 +34,8 @@ from motif_spike.adapter import OP_RELATED, OP_SEARCH, OP_SEED_DETAIL, item_view
 from motif_spike.manifest import Seed
 from motif_spike.resolve import resolve_seed
 
-from .config import EngineConfig
+from .config import ContinuousConfig, EngineConfig
+from .continuous import run_continuous
 from .engine import run_engine
 from .evidence import items_from_body
 from .qloo import QlooAccess, entity_argv, related_argv, search_argv
@@ -41,7 +49,8 @@ STOP_ACCESS = {"auth_error", "forbidden", "skipped_after_auth_error"}
 class Controller:
     def __init__(self, access: QlooAccess, config: EngineConfig, reference: str, reference_type: str = "brand",
                  choose: Optional[str] = None, domains: Optional[Sequence[str]] = None,
-                 allow_unverified: bool = False, overrides: Optional[Dict[str, str]] = None):
+                 allow_unverified: bool = False, overrides: Optional[Dict[str, str]] = None,
+                 engine: str = "legacy", continuous: Optional[ContinuousConfig] = None):
         if reference_type not in REFERENCE_TYPES:
             raise ValueError(f"reference type must be one of {sorted(REFERENCE_TYPES)}")
         self.access = access
@@ -55,6 +64,10 @@ class Controller:
             raise ValueError(f"unsupported domains {unknown}; MVP domains are {sorted(DOMAIN_TYPES)}")
         self.allow_unverified = allow_unverified
         self.overrides = overrides or {}
+        if engine not in ("legacy", "continuous") or (engine == "continuous" and continuous is None):
+            raise ValueError("engine must be 'legacy', or 'continuous' with a ContinuousConfig")
+        self.engine = engine
+        self.continuous = continuous
         self.trace: List[Dict[str, Any]] = []
         self.evidence: List[Dict[str, Any]] = []
 
@@ -84,6 +97,13 @@ class Controller:
             return "stopped_not_recorded"
         return "stopped_request_failed"
 
+    def evaluate(self) -> Dict[str, Any]:
+        """The selected engine's result on the evidence fetched so far (deterministic, offline)."""
+        if self.engine == "continuous":
+            c = self.continuous
+            return run_continuous(self.evidence, c.lexicon, c.scoring, c.vectors, c.params, ["own"] + self.domains)
+        return run_engine(self.evidence, self.config, self.allow_unverified, self.overrides)
+
     # -- the flow ----------------------------------------------------------------------
 
     def run(self) -> Dict[str, Any]:
@@ -102,7 +122,7 @@ class Controller:
         self._add_evidence("own", rec)
 
         for domain in self.domains:
-            result = run_engine(self.evidence, self.config, self.allow_unverified, self.overrides)
+            result = self.evaluate()
             fetch, reason = self._worth_fetching(domain, result)
             if not fetch:
                 self._step(f"fetch_related:{domain}", self._summary(result), "skip", reason)
@@ -112,12 +132,12 @@ class Controller:
             self._step(f"fetch_related:{domain}", self._summary(result), "stop" if stop else "fetched",
                        reason if not stop else self._error_text(rec), rec)
             if stop:
-                partial = run_engine(self.evidence, self.config, self.allow_unverified, self.overrides)
+                partial = self.evaluate()
                 return {"resolution": resolution, "trace": self.trace, "result": partial,
                         **self._stopped(stop, self._error_text(rec), partial_result=True)}
             self._add_evidence(domain, rec)
 
-        result = run_engine(self.evidence, self.config, self.allow_unverified, self.overrides)
+        result = self.evaluate()
         question = self._question_for(result)
         self._step("finish", self._summary(result), "ask_user" if question else "finish",
                    question["why"] if question else "every allowed step that could change the result has been taken")
@@ -196,6 +216,8 @@ class Controller:
         insufficient_evidence to no_translation_rule). If no such motif exists, the skip
         is safe. Weak, unanchored motifs it could add are display-only and do not count.
         """
+        if self.engine == "continuous":
+            return True, f"under graded scoring, related {domain} evidence can change motif scores and the profile"
         if domain in ANCHOR_DOMAINS:
             return True, "related brands are an anchor source: they can create or corroborate motifs"
         open_motifs = sorted(m for m, info in result["motifs"].items()
@@ -207,6 +229,11 @@ class Controller:
                        "below 'strong', so it cannot change the outcome, active motifs, strengths, targets, or materials")
 
     def _question_for(self, result: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        if self.engine == "continuous":
+            if result["outcome"] in ("no_descriptive_data", "insufficient_evidence"):
+                return {"kind": "next_step", "why": result["outcome_meaning"], "options": ["stop", "try another reference"],
+                        "how_to_answer": "stop here or run MOTIF with a different reference"}
+            return None
         if result["outcome"] == "conflicted":
             axis = result["conflicted_axes"][0]
             pushes = result["axes"][axis]["pushes"]
@@ -228,6 +255,10 @@ class Controller:
 
     @staticmethod
     def _summary(result: Dict[str, Any]) -> str:
+        if result.get("engine") == "continuous":
+            lead = [f"{m}:{result['motif_scores'][m]['score']:.2f}" for m in result["leading_motifs"]]
+            resolved = [f"{a}={result['axes'][a]['label']}" for a in result["resolved_axes"]]
+            return f"evidence {result['evidence_count']}; leading [{', '.join(lead)}]; resolved [{', '.join(resolved)}]"
         active = [f"{m}:{i['strength']}" for m, i in sorted(result["motifs"].items()) if i["active"]]
         targets = [f"{a}={v['value']}" for a, v in result["axes"].items() if v["state"] == "target"]
         return f"evidence {result['evidence_count']}; active [{', '.join(active)}]; targets [{', '.join(targets)}]"

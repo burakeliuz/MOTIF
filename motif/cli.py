@@ -5,6 +5,11 @@
                        [--resolve-conflict AXIS=POLE|open] [--allow-unverified-materials]
                        [--max-requests N] [--json] [--data-dir DIR]
   python3 -m motif compare --reference MUJI --recorded RUN [...]
+  python3 -m motif compare-engines --reference MUJI --recorded RUN [--choose ID] [--json]
+
+`run` uses the continuous engine by default (weighted motifs -> six continuous
+dimensions); `--engine legacy` runs the frozen rule engine engine-0.3 instead.
+`compare-engines` replays one recording and runs both engines on the same evidence.
 
 Live mode (no --recorded) sends real Qloo requests through motif_spike's
 DirectTransport and needs the event credential in the environment. Recorded
@@ -28,7 +33,8 @@ from motif_spike.util import data_root, iso, utc_now, write_json
 from . import ENGINE_VERSION
 from .agent import Controller
 from .brief import AXIS_LABELS, build_brief
-from .config import AXES, load_config
+from .config import AXES, load_config, load_continuous_config
+from .continuous import run_continuous
 from .engine import evidence_subset, run_engine
 from .llm import write_prose, writer_from_env
 from .qloo import LiveQloo, RecordedQloo
@@ -82,18 +88,22 @@ def cmd_run(args) -> int:
     session_dir.mkdir(parents=True, exist_ok=True)
     access, label = _access(args, root, session_dir, config)
     domains = list(config.params["default_domains"]) + (["artist"] if args.include_artist else [])
+    continuous = load_continuous_config() if args.engine == "continuous" else None
     controller = Controller(access, config, args.reference, args.type, args.choose, domains,
-                            args.allow_unverified_materials, _overrides(args.resolve_conflict))
+                            args.allow_unverified_materials, _overrides(args.resolve_conflict),
+                            engine=args.engine, continuous=continuous)
     outcome = controller.run()
 
-    session = {"session_id": session_id, "created_at": iso(utc_now()), "engine_version": ENGINE_VERSION,
-               "versions": config.versions, **label, "reference": {"input": args.reference, "type": args.type},
+    session = {"session_id": session_id, "created_at": iso(utc_now()), "engine": args.engine,
+               "engine_version": (outcome.get("result") or {}).get("engine_version", ENGINE_VERSION),
+               "versions": continuous.versions if continuous else config.versions, **label,
+               "reference": {"input": args.reference, "type": args.type},
                "domains": domains, "resolution": outcome["resolution"], "status": outcome["status"],
                "outcome": outcome["outcome"], "question": outcome.get("question"), "trace": outcome["trace"],
                "requests": access.log, "network_attempts": access.network_attempts,
                "message": outcome.get("message")}
     brief = None
-    if outcome.get("result") is not None and outcome["status"] == "completed":
+    if args.engine == "legacy" and outcome.get("result") is not None and outcome["status"] == "completed":
         llm = writer_from_env(os.environ, ledger_path=root / "llm_calls.jsonl")
         session["llm_status"] = llm["status"]
         prose = write_prose(outcome["resolution"].get("name") or args.reference, outcome["result"], llm["writer"])
@@ -104,10 +114,28 @@ def cmd_run(args) -> int:
     write_json(session_dir / "session.json", session)
 
     if args.json:
-        print(json.dumps(brief or session, indent=2, sort_keys=True, ensure_ascii=False))
+        print(json.dumps(brief or (dict(session, result=outcome.get("result")) if args.engine == "continuous" else session),
+                         indent=2, sort_keys=True, ensure_ascii=False))
     else:
         _print_human(session, outcome, brief, session_dir)
     return EXIT[outcome["status"]]
+
+
+def _continuous_lines(result: Dict[str, Any]) -> List[str]:
+    lines = [f"Outcome: {result['outcome']} — {result['outcome_meaning']}", "Motif scores (0-1, design quantities; common-cue-only motifs marked):"]
+    for m, s in sorted(result["motif_scores"].items(), key=lambda kv: (-kv[1]["score"], kv[0])):
+        kinds = ", ".join(s["source_kinds"]) or "common cues only"
+        lines.append(f"  {m:12} {s['score']:.3f}  {kinds}{'  (leads)' if m in result['leading_motifs'] else ''}")
+    lines.append("Dimensions:")
+    for a in AXES:
+        v = result["axes"][a]
+        if v["state"] == "resolved":
+            text = f"{v['label']} ({v['confidence_word']}; basis {v['evidence_basis']})"
+        else:
+            text = "open" + (": contributors pull both ways" if v["state"] == "balanced_open" else "")
+        pulls = "; ".join(f"{pole}: {', '.join(ms)}" for pole, ms in v["pulls"].items() if ms)
+        lines.append(f"  {a:20} {text}" + (f"  [{pulls}]" if pulls else ""))
+    return lines
 
 
 def _print_human(session, outcome, brief, session_dir) -> None:
@@ -135,7 +163,10 @@ def _print_human(session, outcome, brief, session_dir) -> None:
                 print(f"    - {opt if isinstance(opt, str) else json.dumps(opt, ensure_ascii=False)}")
             print(f"  {question['how_to_answer']}")
     result = outcome.get("result")
-    if result:
+    if result and result.get("engine") == "continuous":
+        print("\n" + "\n".join(_continuous_lines(result)))
+        print("\nThe written brief for the continuous engine comes with the scent architecture (phases 8-9).")
+    elif result:
         print(f"\nOutcome: {result['outcome']} — {result['outcome_meaning']}")
         print("Motifs (support before thresholds):")
         for name, info in sorted(result["motifs"].items()):
@@ -222,6 +253,35 @@ def _compare_text(reference: str, r: Dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def cmd_compare_engines(args) -> int:
+    """Legacy rule engine vs continuous engine on the same recorded evidence (offline)."""
+    config = load_config()
+    cc = load_continuous_config()
+    root = data_root(args.data_dir)
+    access = RecordedQloo(_recording_dir(root, args.recorded), None, 99)
+    domains = list(config.params["default_domains"]) + (["artist"] if args.include_artist else [])
+    controller = Controller(access, config, args.reference, args.type, args.choose, domains)
+    controller._worth_fetching = lambda domain, result: (True, "comparison fetches every allowed domain")
+    outcome = controller.run()
+    if outcome["status"] == "needs_choice" and (outcome.get("question") or {}).get("kind") == "choose_entity" or not controller.evidence:
+        print(json.dumps({k: outcome.get(k) for k in ("status", "outcome", "question", "message")}, indent=2))
+        return 3
+    legacy = run_engine(controller.evidence, config)
+    cont = run_continuous(controller.evidence, cc.lexicon, cc.scoring, cc.vectors, cc.params, ["own"] + domains)
+    if args.json:
+        print(json.dumps({"legacy": {k: legacy[k] for k in ("engine_version", "outcome", "axes", "materials")},
+                          "continuous": {k: cont[k] for k in ("engine_version", "versions", "outcome", "motif_scores", "axes")}},
+                         indent=2, sort_keys=True, ensure_ascii=False))
+        return 0
+    targets = {a: v["value"] for a, v in legacy["axes"].items() if v["state"] == "target"}
+    print(f"{args.reference}: same evidence ({legacy['evidence_count']} items), two engines")
+    print(f"\nLegacy {legacy['engine_version']}: outcome {legacy['outcome']}; targets {targets or 'none'}; "
+          f"materials {[m['name'] for m in legacy['materials'].get('selected', [])] or 'none'}")
+    print(f"\nContinuous {cont['engine_version']} ({', '.join(f'{k} {v}' for k, v in cont['versions'].items())}):")
+    print("\n".join(_continuous_lines(cont)))
+    return 0
+
+
 def cmd_llm_check(args) -> int:
     """One real API call to confirm the configured model is available (counted in the call ledger)."""
     root = data_root(args.data_dir)
@@ -241,7 +301,7 @@ def cmd_llm_check(args) -> int:
 def main(argv: Optional[List[str]] = None) -> int:
     parser = argparse.ArgumentParser(prog="python3 -m motif", description="MOTIF engine: Qloo evidence to a perfumer brief.")
     sub = parser.add_subparsers(dest="command", required=True)
-    for name in ("run", "compare"):
+    for name in ("run", "compare", "compare-engines"):
         p = sub.add_parser(name)
         p.add_argument("--reference", required=True)
         p.add_argument("--type", default="brand", choices=["brand", "movie", "artist", "any"])
@@ -253,7 +313,9 @@ def main(argv: Optional[List[str]] = None) -> int:
         p.add_argument("--json", action="store_true")
         p.add_argument("--data-dir")
         if name == "run":
-            p.add_argument("--resolve-conflict", action="append", help="AXIS=POLE or AXIS=open (answer to a conflict question)")
+            p.add_argument("--engine", choices=["continuous", "legacy"], default="continuous",
+                           help="continuous (default) or the frozen legacy rule engine engine-0.3")
+            p.add_argument("--resolve-conflict", action="append", help="AXIS=POLE or AXIS=open (legacy engine only)")
             p.add_argument("--max-requests", type=int, help="network attempt budget for a live session")
     p = sub.add_parser("llm-check", help="one real API call: is the configured LLM model available?")
     p.add_argument("--data-dir")
@@ -261,7 +323,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     if args.command == "llm-check":
         return cmd_llm_check(args)
     try:
-        return cmd_run(args) if args.command == "run" else cmd_compare(args)
+        return {"run": cmd_run, "compare": cmd_compare, "compare-engines": cmd_compare_engines}[args.command](args)
     except ValueError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2

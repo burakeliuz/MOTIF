@@ -1,6 +1,6 @@
 """Self-review of a motif-to-sensory model (phase 3): rules, data agreement, coverage, similarity.
 
-  python3 tools/sensory_model_review.py [--model config/candidates/motif_sensory_vectors.v1.json] [--markdown OUT.md]
+  python3 tools/sensory_model_review.py [--model config/motif_sensory_vectors.v1.json] [--markdown OUT.md]
 
 Checks, all deterministic and offline (problems make the exit code 1; notes are reported):
 * every cell's value equals its direction sign x strength value; enums are valid;
@@ -158,7 +158,7 @@ def markdown(model, rep):
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--model", default=str(ROOT / "config" / "candidates" / "motif_sensory_vectors.v1.json"))
+    ap.add_argument("--model", default=str(ROOT / "config" / "motif_sensory_vectors.v1.json"))
     ap.add_argument("--evidence", default=str(ROOT / "config" / "candidates" / "odor_axis_evidence.v1.json"))
     ap.add_argument("--markdown")
     args = ap.parse_args(argv)

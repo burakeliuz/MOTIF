@@ -15,6 +15,7 @@ from pathlib import Path
 
 from motif.agent import Controller
 from motif.brief import validate_prose
+from motif.config import load_continuous_config
 from motif.engine import run_engine
 from motif.llm import write_prose, writer_from_env
 from motif.qloo import LiveQloo, RecordedQloo
@@ -60,6 +61,28 @@ class ControllerFlow(unittest.TestCase):
         self.assertEqual(len(transport.calls), len({json.dumps(c) for c in transport.calls}))
         targets = {a: v["value"] for a, v in out["result"]["axes"].items() if v["state"] == "target"}
         self.assertEqual(targets, {"light_dense": "light", "raw_polished": "polished", "natural_synthetic": "natural"})
+
+    def test_continuous_engine_fetches_every_domain_and_asks_no_conflict_question(self):
+        cc = load_continuous_config()
+        own = entities_body(SEED, "Synthbrand", [("Typewriter Font", AESTHETIC)])  # the legacy engine would skip films
+        transport = FakeTransport(routes(own=own, brand=insights_body([])))
+        out = Controller(live(transport), CONFIG, "Synthbrand", engine="continuous", continuous=cc).run()
+        movie_step = next(t for t in out["trace"] if t["action"] == "fetch_related:movie")
+        self.assertEqual(movie_step["decision"], "fetched")
+        self.assertTrue(any("urn:entity:movie" in c for c in transport.calls))
+        self.assertEqual(out["result"]["engine"], "continuous")
+        self.assertNotEqual((out.get("question") or {}).get("kind"), "conflict")
+
+    def test_continuous_engine_leaves_opposite_pulls_open(self):
+        cc = load_continuous_config()
+        own = entities_body(SEED, "Synthbrand", [("Lush", AESTHETIC), ("Opulent", AESTHETIC), ("Muted", AESTHETIC),
+                                                 ("Understated", AESTHETIC)])
+        transport = FakeTransport(routes(own=own))
+        out = Controller(live(transport), CONFIG, "Synthbrand", engine="continuous", continuous=cc).run()
+        self.assertEqual(out["status"], "completed")
+        weight = out["result"]["axes"]["light_dense"]
+        self.assertEqual(weight["state"], "balanced_open")
+        self.assertEqual(sorted(weight["pulls"]["light"] + weight["pulls"]["dense"]), ["opulent", "restrained"])
 
     def test_corroborating_domain_is_skipped_only_when_provably_useless(self):
         own = entities_body(SEED, "Synthbrand", [("Typewriter Font", AESTHETIC)])  # no cue at all
