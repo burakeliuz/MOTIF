@@ -267,7 +267,9 @@ PDF, and one-page PDFs. No Qloo or LLM request was made.
   regression; holdout without structural failure; no internal wording; secret
   scan clean (test sentinels only); no paid infrastructure; the review gate's
   tests pass and the gate is unchanged.
-- `main` fast-forwarded (no force) to the commit that adds this entry.
+- `main` not updated: the fast-forward push (no force) was refused by this
+  session's permission check, so it waits for the owner. `main` can be
+  fast-forwarded to this branch (`origin/main` is an ancestor of it).
 - Render: no authenticated deploy path from this environment (no Render key; the
   host is not reachable through the network policy). The owner deploys `main`
   manually, keeping `MOTIF_ACCESS_PROTECTION=on` and the password.
