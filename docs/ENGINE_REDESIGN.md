@@ -126,5 +126,19 @@ primary engine. It must:
 Remaining collisions (A24 = Supreme, Comme des Garçons = Balenciaga) mirror
 nearly identical motif profiles. Weaknesses: a tentative dry bias (9 of 13),
 precision and provocation carry half of all contributions, labels flip near
-thresholds for brands with opposed motifs. Phase 7 (holdout) and phase 10 (final
-validation) add their numbers here.
+thresholds for brands with opposed motifs.
+
+**Phase 7, pre-registered holdout of five new brands** (`reports/continuous_holdout.md`):
+17 Qloo requests, no LLM. No structural failure: 4 of 5 resolved (IKEA: the
+untyped search returned only stores), all results traceable and deterministic.
+Findings: 3 distinct profiles among the 4 resolved (LEGO = Coca-Cola, both
+nearly empty); Hermès = Ralph Lauren; 8% of supporting descriptors misread
+("Industrial Design" as an industrial aesthetic, film techniques); brands whose
+own descriptors fall outside the lexicon (LEGO, Coca-Cola) get little.
+
+Candidate fixes, not applied (each needs a version bump and a new holdout):
+typed brand search with a fallback; context rules for "industrial design" and
+film-technique phrases; a commonness reference set that is not fashion-heavy;
+a lead-level floor before a minor motif can resolve a dimension; wider lexicon
+coverage (geometry, modular, vibrant, nostalgic). Phase 10 adds the final
+validation.

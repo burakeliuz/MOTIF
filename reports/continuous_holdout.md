@@ -83,6 +83,81 @@ structural failures.
 No expectation is recorded about which motifs, dimensions, or leanings any of
 these brands should receive.
 
-## Part B — results
+## Part B — results (2026-10-07, after the run)
 
-(Added in a separate commit after the run.)
+Run `data/motif_sessions/holdout-20261007T123346Z` (git-ignored), started after
+the pre-registration commit `ba7fea1`; frozen code, no parameter changed. **17
+network attempts in total** (budget 20), no failed request, no retry, **no LLM
+call**. Evaluation: `python3 tools/holdout_run.py evaluate RUN_DIR` (offline).
+
+### B.1 Per brand
+
+| Brand | C1 resolution | Requests | C2 leading motifs (score) | Profile (resolved · confidence; other dimensions open) | C6 one entity removed: max move, label changes |
+|---|---|---|---|---|---|
+| IKEA | **unresolved**: the 10 search results were all IKEA stores (`urn:entity:place`), no brand entity; the rule found no brand | 1 | — | — | — |
+| Hermès | resolved (single match) | 4 | heritage 0.82, precision 0.64, opulence 0.54, restraint 0.43, provocation 0.43 | texture slightly polished · supported; projection slightly projecting · tentative; temperature, weight, sweetness pull both ways | 0.071, 2 of 20 |
+| Bang & Olufsen | resolved (single match) | 4 | precision 0.87, restraint 0.63, heritage 0.58, industrial 0.45 | weight slightly light · supported; texture slightly polished · supported; temperature slightly cool · tentative | 0.055, 0 of 20 |
+| LEGO | resolved by the pre-registered rule: first returned brand, "The Lego Group" (no exact "LEGO" brand among the candidates) | 4 | playfulness 0.35 | texture slightly polished · tentative (from two minor motifs only); weight pulls both ways | 0.024, 3 of 20 |
+| Coca-Cola | resolved (single match) | 4 | heritage 0.31 | texture slightly polished · tentative (from three minor motifs only) | 0.031, 1 of 20 |
+
+C4 traceability: every contributor of every resolved dimension maps to support
+annotations, evidence items, request IDs, and JSON pointers (4 of 4 brands).
+Determinism: two evaluations identical (4 of 4). No dimension reads "supported"
+or "firm" on low-confidence cells alone; no forbidden cell appears.
+
+### B.2 Differentiation (C3)
+
+- Among the four resolved brands, **3 distinct profiles**: LEGO and Coca-Cola
+  share the same resolved labels (both only "texture slightly polished,
+  tentative"; commitment distance 0.012).
+- Against the 13 trial brands: **Hermès has the same resolved profile as Ralph
+  Lauren** (distance 0.097); LEGO and Coca-Cola are nearest to Nike (0.015,
+  0.027), the trial brand with no direction; Bang & Olufsen is distinct (nearest
+  Ralph Lauren, 0.184).
+
+### B.3 Semantic misreads (C5), manual reading
+
+All 59 supporting descriptors of the leading motifs were read. **5 misreads
+(8%)**:
+
+| Brand / motif | Descriptor (entity) | Why it is a misread |
+|---|---|---|
+| Bang & Olufsen / industrial | "Industrial Design" (Mark Levinson), "Industrial Design" (Sonos) | the design discipline, not an industrial aesthetic |
+| Bang & Olufsen / industrial | "Industrial Precision" (Bowers & Wilkins) | manufacturing precision, not an industrial look |
+| Bang & Olufsen / precision | "Precision cut" (film *Steve Jobs*) | an editing technique the context rules do not catch |
+| Hermès / precision | "Meticulous practical effects" (film *The Shape of Water*) | a production technique |
+
+Bang & Olufsen's industrial motif (0.45) rests mostly on misreads (3 of 5); its
+industrial cells are low-confidence, so the effect on the profile is small, but
+the motif would be shown in the cultural profile.
+
+### B.4 Coverage (C2) and other findings
+
+- **LEGO's own entry is outside the lexicon**: "Modular Geometry",
+  "Interlocking Texture", "Vibrant Primary Colors", "Creative", "Nostalgic" match
+  no cue; "Playful" matches the playful cue but counts at the reduced
+  common-cue weight because "playful" was common in the five stage-2 reference
+  brands. Playfulness reaches 0.35 mostly through two related films.
+- **Coca-Cola**: only heritage leads (0.31, two related brands); heritage
+  carries no sensory claim in `sensory-1.0`, so the profile is nearly empty.
+- **Minor motifs can resolve a dimension**: for LEGO and Coca-Cola the only
+  resolved dimension comes from motifs below the lead level (precision 0.16 on
+  one related brand), shown as tentative. The `min_mass` of 0.05 allows this.
+- **IKEA**: MOTIF's search sends no entity type, so ten store locations crowd out
+  the brand. The adapter supports a type filter (`search_argv(..., type_hint)`),
+  but MOTIF does not use it.
+
+### B.5 Verdict
+
+**No structural failure** (pre-registered definition): no engine exception, no
+non-determinism, no untraceable contributor, no forbidden cell, no overclaimed
+word, and 4 of 5 brands resolved. Findings, not failures, that limit the product:
+weak coverage for brands whose descriptors fall outside the 47 cue groups
+(LEGO, Coca-Cola), one cross-set collision (Hermès = Ralph Lauren), one in-set
+collision (LEGO = Coca-Cola), an 8% misread rate concentrated on
+"industrial design", and IKEA unresolved by an untyped search. None of these is
+fixed in this phase; candidate fixes (typed search with a fallback, context rules
+for "industrial design" and film techniques, a commonness set that is not
+fashion-heavy, a lead-level floor for resolving a dimension) are listed for the
+owner in `docs/ENGINE_REDESIGN.md` and would need their own version bumps and a
+new holdout.

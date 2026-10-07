@@ -131,3 +131,12 @@ PDF, and one-page PDFs. No Qloo or LLM request was made.
   pairs 7 → 0; unresolved 80% → 53%; all six dimensions reachable. Deterministic.
 - Gate: not collapsing; weaknesses recorded, not tuned on these 13 brands.
 - `tests/test_continuous_analysis.py` keeps the result (when recordings exist).
+
+## Phase 7: pre-registered holdout
+
+- Pre-registration `reports/continuous_holdout.md` part A and the harness
+  `tools/holdout_run.py` (+ `tests/test_holdout_harness.py`) committed in
+  `ba7fea1` before any request. Live run: 17 Qloo requests (cap 20), no LLM.
+- Part B (this commit): no structural failure; 4 of 5 resolved (IKEA not:
+  untyped search); 3 distinct profiles among the 4; Hermès = Ralph Lauren;
+  misreads 5 of 59 (8%); weak coverage for LEGO and Coca-Cola. Nothing tuned.
