@@ -76,7 +76,12 @@ empty role is "open to the perfumer". `docs/OLFACTORY_LAYER.md`.
 **Readings and brief** (`motif/story.py`). The headline leads with the brand's
 own motifs; a direction drawn only from references Qloo relates to the brand
 never leads the title. The why-chain links each resolved dimension to its
-motifs and their Qloo phrases. The brief JSON (`brief-1.0`) keeps the user's
+motifs and their Qloo phrases. Open dimensions are told once, grouped by why
+they are open (no read motif speaks to them, too weak to decide, or motifs pull
+both ways), with how many of the returned descriptors MOTIF reads. "In scent"
+reads the proposal in one sentence and adds what the chosen accords themselves
+bring to the open dimensions, from their library cells; it is labelled as MOTIF's
+creative proposal and changes no dimension. The brief JSON (`brief-1.0`) keeps the user's
 application context and accepted readings apart from the evidence (categories
 `user_intent`, `user_preference`); they change nothing.
 

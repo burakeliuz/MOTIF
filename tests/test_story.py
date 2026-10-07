@@ -102,6 +102,71 @@ class Prose(unittest.TestCase):
         self.assertEqual(bad.calls, 2)  # one controlled retry with the problems as feedback
 
 
+class OpenDimensionsAndStory(unittest.TestCase):
+    """Open dimensions are told once, grouped by why; the proposal is read from its documented character; nothing is filled in."""
+
+    def test_each_open_dimension_appears_once_under_its_reason(self):
+        r = result(OWN_QUIET)
+        states = {a: r["axes"][a]["state"] for a in r["axes"]}
+        o = story.open_summary("Synthquiet", r)
+        self.assertEqual(o["dims"], [story.DIM_NAMES[a] for a in story.open_dims(r)])
+        named = [d for line in o["lines"] for d in line["dims"]]
+        self.assertEqual(sorted(named), sorted(o["dims"]))
+        self.assertLessEqual({line["kind"] for line in o["lines"]}, {"none", "faint", "both"})
+        self.assertEqual({a: r["axes"][a]["state"] for a in r["axes"]}, states)  # reading changes nothing
+        self.assertLessEqual(o["counts"]["read"], o["counts"]["returned"])
+        self.assertIn(f"reads {o['counts']['read']} of the {o['counts']['returned']} descriptors", o["coverage"])
+
+    def test_a_faint_lean_is_named_but_stays_open(self):
+        r = result([ev("brand", "B1", "Clean Lines", AESTHETIC)])
+        self.assertEqual(r["axes"]["warm_cool"]["state"], "open")
+        o = story.open_summary("Synthfaint", r)
+        self.assertIn("Too weak to decide, faint leans only: temperature cool (precision).", [x["text"] for x in o["lines"]])
+
+    def test_the_accords_never_silently_contradict_a_faint_lean(self):
+        r = result([ev("brand", "B1", "Clean Lines", AESTHETIC)])  # a faint cool lean on temperature
+        vectors = {d["id"]: d["vector"] for d in CC.library["directions"]}
+        cells = [vectors[s["direction"]]["warm_cool"]["value"] for s in r["architecture"]["structure"].values()
+                 if s and vectors[s["direction"]].get("warm_cool")]
+        character = story.accord_character(r, CC.library) or ""
+        if cells and all(v < 0 for v in cells):  # the chosen accords lean warm: the text must say it goes against the lean
+            self.assertIn("warm (against the faint cool lean)", character)
+        else:
+            self.assertNotIn("against the faint", character.split("warm")[0] if "warm" in character else "")
+
+    def test_a_contested_dimension_names_both_sides(self):
+        r = result([ev("own", "S", n, AESTHETIC) for n in ("Muted", "Understated", "Opulent", "Lavish")])
+        self.assertEqual(r["axes"]["light_dense"]["state"], "balanced_open")
+        both = next(x["text"] for x in story.open_summary("Synthboth", r)["lines"] if x["kind"] == "both")
+        self.assertIn("weight: light (restraint) vs dense (opulence)", both)
+
+    def test_the_story_and_the_accords_character_come_from_the_proposal(self):
+        r = result(OWN_QUIET)
+        arch = r["architecture"]
+        text = story.scent_story(r)
+        for s in arch["structure"].values():
+            if s:
+                self.assertIn(s["label"].lower().replace(", ", " and "), text.lower())
+        character = story.accord_character(r, CC.library) or ""
+        resolved_words = {story.POLE_WORDS[r["axes"][a]["pole"]] for a in r["axes"] if r["axes"][a]["state"] == "resolved"}
+        vectors = {d["id"]: d["vector"] for d in CC.library["directions"]}
+        for a in story.open_dims(r):
+            cells = [vectors[s["direction"]][a]["value"] for s in arch["structure"].values() if s and vectors[s["direction"]].get(a)]
+            if cells and len({v > 0 for v in cells}) == 1:
+                self.assertIn(story.POLE_WORDS[story.POLES[a][1 if cells[0] > 0 else 0]], character)
+        self.assertNotRegex(character, r"\d|%")
+        self.assertIsNone(story.accord_character(result([ev("own", "S", "Typewriter Font", AESTHETIC)]), CC.library))
+        self.assertTrue(resolved_words)
+
+    def test_a_common_word_that_counts_lightly_is_disclosed(self):
+        r = result([ev("own", "S", "Minimalist", AESTHETIC), ev("movie", "M1", "Understated", STYLE)])
+        row = next(p for p in continuous_view("Synthcommon", r, CC.library)["profile"] + continuous_view("Synthcommon", r, CC.library)["minor"]
+                   if p["motif"] == "restrained")
+        self.assertEqual(row["basis"]["kind"], "related_only")
+        self.assertIn("“minimalist”", row["common"])
+        self.assertIn("Synthcommon's own entry", row["common"])
+
+
 class View(unittest.TestCase):
     def test_weak_signals_are_listed_when_nothing_leads(self):
         v = continuous_view("Synthweak", result([ev("brand", "B1", "Muted", AESTHETIC)]), CC.library)
@@ -112,10 +177,12 @@ class View(unittest.TestCase):
 
     def test_open_dimensions_are_not_drawn_and_sources_are_honest(self):
         v = continuous_view("Synthquiet", result(OWN_QUIET), CC.library)
+        opened = [d["name"] for d in v["dimensions"] if d["state"] != "resolved"]
         for d in v["dimensions"]:
             if d["state"] != "resolved":
                 self.assertNotIn("word", d)
-                self.assertTrue(d["open_text"].startswith("Open to the perfumer"))
+        self.assertEqual(v["open_summary"]["dims"], opened)
+        self.assertEqual(sorted(x for line in v["open_summary"]["lines"] for x in line["dims"]), sorted(opened))
         q = v["sources"]["qloo"]
         self.assertTrue(q["requests"])
         self.assertNotIn("http", json.dumps(q))

@@ -132,6 +132,20 @@ Aesop differ only in weaker or tentative dimensions). Six of the 13 structures
 (A24, Comme des Garçons, Supreme, Harley-Davidson, Sanrio, Balenciaga) rest only
 on tentative dimensions and say so; Nike has no structure (insufficient evidence).
 
+## 5b. Reading the proposal (presentation, no matching change)
+
+The result page and the brief describe the chosen structure in one sentence
+("In scent: watery and ozonic to open, a transparent floral core and a powdery
+iris and violet drydown") and say what the chosen accords bring to the
+dimensions the evidence leaves open, from their cells in this library: a
+dimension all chosen accords lean the same way on is named with that lean
+("slightly" when no cell is stronger than 0.25); one they disagree on is
+"mixed", with the role of each side; one none of them touches is not set by
+them either. When the accords go against a lean the evidence shows too weakly
+to decide, the text says so. This is MOTIF's creative reading of the proposal, labelled so; the
+dimensions stay open and nothing in the matching changes (`motif/story.py`
+`scent_story`, `accord_character`).
+
 ## 6. Limits
 
 - The library is MOTIF's MVP vocabulary of 23 accord types; most cells are

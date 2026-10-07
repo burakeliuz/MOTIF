@@ -112,10 +112,12 @@ class HubFlow(unittest.TestCase):
         self.assertEqual([s["key"] for s in v["steps"]], ["resolve", "own", "brand", "movie", "engine", "brief"])
         self.assertTrue(all(s["status"] in ("done", "skipped") for s in v["steps"]))
         self.assertEqual(v["result"]["engine"], "continuous")
+        opened = [dim["name"] for dim in v["result"]["dimensions"] if dim["state"] != "resolved"]
         for dim in v["result"]["dimensions"]:
             if dim["state"] != "resolved":
                 self.assertNotIn("word", dim)  # nothing for the UI to place on the scale
-                self.assertTrue(dim["open_text"].startswith("Open to the perfumer"))
+        summary = v["result"]["open_summary"]
+        self.assertEqual(summary["dims"] if summary else [], opened)  # every open dimension, told once
         self.assertEqual(v["brief"]["author"], "template")
         self.assertIn(v["result"]["architecture"]["status"], ("proposed", "open"))
         self.assertNotEqual(v["result"]["outcome_text"], v["result"]["outcome"])  # every outcome has plain-language copy

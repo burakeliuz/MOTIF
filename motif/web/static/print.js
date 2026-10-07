@@ -21,8 +21,12 @@
   }
   const link = (url, text) => h("a", { href: url, target: "_blank", rel: "noopener noreferrer", text });
 
+  const PROVENANCE = { "Cultural profile": "Qloo evidence", "Olfactory direction": "MOTIF's translation",
+    "Scent architecture": "MOTIF's creative proposal", "Emphasize and avoid": "MOTIF's creative proposal" };
+
   function section(num, title, ...body) {
-    return h("div", { class: "grid" }, h("h2", {}, h("span", { text: num }), title), h("div", {}, body));
+    return h("div", { class: "grid" }, h("div", {}, h("h2", {}, h("span", { text: num }), title),
+      PROVENANCE[title] ? h("p", { class: "prov", text: PROVENANCE[title] }) : null), h("div", {}, body));
   }
 
   function profile(r) {
@@ -31,21 +35,25 @@
     return h("ul", { class: "basis" }, r.profile.slice(0, 4).map((p) => h("li", {},
       h("b", { text: p.label + " · " }), p.strength_label.toLowerCase() + ", " + (p.basis.kind === "related_only" ? "references only: " : "")
         + p.source_short.join(", ") + "." + (p.translation ? " " + p.translation : "") + " Examples: ",
-      p.examples.slice(0, 3).map((e, i) => [i ? ", " : "", h("span", { class: "sc", text: e.tag }), " (" + e.entity + ")"]), ".")));
+      p.examples.slice(0, 3).map((e, i) => [i ? ", " : "", h("span", { class: "sc", text: e.tag }), " (" + e.entity + ")"]), ".",
+      p.common ? h("span", { class: "cm", text: " " + p.common }) : null)));
   }
 
   function dimensions(r) {
     const resolved = r.dimensions.filter((d) => d.state === "resolved");
-    const open = r.dimensions.filter((d) => d.state !== "resolved");
-    return h("p", { class: "dirl" },
+    const o = r.open_summary;
+    return [h("p", { class: "dirl" },
       resolved.length ? resolved.map((d, i) => [i ? " · " : "", h("b", { text: d.word.toUpperCase() }), " (" + d.name.toLowerCase() + ", " + d.confidence_word + ")"]) : "No dimension resolved yet",
-      open.length ? ". Open to the perfumer: " + open.map((d) => d.name.toLowerCase() + (d.state === "balanced_open" ? " (motifs pull both ways)" : "")).join(", ") + "." : ".");
+      "."),
+      o ? h("p", { class: "open" }, h("b", { text: "Open to the perfumer. " }), o.lines.map((line) => line.text).join(" ") + " ",
+        h("span", { class: "cov", text: o.coverage })) : null];
   }
 
   function architecture(r) {
     const a = r.architecture;
     if (a.status !== "proposed") return h("p", { text: "No scent architecture is proposed: the structure is open to the perfumer." });
-    return h("div", { class: "mats" }, a.roles.map((role) => {
+    return [h("p", { class: "story" }, h("b", { text: "In scent: " }), r.scent_story + (r.accord_character ? " " + r.accord_character : "")),
+      h("div", { class: "mats" }, a.roles.map((role) => {
       if (role.open) return h("div", { class: "mat open" }, h("div", {}, h("div", { class: "s", text: role.name }), h("div", { class: "n", text: "Open to the perfumer" })));
       const strip = h("div", { class: "strip" });
       strip.append(MotifStrips.svg(role.props));
@@ -56,7 +64,7 @@
         h("div", { class: "x", text: role.descriptors.join(", ") }),
         refs.length ? h("div", { class: "q" }, "e.g. ", refs.map((m, i) => [i ? "; " : "", m.generic,
           m.example ? [" (", m.url ? link(m.url, m.example) : m.example, ")"] : null])) : null));
-    }));
+    }))];
   }
 
   function emphasize(r) {

@@ -70,10 +70,17 @@ const { chromium } = require(MODULE);
   out.checks.result_context_count = count(resultText, "A scent for a private gallery opening");
   out.checks.result_qloo_line = count(resultText, "Cultural evidence sourced from Qloo");
   out.checks.result_has_suggest_block = !!(await p.$("#suggest"));
-  out.checks.result_sections = await p.$$eval(".sec > h2", (hs) => hs.map((x) => x.textContent));
+  out.checks.result_sections = await p.$$eval(".sec h2", (hs) => hs.map((x) => x.textContent));
   out.checks.result_context_line = await p.textContent(".intentline").catch(() => null);
   out.checks.result_role_names = await p.$$eval(".roles .role .kicker", (ks) => ks.map((x) => x.textContent.split(" · ")[0]));
   out.checks.result_open_count = count(resultText, "Open to the perfumer");
+  // open dimensions are told once, in one block, not one line per dimension
+  out.checks.result_per_dimension_open = (resultText.match(/(Temperature|Weight|Texture|Impression|Projection|Sweetness): Open to the perfumer/g) || []).length;
+  out.checks.result_open_boxes = await p.$$eval("#sec-02 .openbox", (xs) => xs.length);
+  out.checks.result_provenance = await p.$$eval(".sec .prov", (xs) => xs.map((x) => x.textContent));
+  // every motif row shares one label column: the same label and description edges in every row
+  out.checks.profile_columns = await p.$$eval("#sec-01 .basis li", (ls) => [...new Set(ls.map((li) =>
+    Math.round(li.children[0].getBoundingClientRect().left) + "/" + Math.round(li.children[1].getBoundingClientRect().left)))]);
   out.checks.desktop_result_overflow = await overflow(p);
   // labels never run under their descriptions (long words such as EXPERIMENTATION wrap the description below)
   const labelOverflow = (q) => q.evaluate(() => [...document.querySelectorAll(".ax, h1, h2, h3, .nm, .kicker")]
@@ -105,6 +112,7 @@ const { chromium } = require(MODULE);
   out.checks.pdf_qloo_line = count(pdfText, "Cultural evidence sourced from Qloo");
   out.checks.pdf_sections = await pr.$$eval(".grid h2", (hs) => hs.map((x) => x.textContent));
   out.checks.pdf_open_count = count(pdfText, "Open to the perfumer");
+  out.checks.pdf_per_dimension_open = (pdfText.match(/(Temperature|Weight|Texture|Impression|Projection|Sweetness): Open to the perfumer/g) || []).length;
   await pr.emulateMedia({ media: "print" });
   const pdf = await pr.pdf({ format: "A4", printBackground: true, preferCSSPageSize: true, path: SHOTS ? `${SHOTS}/brief.pdf` : undefined });
   out.checks.pdf_pages = (pdf.toString("latin1").match(/\/Type\s*\/Page[^s]/g) || []).length;

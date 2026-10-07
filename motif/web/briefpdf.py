@@ -25,6 +25,8 @@ PT = 25.4 / 72  # mm per point
 FACES = {"black": "Archivo-Condensed-Black.ttf", "bold": "Archivo-Narrow-ExtraBold.ttf", "semi": "Archivo-SemiBold.ttf",
          "logo": "Archivo-Expanded-Black.ttf", "light": "Newsreader-Light.ttf", "text": "Newsreader-Regular.ttf",
          "strong": "Newsreader-SemiBold.ttf"}
+PROVENANCE = {"Cultural profile": "Qloo evidence", "Olfactory direction": "MOTIF's translation",
+              "Scent architecture": "MOTIF's creative proposal", "Emphasize and avoid": "MOTIF's creative proposal"}
 # step-down levels: the scale applied to every type size, like print.css .fit1 … .fit3
 LEVELS = (1.0, 0.94, 0.88, 0.82, 0.76, 0.7)
 
@@ -123,10 +125,13 @@ class _Brief:
                 lines.append([])
                 used = 0.0
             for piece, seg, pw in parts:
-                while pw > w - used and len(piece) > 1 and used == 0.0:  # one word wider than the column: cut it
-                    cut = len(piece)
+                while pw > w - used and len(piece) > 1 and used == 0.0:  # one word wider than the column: cut it,
+                    cut = len(piece)                                        # after a hyphen or comma when one fits
                     while cut > 1 and width(piece[:cut], seg) > w:
                         cut -= 1
+                    soft = max((i + 1 for i, ch in enumerate(piece[:cut]) if ch in "-,;/)" and i + 1 < len(piece)), default=0)
+                    if soft > 1:
+                        cut = soft
                     lines[-1].append((piece[:cut], seg, width(piece[:cut], seg)))
                     lines.append([])
                     piece = piece[cut:]
@@ -206,6 +211,9 @@ class _Brief:
         self.flow([self.seg(num, "black", 14)], ML, LEFT_COL, lh=1.0)
         self.gap(0.8)
         self.flow([self.seg(title.upper(), "bold", 7.2)], ML, LEFT_COL, lh=1.3, spacing=0.75)
+        if PROVENANCE.get(title):  # Qloo evidence, MOTIF's translation, or MOTIF's creative proposal
+            self.gap(0.6)
+            self.flow([self.seg(PROVENANCE[title].upper(), "semi", 6.0, MUTE)], ML, LEFT_COL, lh=1.3)
         left_bottom = pdf.get_y()
         pdf.set_y(y)
         self._left_bottom = left_bottom
@@ -311,6 +319,8 @@ def _build(view: Dict[str, Any], scale: float):
         for i, e in enumerate(p["examples"][:3]):
             segs += [b.seg((", " if i else "")), b.seg(e["tag"].upper(), size=7.7), b.seg(f" ({e['entity']})")]
         segs.append(b.seg("."))
+        if p.get("common"):
+            segs.append(b.seg(" " + p["common"], color=MUTE))
         b.flow(segs, x, w)
         b.gap(1.2)
     b.end_section()
@@ -318,7 +328,6 @@ def _build(view: Dict[str, Any], scale: float):
     # 02 olfactory direction
     b.section(num(), "Olfactory direction")
     resolved = [d for d in r["dimensions"] if d["state"] == "resolved"]
-    opened = [d for d in r["dimensions"] if d["state"] != "resolved"]
     segs: List[Segment] = []
     if resolved:
         for i, d in enumerate(resolved):
@@ -326,10 +335,13 @@ def _build(view: Dict[str, Any], scale: float):
                      b.seg(f" ({d['name'].lower()}, {d['confidence_word']})", size=8.6)]
     else:
         segs.append(b.seg("No dimension resolved yet", size=8.6))
-    segs.append(b.seg((". Open to the perfumer: " + ", ".join(
-        d["name"].lower() + (" (motifs pull both ways)" if d["state"] == "balanced_open" else "") for d in opened) + ".")
-                      if opened else ".", size=8.6))
+    segs.append(b.seg(".", size=8.6))
     b.flow(segs, x, w)
+    o = r.get("open_summary")
+    if o:  # every open dimension in one paragraph, grouped by why it is open
+        b.gap(1.2)
+        b.flow([b.seg("Open to the perfumer. ", "strong", 8), b.seg(" ".join(line["text"] for line in o["lines"]) + " ", size=8),
+                b.seg(o["coverage"], size=8, color=MUTE)], x, w)
     b.end_section()
 
     # 03 scent architecture
@@ -338,6 +350,8 @@ def _build(view: Dict[str, Any], scale: float):
     if a["status"] != "proposed":
         b.flow([b.seg("No scent architecture is proposed: the structure is open to the perfumer.")], x, w)
     else:
+        b.flow([b.seg("In scent: ", "strong", 8.6), b.seg(r["scent_story"] + (" " + r["accord_character"] if r.get("accord_character") else ""), size=8.6)], x, w)
+        b.gap(1.6)
         col = (w - 2 * 3) / 3
         top_y = pdf.get_y()
         bottoms = []

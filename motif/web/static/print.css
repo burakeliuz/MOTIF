@@ -30,6 +30,10 @@ a { color: inherit; text-decoration-color: var(--accent); text-underline-offset:
 .grid { display: grid; grid-template-columns: 30mm 1fr; gap: 0 5mm; margin-top: 3mm; border-top: 1pt solid var(--ink); padding-top: 2mm; break-inside: avoid; }
 .grid h2 { margin: 0; font: 800 7.2pt/1.3 var(--disp); letter-spacing: .12em; text-transform: uppercase; }
 .grid h2 span { display: block; font: 900 14pt/1 var(--disp); font-stretch: 62%; margin-bottom: .8mm; }
+.grid .prov { margin: .8mm 0 0; font: 600 6pt/1.3 var(--disp); letter-spacing: .1em; text-transform: uppercase; color: var(--mute); }
+.open { font-size: 8pt; margin: 1.2mm 0 0; }
+.open .cov, .cm { color: var(--mute); }
+.story { font-size: 8.6pt; margin: 0 0 1.6mm; }
 p { margin: 0 0 1.4mm; }
 .mats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3mm; }
 .mat { display: grid; grid-template-columns: 9mm 1fr; gap: 0 2.5mm; }
@@ -51,9 +55,9 @@ ol { margin: 0; padding-left: 4.5mm; } li { margin-bottom: .8mm; }
 /* step-down levels chosen by print.js so that one brief always fits one A4 page */
 .sheet.measure { font-size: 9.4pt; }
 .sheet.fit1 { font-size: 8.8pt; } .fit1 .idea { font-size: 13pt; } .fit1 .prose, .fit1 .src { font-size: 7.3pt; } .fit1 .grid { margin-top: 2.4mm; }
-.sheet.fit2 { font-size: 8.2pt; } .fit2 .idea { font-size: 12pt; } .fit2 .prose, .fit2 .src, .fit2 .mat .q, .fit2 .mat .x { font-size: 7pt; }
+.sheet.fit2 { font-size: 8.2pt; } .fit2 .idea { font-size: 12pt; } .fit2 .prose, .fit2 .src, .fit2 .mat .q, .fit2 .mat .x, .fit2 .open, .fit2 .story { font-size: 7pt; }
 .fit2 .grid { margin-top: 2mm; padding-top: 1.6mm; } .fit2 .line, .fit2 .dirl { font-size: 7.8pt; }
-.sheet.fit3 { font-size: 7.6pt; } .fit3 .idea { font-size: 11pt; } .fit3 .prose, .fit3 .src, .fit3 .mat .q, .fit3 .mat .x, .fit3 .note { font-size: 6.8pt; }
+.sheet.fit3 { font-size: 7.6pt; } .fit3 .idea { font-size: 11pt; } .fit3 .prose, .fit3 .src, .fit3 .mat .q, .fit3 .mat .x, .fit3 .note, .fit3 .open, .fit3 .story { font-size: 6.8pt; }
 .fit3 .grid { margin-top: 1.6mm; padding-top: 1.4mm; } .fit3 .line, .fit3 .dirl { font-size: 7.2pt; } .fit3 .strip { height: 28mm; }
 .sheet.measure { position: absolute; left: -10000px; top: 0; width: 210mm; max-width: none; margin: 0; padding: 11mm 13mm 10mm; visibility: hidden; }
 @media print {

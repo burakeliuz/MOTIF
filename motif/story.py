@@ -128,8 +128,8 @@ def headline(name: str, result: Dict[str, Any]) -> Dict[str, Any]:
     elif lead:
         title = "A direction drawn from references Qloo relates to " + name + "."
         lines.append(poss(name) + " own Qloo descriptors do not lead a motif on their own; "
-                     + _join([r["label"] for r in lead[:3]]) + " come" + ("s" if len(lead) == 1 else "")
-                     + " from the references.")
+                     + _join([r["label"] for r in lead[:3]]) + " lead" + ("s" if len(lead) == 1 else "")
+                     + " only with the references.")
     elif resolved:
         # no motif reaches the lead level, yet weaker signals resolve a dimension (a known engine behaviour)
         title = "Weak signals only: no motif leads yet."
@@ -170,6 +170,142 @@ def open_dims(result: Dict[str, Any]) -> List[str]:
     return [a for a in AXES if result["axes"][a]["state"] != "resolved"]
 
 
+def _cap(text: str) -> str:
+    return text[:1].upper() + text[1:]
+
+
+def _article(word: str) -> str:
+    return "an" if word[:1].lower() in "aeiou" else "a"
+
+
+def coverage(name: str, result: Dict[str, Any]) -> Dict[str, Any]:
+    """How much of what Qloo returned MOTIF's vocabulary reads: distinct descriptors returned, distinct ones that
+    support a motif, and up to three descriptors it does not read at all (the brand's own first, quoted literally)."""
+    ev = result["evidence"]
+    evd = {e["evidence_id"]: e for e in ev}
+
+    def fold(t: str) -> str:
+        return t.strip().lower()
+    returned = {fold(e["tag_name"]) for e in ev}
+    read = {fold(evd[a["evidence_id"]]["tag_name"]) for a in result["annotations"] if a["role"] == "support" and a["evidence_id"] in evd}
+    touched = {fold(evd[a["evidence_id"]]["tag_name"]) for a in result["annotations"] if a["evidence_id"] in evd}
+    own, seen = [], set()
+    for e in ev:
+        t = fold(e["tag_name"])
+        if e["source_kind"] == "own" and t not in touched and t not in seen:
+            seen.add(t)
+            own.append(e["tag_name"].strip())
+    counts: Dict[str, set] = {}
+    for e in ev:
+        if fold(e["tag_name"]) not in touched:
+            counts.setdefault(e["tag_name"].strip(), set()).add(e["entity_id"])
+    related = sorted(counts, key=lambda t: (-len(counts[t]), t.lower()))
+    return {"returned": len(returned), "read": len(read), "unread_own": own[:3], "unread_related": related[:3]}
+
+
+def open_summary(name: str, result: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """One short account of the dimensions the evidence leaves open, grouped by why: no read motif speaks to
+    them, the lean is too weak to decide, or motifs pull both ways. Descriptive only; nothing is filled in."""
+    axes = result["axes"]
+    opened = open_dims(result)
+    if not opened:
+        return None
+
+    def names(xs: List[str]) -> str:
+        return _join([DIM_NAMES[a].lower() for a in xs])
+    lines: List[Dict[str, Any]] = []
+    none = [a for a in opened if axes[a]["state"] == "open" and not axes[a]["contributors"]]
+    faint = [a for a in opened if axes[a]["state"] == "open" and axes[a]["contributors"]]
+    both = [a for a in opened if axes[a]["state"] == "balanced_open"]
+    if none:
+        lines.append({"kind": "none", "dims": [DIM_NAMES[a] for a in none],
+                      "text": _cap(names(none)) + ": no motif MOTIF reads in this evidence speaks to " + ("it." if len(none) == 1 else "them.")})
+    if faint:
+        parts = []
+        for a in faint:
+            poles: Dict[str, List[str]] = {}
+            for c in axes[a]["contributors"]:
+                poles.setdefault(POLES[a][0 if c["cell_value"] < 0 else 1], []).append(MOTIF_LABELS.get(c["motif"], c["motif"]))
+            if len(poles) == 1:
+                (pole, motifs), = poles.items()
+                parts.append(f"{DIM_NAMES[a].lower()} {POLE_WORDS[pole]} ({', '.join(motifs)})")
+            else:
+                parts.append(f"{DIM_NAMES[a].lower()} both ways")
+        lines.append({"kind": "faint", "dims": [DIM_NAMES[a] for a in faint],
+                      "text": "Too weak to decide, faint leans only: " + "; ".join(parts) + "."})
+    if both:
+        parts = []
+        for a in both:
+            pulls = [POLE_WORDS[pole] + " (" + ", ".join(MOTIF_LABELS.get(m, m) for m in ms) + ")" for pole, ms in axes[a]["pulls"].items() if ms]
+            parts.append(f"{DIM_NAMES[a].lower()}: " + " vs ".join(pulls))
+        lines.append({"kind": "both", "dims": [DIM_NAMES[a] for a in both], "text": "Motifs pull both ways — " + "; ".join(parts) + "."})
+    cov = coverage(name, result)
+    quoted = ["“" + t + "”" for t in (cov["unread_own"] or cov["unread_related"])]
+    text = (f"MOTIF's vocabulary reads {cov['read']} of the {cov['returned']} descriptors Qloo returned for {name} "
+            f"and the brands and films Qloo relates to it")
+    if quoted:
+        text += ("; " + poss(name) + " own " if cov["unread_own"] else "; others such as ") + _join(quoted) + " are not in it yet."
+    else:
+        text += "."
+    return {"dims": [DIM_NAMES[a] for a in opened], "lines": lines, "coverage": text, "counts": cov}
+
+
+def scent_story(result: Dict[str, Any]) -> Optional[str]:
+    """The proposed structure in one sentence, from the chosen directions' labels (MOTIF's creative proposal)."""
+    arch = result.get("architecture") or {}
+    if arch.get("status") != "proposed":
+        return None
+    st = arch["structure"]
+
+    def label(role: str) -> Optional[str]:
+        return st[role]["label"].lower().replace(", ", " and ") if st.get(role) else None
+    o, c, d = label("opening"), label("core"), label("drydown")
+    parts = [f"{o} to open" if o else "an opening left to the perfumer",
+             f"{_article(c)} {c} core" if c else "a core left to the perfumer",
+             f"{_article(d)} {d} drydown" if d else "a drydown left to the perfumer"]
+    return _cap(", ".join(parts[:2]) + " and " + parts[2]) + "."
+
+
+def accord_character(result: Dict[str, Any], library: Dict[str, Any]) -> Optional[str]:
+    """What the chosen directions bring to the dimensions the evidence leaves open, from their documented cells in
+    the olfactory library (odor data or MOTIF's design reading). A creative reading of the proposal, not evidence:
+    the dimensions stay open, nothing here changes a score, a dimension, or the structure."""
+    arch = result.get("architecture") or {}
+    opened = open_dims(result)
+    if arch.get("status") != "proposed" or not opened:
+        return None
+    vectors = {d["id"]: d["vector"] for d in library["directions"]}
+    picks = [(role, s["direction"]) for role, s in arch["structure"].items() if s]
+    leans, mixed, unset = [], [], []
+    for a in opened:
+        cells = [(role, vectors[d][a]["value"]) for role, d in picks if (vectors.get(d) or {}).get(a)]
+        if not cells:
+            unset.append(DIM_NAMES[a].lower())
+        elif len({v > 0 for _, v in cells}) == 1:
+            strongest = max(abs(v) for _, v in cells)
+            pole = POLES[a][1 if cells[0][1] > 0 else 0]
+            word = ("slightly " if strongest <= 0.25 else "") + POLE_WORDS[pole]
+            # say so when the accords go against a lean the evidence shows but too weakly to decide
+            faint = {POLES[a][0 if c["cell_value"] < 0 else 1] for c in result["axes"][a]["contributors"]}
+            if result["axes"][a]["state"] == "open" and len(faint) == 1 and pole not in faint:
+                word += f" (against the faint {POLE_WORDS[next(iter(faint))]} lean)"
+            leans.append(word)
+        else:
+            sides: Dict[str, List[str]] = {}
+            for role, v in cells:
+                sides.setdefault(POLE_WORDS[POLES[a][1 if v > 0 else 0]], []).append(role)
+            mixed.append(f"{DIM_NAMES[a].lower()} is mixed ("
+                         + ", ".join(word + " in the " + _join(roles) for word, roles in sides.items()) + ")")
+    if not (leans or mixed or unset):
+        return None
+    if not (leans or mixed):
+        return "As built, the accords do not set " + _join(unset) + " either."
+    parts = (["the accords also read " + _join(leans)] if leans else []) + mixed
+    if unset:
+        parts.append(_join(unset) + (" is" if len(unset) == 1 else " are") + " not set by the accords either")
+    return "As built, " + "; ".join(parts) + "."
+
+
 def template_prose(name: str, result: Dict[str, Any]) -> str:
     """Plain-language brief written by a fixed template (no LLM). It opens with the same lead as the page."""
     axes = result["axes"]
@@ -181,11 +317,8 @@ def template_prose(name: str, result: Dict[str, Any]) -> str:
                                                          for a in resolved) + ".")
     arch = result.get("architecture")
     if arch and arch["status"] == "proposed":
-        roles = []
-        for role, s in arch["structure"].items():
-            roles.append(f"{role}: {s['label'].lower()} ({_join(s['descriptors'][:2])}{', tentative' if s['basis'] == 'tentative' else ''})"
-                         if s else f"{role}: open to the perfumer")
-        parts.append("Scent architecture. " + "; ".join(r[0].upper() + r[1:] for r in roles) + ".")
+        parts.append("In scent: " + scent_story(result)[:1].lower() + scent_story(result)[1:]
+                     + (" Every role rests on tentative leanings." if arch.get("basis") == "tentative" else ""))
         if arch["emphasize"]:
             parts.append("Emphasize " + _join([x["label"].lower() for x in arch["emphasize"]]) + ".")
         if arch["avoid"]:

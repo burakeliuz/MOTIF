@@ -102,6 +102,15 @@ class StartResultAndBrief(unittest.TestCase):
     def test_open_dimensions_and_roles_say_so_plainly(self):
         self.assertEqual(self.c["result_role_names"], ["Opening", "Core", "Drydown"])
         self.assertEqual(self.c["pdf_open_count"] > 0, self.c["result_open_count"] > 0)
+        # told once, grouped by why; never one line per dimension
+        self.assertEqual((self.c["result_per_dimension_open"], self.c["pdf_per_dimension_open"]), (0, 0))
+        self.assertLessEqual(self.c["result_open_boxes"], 1)
+
+    def test_evidence_and_creative_proposal_are_labelled_apart(self):
+        self.assertEqual(self.c["result_provenance"][:3], ["Qloo evidence", "MOTIF's translation", "MOTIF's creative proposal"])
+
+    def test_every_motif_row_shares_one_label_column(self):
+        self.assertEqual(len(self.c["profile_columns"]), 1, self.c["profile_columns"])
 
     def test_no_internal_wording_and_the_context_appears_once(self):
         self.assertIsNone(self.c["result_internal"])

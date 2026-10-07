@@ -329,6 +329,21 @@ def continuous_view(name: str, result: Dict[str, Any], library: Dict[str, Any]) 
         cells = (result["motif_scores"].get(r["motif"]) or {})
         return "No sensory claim: open to the perfumer." if cells else ""
 
+    def common_note(motif: str) -> Optional[str]:
+        """A word common to many brands (lexicon commonness) still counts lightly toward a motif that has other
+        support; say so, with where it was found, so the score is not read as resting on the examples alone."""
+        s = result["motif_scores"].get(motif) or {}
+        ch = s.get("channels") or {}
+        own = bool((ch.get("own") or {}).get("common_cue_groups"))
+        related = {k: (ch.get(k) or {}).get("common_only_entities", 0) for k in ("brand", "movie", "artist")}
+        if not own and not any(related.values()):
+            return None
+        words = sorted({a["cue_id"] for a in result["annotations"] if a["motif"] == motif and a["role"] == "context_common_cue"})
+        where = ([story.poss(name) + " own entry"] if own else []) + [
+            f"{n} related {k if k != 'movie' else 'film'}{'s' if n != 1 else ''}" for k, n in related.items() if n]
+        return ("Also counted lightly: " + story._join(["“" + w + "”" for w in words]) + (", a word" if len(words) == 1 else ", words")
+                + " common to many brands, in " + story._join(where) + ".")
+
     profile_rows = []
     for r in rows:
         kinds = set(r["source_kinds"])
@@ -338,7 +353,7 @@ def continuous_view(name: str, result: Dict[str, Any], library: Dict[str, Any]) 
                              "source_short": [SOURCE_SHORT[k] for k in r["source_kinds"]],
                              "basis": {"kind": "own_and_related" if r["own"] and kinds - {"own"} else "own_only" if r["own"] else "related_only",
                                        "text": _basis_text(name, r["own"], bool(kinds - {"own"}))},
-                             "translation": translation(r), "examples": examples(r["motif"])})
+                             "translation": translation(r), "examples": examples(r["motif"]), "common": common_note(r["motif"])})
     dims = []
     for a in AXES:
         v = axes[a]
@@ -350,10 +365,8 @@ def continuous_view(name: str, result: Dict[str, Any], library: Dict[str, Any]) 
                        basis_text=("From references Qloo relates to the brand only." if share == 0 else
                                    "From the brand's own motifs." if share == 1 else "From the brand's own motifs and its references."),
                        design_only=v["evidence_basis"] == "design_inference_only")
-        elif v["state"] == "balanced_open":
-            row["open_text"] = "Open to the perfumer: " + "; ".join(f"{', '.join(ms).lower()} toward {POLE_WORDS[p]}" for p, ms in pulls.items()) + "."
-        else:
-            row["open_text"] = "Open to the perfumer."
+        else:  # why it is open, and what the proposal brings to it, are told once for all open dimensions (open_summary)
+            row["pulls"] = pulls
         dims.append(row)
     arch = result.get("architecture") or {"status": "open", "structure": {}, "emphasize": [], "avoid": [], "basis": None}
     roles = []
@@ -398,6 +411,9 @@ def continuous_view(name: str, result: Dict[str, Any], library: Dict[str, Any]) 
         "profile": [p for p in profile_rows if p["leads"]],
         "minor": [p for p in profile_rows if not p["leads"]],
         "dimensions": dims,
+        "open_summary": story.open_summary(name, result),
+        "scent_story": story.scent_story(result),
+        "accord_character": story.accord_character(result, library),
         "still_open": [{"key": a, "axis": AXIS_NAMES[a], "poles": POLES[a], "state": axes[a]["state"]} for a in AXES if axes[a]["state"] != "resolved"],
         "architecture": {"status": arch["status"], "tentative": arch.get("basis") == "tentative", "roles": roles,
                          "emphasize": [{"label": x["label"], "because": [AXIS_NAMES[a].lower() for a in x["because"]]} for x in arch["emphasize"]],

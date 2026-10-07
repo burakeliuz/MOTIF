@@ -136,8 +136,10 @@ details.axes dl { margin-top: 10px; max-width: 46em; }
 
 /* result: sections */
 .sec { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--g); margin-top: clamp(40px, 6vw, 84px); border-top: 2px solid var(--ink); padding-top: 12px; }
-.sec > h2 { grid-column: 1 / 4; font: 800 13px/1.3 var(--disp); letter-spacing: .14em; text-transform: uppercase; }
-.sec > h2 .num { display: block; font: 900 64px/1 var(--disp); font-stretch: 62%; letter-spacing: 0; margin-bottom: 6px; }
+.sec > .sech { grid-column: 1 / 4; min-width: 0; }
+.sech h2 { font: 800 13px/1.3 var(--disp); letter-spacing: .14em; text-transform: uppercase; }
+.sech h2 .num { display: block; font: 900 64px/1 var(--disp); font-stretch: 62%; letter-spacing: 0; margin-bottom: 6px; }
+.sech .prov { margin: 8px 0 0; font: 600 10.5px/1.3 var(--disp); letter-spacing: .1em; text-transform: uppercase; color: var(--mute); }
 .sec > .body { grid-column: 4 / 13; min-width: 0; }
 .sec .intro { color: var(--mute); max-width: 46em; }
 
@@ -158,25 +160,29 @@ details.refs { margin-top: 10px; font-size: 14px; }
 details.refs summary { cursor: pointer; display: inline-block; font: 700 11px/1.3 var(--disp); letter-spacing: .12em; text-transform: uppercase; border-bottom: 1px solid var(--ink); }
 details.refs ul { list-style: none; margin: 8px 0 0; padding: 0; }
 details.refs li { padding: 4px 0; border-bottom: 1px solid var(--hair); overflow-wrap: anywhere; }
-.openlist { list-style: none; margin: 16px 0 0; padding: 0; font-size: 15px; max-width: 46em; }
-.openlist li { padding: 5px 0; border-bottom: 1px solid var(--hair); }
+.openbox { margin-top: 18px; border-top: 1px solid var(--hair); padding-top: 10px; max-width: 46em; }
+.openbox .kicker { margin: 0 0 6px; }
+.openbox p { margin: 0 0 6px; font-size: 15px; }
+.story { font: 400 18px/1.5 var(--text); max-width: 46em; margin: 0 0 4px; }
+.story + .mute.small { margin: 0 0 18px; }
 .ea { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--g); }
 .ea ul { list-style: none; margin: 0; padding: 0; }
 .ea li { padding: 6px 0; border-bottom: 1px solid var(--hair); }
 
 /* why / decisions / brief */
 .basis, .why { list-style: none; margin: 0; padding: 0; }
-/* The label column is at least 170px and grows to its longest word ("EXPERIMENTATION"); when it grows,
-   the description wraps below it instead of running under the label. */
-.basis li, .why li { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 4px 20px; padding: 12px 0; border-bottom: 1px solid var(--hair); }
-.basis .ax, .why .ax { box-sizing: border-box; flex: 0 0 auto; width: min-content; min-width: min(170px, 100%); max-width: 100%; overflow-wrap: break-word; hyphens: auto; font: 900 26px/1 var(--disp); font-stretch: 68%; text-transform: uppercase; }
-.basis li > :not(.ax), .why li > :not(.ax) { flex: 1 1 0; min-width: min(100%, calc(100% - 190px)); }
+/* One label column for every motif and why row: wide enough for the longest single label word at this size
+   ("EXPERIMENTATION", with the related-only accent bar); longer labels wrap at their spaces. On phones every
+   row stacks the same way (see the mobile rules). */
+.basis li, .why li { display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 4px 20px; padding: 12px 0; border-bottom: 1px solid var(--hair); }
+.basis .ax, .why .ax { box-sizing: border-box; min-width: 0; overflow-wrap: break-word; hyphens: auto; font: 900 24px/1 var(--disp); font-stretch: 68%; text-transform: uppercase; }
 .basis .ax small, .why .ax small { display: block; font: 600 10.5px/1.3 var(--disp); letter-spacing: .1em; color: var(--mute); margin-top: 4px; }
 .why p { margin: 0 0 8px; font-size: 15px; }
 .why .phr { display: inline-flex; margin-top: 0; }
 .basis li.rel .ax { border-left: 3px solid var(--accent); padding-left: 10px; }
 .basis .tr { font-size: 15px; margin: 0; }
 .basis .tr.open { color: var(--mute); }
+.basis .common { font-size: 13px; color: var(--mute); margin: 8px 0 0; }
 .sources { margin-top: 22px; border-top: 1px solid var(--ink); padding-top: 10px; }
 .sources ul { list-style: none; margin: 0; padding: 0; font-size: 15px; }
 .sources li { padding: 6px 0; border-bottom: 1px solid var(--hair); overflow-wrap: anywhere; }
@@ -257,8 +263,10 @@ code { font: 12px/1.4 ui-monospace, Menlo, monospace; background: var(--paper); 
   .idea { font-size: 30px; }
   .char .w .v { font-size: 34px; }
   .sec { margin-top: 40px; }
-  .sec > h2 { grid-column: 1; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 10px; overflow-wrap: break-word; }
-  .sec > h2 .num { font-size: 30px; margin: 0; }
+  .sec > .sech { grid-column: 1; }
+  .sech h2 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 10px; overflow-wrap: break-word; }
+  .sech h2 .num { font-size: 30px; margin: 0; }
+  .sech .prov { margin: 2px 0 0; }
   .sec > .body { grid-column: 1; }
   .roles { grid-template-columns: minmax(0, 1fr); gap: 18px; }
   .role { grid-template-columns: 48px minmax(0, 1fr); gap: 0 12px; }
@@ -266,7 +274,7 @@ code { font: 12px/1.4 ui-monospace, Menlo, monospace; background: var(--paper); 
   .role .nm { font-size: 19px; }
   .ea { grid-template-columns: 1fr; }
   .mrow { grid-template-columns: minmax(0, 1fr); }
-  .basis li > :not(.ax), .why li > :not(.ax) { min-width: 100%; }
+  .basis li, .why li { grid-template-columns: minmax(0, 1fr); }
   .option { grid-template-columns: 1fr; }
   .option .btn { width: 100%; }
   dl.kv { grid-template-columns: 1fr; gap: 0; }

@@ -214,9 +214,15 @@ function renderChoose(s) {
 
 // ---------- result ----------
 
+// What each part of the result is: Qloo's evidence, MOTIF's translation of it, or MOTIF's creative proposal.
+const PROVENANCE = { "Cultural profile": "Qloo evidence", "Olfactory direction": "MOTIF's translation",
+  "Scent architecture": "MOTIF's creative proposal", "Emphasize and avoid": "MOTIF's creative proposal" };
+
 function section(num, title, ...body) {
   return h("section", { class: "sec", id: "sec-" + num },
-    h("h2", {}, h("span", { class: "num", text: num }), title), h("div", { class: "body" }, body));
+    h("div", { class: "sech" }, h("h2", {}, h("span", { class: "num", text: num }), title),
+      PROVENANCE[title] ? h("p", { class: "prov", text: PROVENANCE[title] }) : null),
+    h("div", { class: "body" }, body));
 }
 
 function supplierLink(url, text) {
@@ -236,7 +242,8 @@ function profileBlock(r, brand) {
     h("div", { class: "ax" }, p.label, h("small", { text: p.strength_label + " · " + (p.basis.kind === "related_only" ? "references only: " : "") + p.source_short.join(", ") })),
     h("div", {},
       p.translation ? h("p", { class: "tr" + (/^Moves/.test(p.translation) ? "" : " open"), text: p.translation }) : null,
-      phraseButtons(p.examples, byMotif[p.motif] || p)))));
+      phraseButtons(p.examples, byMotif[p.motif] || p),
+      p.common ? h("p", { class: "common", text: p.common }) : null))));
   const qloo = h("b", { text: "Cultural evidence sourced from Qloo." });
   if (!r.profile.length) return [h("p", { class: "intro" }, qloo, r.minor.length
       ? " The weaker signals MOTIF reads in it; none is strong enough to lead." : " MOTIF reads no motif in it."),
@@ -251,8 +258,17 @@ function dimensionsBlock(r) {
   return h("div", { class: "dir" },
     resolved.length ? h("div", { class: "char" }, resolved.map((d) => h("span", { class: "w" + (d.tentative ? " rel" : "") },
       h("span", { class: "v", text: d.word }), h("small", { text: d.name + " · " + d.confidence_word })))) : h("p", { class: "none", text: "No dimension is resolved yet." }),
-    open.length ? h("ul", { class: "openlist" }, open.map((d) => h("li", {}, h("b", { text: d.name + ": " }), d.open_text))) : null,
-    resolved.some((d) => d.tentative) ? h("p", { class: "mute small", text: "Tentative leanings rest on MOTIF's design reading alone; supported ones on the brand's motifs with a medium-confidence translation." }) : null);
+    resolved.some((d) => d.tentative) ? h("p", { class: "mute small", text: "Tentative leanings rest on MOTIF's design reading alone; supported ones on the brand's motifs with a medium-confidence translation." }) : null,
+    openBlock(r.open_summary));
+}
+
+// Every dimension the evidence leaves open, in one place, grouped by why it is open.
+function openBlock(o) {
+  if (!o) return null;
+  return h("div", { class: "openbox" },
+    h("p", { class: "kicker", text: "Open to the perfumer" }),
+    o.lines.map((line) => h("p", { text: line.text })),
+    h("p", { class: "mute small", text: o.coverage }));
 }
 
 function andList(xs) {
@@ -272,7 +288,9 @@ function roleDetail(role) {
 function architectureBlock(r) {
   const a = r.architecture;
   if (a.status !== "proposed") return h("p", { class: "intro", text: "No scent architecture is proposed: no dimension is resolved. The structure is open to the perfumer." });
-  return [a.tentative ? h("p", { class: "intro", text: "Tentative: every role here rests on tentative leanings." }) : null,
+  return [h("p", { class: "story" }, h("b", { text: "In scent: " }), r.scent_story, r.accord_character ? " " + r.accord_character : ""),
+    h("p", { class: "mute small", text: "MOTIF's creative proposal, built from the olfactory direction above; not Qloo evidence, and nothing has been smelled."
+      + (a.tentative ? " Every role here rests on tentative leanings." : "") }),
     h("div", { class: "roles" }, a.roles.map((role) => {
       if (role.open) return h("div", { class: "role open" }, h("p", { class: "kicker", text: role.name }), h("p", { class: "nm", text: "Open to the perfumer" }));
       const strip = h("span", { class: "strip", "aria-hidden": "true" });

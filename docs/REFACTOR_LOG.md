@@ -294,3 +294,25 @@ PDF, and one-page PDFs. No Qloo or LLM request was made.
   Anthropic key present: 15 real Claude calls (about $0.10 estimated) were made
   and logged to temporary ledgers; their rows were added to `data/llm_calls.jsonl`.
   The PDF code itself makes no call.
+
+## Review of two hosted results: Adidas and OpenAI (2026-10-07)
+
+- Both brands fetched once through the product's controller (8 Qloo requests,
+  no LLM; git-ignored recordings). Findings in `reports/adidas_openai_review.md`:
+  Qloo returns 139 and 129 distinct descriptors, MOTIF reads 3 and 5; the two
+  read motifs (restraint, precision) have no cells for impression, projection, or
+  sweetness, so those stay open; both targets point the same way (light plus
+  smooth), so the cosine matching picks the same structure; Adidas' restraint
+  rests mostly on the common word "minimalist", switched on by one film tag about
+  narrative tone ("Understated humanism").
+- Presentation only (no engine, threshold, or config change): open dimensions
+  in one block grouped by why, with a coverage line; "In scent" sentence and the
+  chosen accords' documented character for the open dimensions, labelled as
+  MOTIF's creative proposal; section labels for Qloo evidence, MOTIF's
+  translation, and MOTIF's creative proposal; common words disclosed in the
+  profile; the related-only headline says the motif "leads only with the
+  references"; web, HTML brief, and PDF consistent.
+- Rows: every motif and why row shares one 210 px label column at 24 px; phones
+  stack every row the same way (EXPERIMENTATION no longer gets its own layout).
+- Engine proposals for the owner (not applied): lexicon coverage, narrative-tone
+  context rule, common-word unlocking, no olfactory-layer change.

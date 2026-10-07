@@ -113,7 +113,7 @@ class WebAndPrintAgree(unittest.TestCase):
     def test_the_printed_brief_reads_the_shared_fields_and_has_no_empty_list_text(self):
         js = (STATIC / "print.js").read_text(encoding="utf-8")
         app = (STATIC / "app.js").read_text(encoding="utf-8")
-        for field in ("r.headline", "r.architecture", "r.sources", "r.dimensions", "r.profile", "r.why"):
+        for field in ("r.headline", "r.architecture", "r.sources", "r.dimensions", "r.profile", "r.why", "r.open_summary", "r.scent_story", "r.accord_character"):
             self.assertIn(field, js)
             self.assertIn(field, app)
         self.assertNotIn("Set by the evidence", js)
