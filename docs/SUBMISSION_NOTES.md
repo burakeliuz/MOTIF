@@ -31,7 +31,9 @@ The owner must confirm these on the page itself.
   on it: that a password-protected demo is accepted, and that the testing
   instructions field is visible only to judges. The password is never written
   into a public description. (The build environment cannot open devpost.com, so
-  this rests on the owner's reading.)
+  this rests on the owner's reading.) **Decision (owner, 2026-10-08):** the
+  password is removed before judging starts, so judges need none; it stays on
+  until then.
 - A public repository with all code, assets, and run instructions, plus a text description.
 - Judging criteria: Technological Implementation, Design, Potential Impact,
   and Quality of the Idea (no weights seen).
@@ -301,7 +303,7 @@ until the owner approves them; no engine or deployment change was made.
 
 ## 2i. Devpost package (2026-10-08)
 
-- Final texts in `docs/DEVPOST_SUBMISSION.md`: tagline, a 486-word story in
+- Final texts in `docs/DEVPOST_SUBMISSION.md`: tagline, a 498-word story in
   Devpost's sections, built with, judge test steps, gallery captions, and the
   four judging criteria mapped to features.
 - Cover and four gallery images (1500 × 1000 PNG) and a sample PDF in
@@ -310,6 +312,11 @@ until the owner approves them; no engine or deployment change was made.
   from a local run of `main` with live Qloo data (four requests, 2026-10-07);
   Claude not called. Covers kit items 1, 2, and 4 (problem, Qloo workflow,
   screenshots without credentials or personal data).
+- Text revision (owner, 2026-10-08): a more product-focused story (who it helps,
+  what Qloo contributes), the creative-starting-brief framing stated once, test
+  steps that start at the demo address without a password, and the live site
+  described with Claude writing the brief (the sample PDF's template prose is
+  noted as a property of the local capture only).
 
 ## 3. Redacted request-to-result explanation
 
@@ -381,10 +388,9 @@ Hosted demo: <https://motif-pxh8.onrender.com> (Render free web service, deploye
 from `main` by the owner; keys are server-side environment variables).
 
 The demo is behind a review password (`MOTIF_ACCESS_PROTECTION=on`,
-`MOTIF_ACCESS_PASSWORD`). Whether it stays on for judging is the owner's decision
-after the organizers confirm (section 0); turning it off is one environment
-variable. Copy-ready Devpost texts and a testing-instructions draft with a
-password placeholder: `docs/DEVPOST_SUBMISSION.md`.
+`MOTIF_ACCESS_PASSWORD`) until judging; the owner removes it before judging starts
+(section 0; one environment variable). Copy-ready Devpost texts and test steps
+that start directly at the demo address: `docs/DEVPOST_SUBMISSION.md`.
 
 Server variables (names only): `QLOO_API_KEY`, `MOTIF_ACCESS_PROTECTION`,
 `MOTIF_ACCESS_PASSWORD`, `MOTIF_ANTHROPIC_API_KEY` (optional), `MOTIF_LLM_MODEL`, `MOTIF_LLM_MAX_CALLS`,
