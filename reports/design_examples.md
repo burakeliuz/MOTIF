@@ -107,7 +107,7 @@ Each cause is a hypothesis; where the evidence does not decide it, it says so.
 These are listed in `MOTIF_BUILD_SPEC.md`, section 17.
 
 No new brand was queried in stage 3, and no extra Qloo request was made. A
-held-out check is planned as stage-4 task T1; it needs the owner's OK.
+held-out check followed as stage-4 task T1 (`reports/holdout_t1.md`).
 
 ## 3. Chain A: MUJI
 
@@ -241,8 +241,8 @@ Rules, lexicon, thresholds, and palette are identical in both columns.
   own description as returned by Qloo, so it is still Qloo data.
 - **"Plus relations"** adds related brands, movies, and artists.
 
-A baseline without any Qloo data (model memory) is a separate, deferred
-evaluation (`docs/DEFERRED_DESIGN.md`).
+A baseline without any Qloo data (model memory) was evaluated later as the
+LLM-only comparison (`docs/VALIDATION.md` §2.5).
 
 | Seed | Seed only: active motifs → axes | Plus relations: active motifs → axes | What changed |
 |---|---|---|---|

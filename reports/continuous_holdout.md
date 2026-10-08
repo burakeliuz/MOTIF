@@ -158,6 +158,6 @@ collision (LEGO = Coca-Cola), an 8% misread rate concentrated on
 "industrial design", and IKEA unresolved by an untyped search. None of these is
 fixed in this phase; candidate fixes (typed search with a fallback, context rules
 for "industrial design" and film techniques, a commonness set that is not
-fashion-heavy, a lead-level floor for resolving a dimension) are listed for the
-owner in `docs/ENGINE_REDESIGN.md` and would need their own version bumps and a
+fashion-heavy, a lead-level floor for resolving a dimension) are listed in
+`docs/ENGINE_REDESIGN.md` and would need their own version bumps and a
 new holdout.

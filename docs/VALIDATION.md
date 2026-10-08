@@ -153,18 +153,17 @@ data and partly design opinion, and labelled as such. The stage-6B trial also
 showed that Qloo's own entries carry character MOTIF's lexicon does not read yet
 (LEGO, Coca-Cola, Harley-Davidson's "Rugged" and "Chrome Details").
 
-## 4. Gates for updating `main` (phase 13)
+## 4. Release gates (phase 13, 2026-10-07)
 
 | Gate | State |
 |---|---|
-| All tests pass (unit, web, browser, PDF) | yes: 228 tests, network blocked (2026-10-07) |
+| All tests pass (unit, web, browser, PDF) | yes: all 228 tests of that release, network blocked |
 | Deterministic engine | yes (§2.1) |
 | No collapse regression | yes: 3 → 11 architectures, 7 → 11 profiles |
 | Holdout without structural failure | yes |
 | No debug or internal wording on the pages | yes (17 recorded brands; browser test) |
 | No secret in the repository | yes: tracked files scanned; only the existing test sentinels |
-| No paid infrastructure | none created |
-| Review password works | yes: the access tests in `tests/test_motif_web.py` pass; the gate is unchanged |
+| Access gate works | yes: the access tests in `tests/test_motif_web.py` pass |
 
 ## 5. Not claimed
 

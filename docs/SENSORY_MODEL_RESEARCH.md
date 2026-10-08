@@ -34,7 +34,7 @@ The requested hierarchy was peer-reviewed olfaction → crossmodal research
 (Spence, Crisinel) → perfumery literature (Jellinek, Zarzo & Stanton, the Edwards
 wheel) → odor databases (Good Scents) → supplier documents.
 
-The cloud environment's network policy blocks the academic and reference hosts
+The research environment could not reach the academic and reference hosts
 this needs (among others `pmc.ncbi.nlm.nih.gov`, `www.frontiersin.org`,
 `www.mdpi.com`, `journals.sagepub.com`, `academic.oup.com`, `link.springer.com`,
 `en.wikipedia.org`, `www.thegoodscentscompany.com`; checked through the agent
@@ -82,7 +82,7 @@ Rules, checked by the review tool:
   when the odor step is replicated in both rated datasets with both r ≥ 0.3 and
   survives the pleasantness control; otherwise weak. **Any low-confidence cell is
   weak**, so a dimension that rests on low cells can read at most "slightly …".
-- **Forbidden without an owner decision** (`config/draft_rules.json` draft-0.2):
+- **Forbidden without an explicit project decision** (`config/draft_rules.json` draft-0.2):
   playful = sweet, melancholic = cool, romantic = floral, heritage = warm,
   industrial = synthetic. These cells stay null.
 
@@ -196,7 +196,7 @@ dry 3 motifs.
 | Imagery routes supported by at least one imagery family | 5 of 5 |
 | Quoted numbers match the family's measured values | pass (checked in rationales, uncertainty, and null notes) |
 | Near-identical motif vectors (cosine ≥ 0.9) | none; most similar: provocative–industrial 0.78, restrained–playful 0.71, opulent–provocative 0.51 |
-| Opposite pairs | restrained–opulent −0.76, precise–natural −0.36, intimate–provocative −0.45; **natural–industrial +0.47** (they share raw texture and dryness; their natural vs manufactured contrast is not encoded because industrial = synthetic needs an owner decision) |
+| Opposite pairs | restrained–opulent −0.76, precise–natural −0.36, intimate–provocative −0.45; **natural–industrial +0.47** (they share raw texture and dryness; their natural vs manufactured contrast is not encoded because industrial = synthetic needs an explicit project decision) |
 | Design cell against its own imagery | opulent → dense, while floral imagery is rated lighter (noted in the cell's uncertainty) |
 | Stereotypes | the five named in draft-0.2 are excluded; remaining low cells are marked tentative |
 | Forced axes | 49 of 72 cells null; three motifs make no claim at all |
@@ -256,11 +256,11 @@ on odors and temperature, pitch, shape, and texture (Spence, Crisinel, Deroy and
 colleagues); Zarzo & Stanton's analyses of perfumers' descriptor spaces; the
 Geneva Emotion and Odor Scale (Chrea and colleagues); M. Edwards' fragrance
 wheel; P. Jellinek's odor-effect classification; Arctander's material
-monographs; the IFRA fragrance ingredient glossary. Opening
-`pmc.ncbi.nlm.nih.gov`, `www.frontiersin.org`, and the publishers' hosts in the
-environment's network settings would allow this. Owner decisions that would
-change the model: any of the five forbidden pairs; whether heritage, romance, or
-melancholy should carry a sensory claim at all.
+monographs; the IFRA fragrance ingredient glossary. Full-text access to
+`pmc.ncbi.nlm.nih.gov`, `www.frontiersin.org`, and the publishers' hosts would
+allow this. Design questions that would change the model: any of the five
+forbidden pairs; whether heritage, romance, or melancholy should carry a
+sensory claim at all.
 
 ## 9. After validation (phase 10)
 
@@ -276,7 +276,7 @@ new holdout.
 ## 10. `sensory-1.1`: two motifs as creative design decisions (2026-10-07)
 
 `lexicon-0.4` reads energy and technology words that Qloo returned for the
-recorded brands, so the model gains two motifs. At the owner's request their
+recorded brands, so the model gains two motifs. By project decision their
 translations are documented as MOTIF's creative design decisions, not
 researched: no odor data was sought, and each motif claims one weak,
 low-confidence cell, so a dimension resting on it alone reads "tentative".

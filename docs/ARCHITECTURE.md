@@ -102,7 +102,7 @@ Every call is reserved in `data/llm_calls.jsonl` before it is sent.
 server; the page never builds HTML from data. Result sections: Cultural profile
 → Olfactory direction → Scent architecture → Emphasize and avoid (only when
 supported) → Why: Qloo → motif → scent → The brief; the brief prints as one A4
-page; "Download brief (PDF)" returns a real PDF rendered on the server from the same session view (`motif/web/briefpdf.py`, fpdf2, no new Qloo or LLM request). Guards: the review gate (`motif/web/access.py`, fail-closed), per-IP and
+page; "Download brief (PDF)" returns a real PDF rendered on the server from the same session view (`motif/web/briefpdf.py`, fpdf2, no new Qloo or LLM request). Guards: the optional access gate (`motif/web/access.py`, fail-closed), per-IP and
 daily session caps, a daily Qloo cap, the LLM ledger and budget guard, request
 reuse within 30 minutes. Recorded mode is local only and refused on Render.
 
@@ -138,7 +138,7 @@ motif/continuous.py six continuous dimensions with the trace
 motif/olfactory.py  scent architecture
 motif/story.py      headline, profile, why-chain, template prose, checks, brief JSON
 motif/llm.py        optional prose writer and call ledger
-motif/web/          server, view model (present.py), review gate, usage caps, static UI
+motif/web/          server, view model (present.py), access gate, usage caps, static UI
 motif/translate.py, materials.py, brief.py, narrative.py, engine.py   legacy engine
 tools/              offline analyses: baseline, engine comparison, holdout, sensory evidence and review, validation
 config/             versioned lexicon, models, library, legacy rules and palette, manifest

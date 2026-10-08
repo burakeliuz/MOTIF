@@ -120,8 +120,9 @@ Palettes"; none of these changes the direction today.
 ### 2.4 Revisions after seeing the results
 
 None applied. A rule candidate (R6, provocation → raw texture) and one palette
-candidate are proposed in `docs/STAGE_6A_DECISIONS.md` §0.1. If R6 is adopted,
-Aesop and Supreme are no longer independent checks for it.
+candidate were proposed separately and tested offline in §3.8; neither was
+adopted. Had R6 been adopted, Aesop and Supreme would no longer be independent
+checks for it.
 
 ## 3. Second trial: four fresh brands (pre-registered 2026-10-07)
 
@@ -157,7 +158,7 @@ positions, not for expected results):
 
 C runs first for all four brands, so nothing from B can reach it. A, A′, and
 the what-ifs reuse the B responses; they send no request. R6 was written on
-2026-10-06 (`docs/STAGE_6A_DECISIONS.md` §0.1) before these brands were chosen,
+2026-10-06, before these brands were chosen,
 so they are independent checks of its behaviour, not of its creative merit.
 The olibanum what-if uses only what Givaudan's full page for "Frankincense Oil
 Somalia FairWild" supports (read 2026-10-07): warm, nothing else.
@@ -183,7 +184,7 @@ Render or hosted-demo request.
 ### 3.2 What was actually used
 
 Run on 2026-10-07 in the pre-registered order: C for all four brands, then B
-for each brand through the real web interface (local live server, review gate
+for each brand through the real web interface (local live server, access gate
 on), then the suggestions, then the offline analyses.
 
 | | Live Qloo network attempts | Real Claude calls | Estimated Claude cost |
@@ -195,9 +196,7 @@ on), then the suggestions, then the offline analyses.
 | **Round total** (caps: 20 and 15) | **20** | **11** | **≈ $0.085** |
 
 Costs are the ledger's estimates (`data/llm_calls.jsonl`, list prices of
-2026-10-06). Qloo hackathon requests have no per-request price. This excludes
-the Claude Code session that built and ran the trial; its usage is development
-cost, not product API use, and is not measured here.
+2026-10-06). Qloo hackathon requests have no per-request price.
 
 **Deviation (recorded before the result was seen).** Balenciaga's live run
 stopped at a question the pre-registration did not cover: weight was pulled
@@ -297,8 +296,9 @@ unread descriptors; none of these is approved today.
 | Sanrio | no change | no change |
 | Balenciaga | texture becomes **conflicted** too (raw from provocation vs polished from strong precision); two open conflicts | no change |
 
-R6 produced a conflict, not a direction, on both fresh brands it touched. Full
-decision package: `docs/STAGE_6A_DECISIONS.md` §0.3.
+R6 produced a conflict, not a direction, on both fresh brands it touched. R6
+and the olibanum material were not adopted; the legacy engine keeps rules
+draft-0.2 and palette-0.3.
 
 ### 3.9 Offline regression on the existing recordings
 

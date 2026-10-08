@@ -1,6 +1,6 @@
 # Why Adidas and OpenAI leave dimensions open and share one structure
 
-Review of 2026-10-07, after the owner's question about two hosted-demo results.
+Review of 2026-10-07, prompted by two hosted-demo results.
 The hosted sessions are not reachable from the build environment, so both brands
 were fetched once through the product's own controller (`LiveQloo`, direct
 transport, `https://hackathon.api.qloo.com`): **8 Qloo requests** (search, own
@@ -130,16 +130,16 @@ in the lexicon. Making them differ inside the olfactory layer would be forcing.
    follow identical readable evidence; differentiation should come from proposal 1.
 
 Proposals 2 and 3 make Adidas' result thinner but more honest; proposal 1 is the
-one that adds information. None is applied without the owner's decision.
+one that adds information. None was applied as part of this review.
 
-## 7. Applied on the owner's decision (2026-10-07)
+## 7. Applied after the review (2026-10-07)
 
 Proposals 1 and 2 were applied as `lexicon-0.4` and `sensory-1.1`, limited to
 energy, technology, and design words, with no brand exception; proposal 3 was
 not. Differences from the proposal text above: "Polished" (the texture pole word
 itself), "Clean" (mostly typography and interface words of related brands),
 "bold", "kinetic", "analytical", and "innovative" were left out; the new cells
-are creative design decisions, not researched (owner's instruction); the
+are creative design decisions, not researched (a project decision); the
 narrative-tone rule covers look and material motifs only, so intimacy told as a
 story still counts. Replayed offline from the same recordings:
 

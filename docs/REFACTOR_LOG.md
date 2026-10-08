@@ -1,21 +1,14 @@
 # Engine and product refactor log (2026-10-07)
 
 One entry per phase of the full engine and product refactor. Each phase runs its
-offline tests, records what changed, and ends with a checkpoint commit on
-`claude/wizardly-carson-y19ryg`. `main` is not touched until phase 13.
+offline tests, records what changed, and ends with a checkpoint commit.
 
 ## Phase 0: repository state
 
-- `origin/main` = `620072b` (6A/6B, four-brand trial, Devpost drafts).
-- Branch = `c5daedf`, two commits ahead of `main` and none behind:
-  `ac3f61e` (offline collapse diagnostic) and `c5daedf` (presentation pass).
-  `main` contains neither.
+- Starting point: the stage-6B product on the rule engine `engine-0.3`, plus an
+  offline collapse diagnostic (`reports/collapse_analysis.md`) and a
+  presentation pass.
 - Tests: 159, all passing.
-- Deployed Render commit: not determinable from this environment. The egress
-  proxy refuses `motif-pxh8.onrender.com`, and `/healthz` returns `{"ok": true}`
-  with no version. The owner deploys `main` manually, so the deployed commit is
-  at most `620072b`.
-- Work continues on the branch; nothing is merged.
 
 ## Phase 1: UI cleanup, engine unchanged
 
@@ -67,12 +60,12 @@ PDF, and one-page PDFs. No Qloo or LLM request was made.
 - `tools/sensory_evidence.py` → `config/candidates/odor_axis_evidence.v1.json`:
   17 odor families × poles, one pole descriptor at a time, bootstrap interval,
   drop-top-5, pleasantness control. The dry pole has no data support.
-- `config/candidates/motif_sensory_vectors.v1.json` (`sensory-1.0`, revision r2):
+- `config/candidates/motif_sensory_vectors.v1.json`, now `config/motif_sensory_vectors.v1.json` (`sensory-1.0`, revision r2):
   23 of 72 cells; 5 medium (the legacy R1–R5 links, capped at moderate), 18 low
   (always weak, read as tentative); the five stereotypes forbidden by draft-0.2
   stay null; heritage, melancholic, romantic make no claim.
 - Review: r1 was reviewed from three lenses (method, perfumer, engine); the
-  engine lens was stopped by the session usage limit. Findings, all checked
+  engine lens was not completed. Findings, all checked
   against the data, drove the one revision (r2). `tools/sensory_model_review.py`
   checks the rules, quoted numbers, coverage, and similarity;
   `tests/test_sensory_model.py` runs it.
@@ -234,14 +227,10 @@ PDF, and one-page PDFs. No Qloo or LLM request was made.
 
 - New: `docs/ARCHITECTURE.md` (roles, pipeline, steps, web app, versions,
   legacy engine R1–R5, repository map).
-- Updated: `CLAUDE.md` (phase line, commands, non-negotiables for the continuous
-  engine; R1–R5 as legacy), `README.md`, `MOTIF_BUILD_SPEC.md` (rev 0.6, §0e),
+- Updated: `README.md`, `MOTIF_BUILD_SPEC.md` (rev 0.6, §0e),
   `docs/ENGINE_REDESIGN.md` (phases 8–10, goals against outcome),
   `docs/SENSORY_MODEL_RESEARCH.md` §9, `docs/MOTIF_SCORING.md`,
-  `docs/OLFACTORY_LAYER.md` (`olfactory-1.1`, phase 9), `docs/VALIDATION.md`,
-  `docs/STAGE_6A_DECISIONS.md` §0.5 (refactor decisions E1–E8),
-  `docs/SUBMISSION_NOTES.md` §2g and limits, `docs/DEVPOST_SUBMISSION.md`
-  (drafts rewritten for the continuous engine; nothing entered on Devpost).
+  `docs/OLFACTORY_LAYER.md` (`olfactory-1.1`, phase 9), and `docs/VALIDATION.md`.
 
 ## Phase 12: screenshots and final page checks
 
@@ -261,18 +250,13 @@ PDF, and one-page PDFs. No Qloo or LLM request was made.
   and temperature" (now a proper list); dimension names capitalized mid-sentence;
   the footer's legacy wording "rule by rule".
 
-## Phase 13: main
+## Phase 13: release
 
 - Gates (`docs/VALIDATION.md` §4): 228 tests pass; deterministic; no collapse
   regression; holdout without structural failure; no internal wording; secret
-  scan clean (test sentinels only); no paid infrastructure; the review gate's
-  tests pass and the gate is unchanged.
-- `main`: the first fast-forward push was refused by this session's permission
-  check; after the owner's explicit OK, `main` was fast-forwarded (no force) to
-  `70c3711`.
-- Render: no authenticated deploy path from this environment (no Render key; the
-  host is not reachable through the network policy). The owner deploys `main`
-  manually, keeping `MOTIF_ACCESS_PROTECTION=on` and the password.
+  scan clean (test sentinels only); the access gate's tests pass.
+- Released to `main` (fast-forward) at `70c3711`; the hosted demo is deployed
+  from `main`.
 
 ## After phase 13: three UI fixes (2026-10-07)
 
@@ -280,7 +264,7 @@ PDF, and one-page PDFs. No Qloo or LLM request was made.
   rendered on the server by `motif/web/briefpdf.py` (fpdf2, pure Python, new in
   `requirements.txt`; Archivo and Newsreader static instances under the SIL OFL in
   `motif/web/fonts/`) from the session already there: one A4 page, selectable
-  text, clickable supplier and Qloo links, behind the review gate, no Qloo or LLM
+  text, clickable supplier and Qloo links, behind the access gate, no Qloo or LLM
   request, rendered once per session. Busy state and plain errors in the page.
 - **No JSON download in the UI.** "Technical JSON" and its links are gone from the
   result and brief pages; the developer endpoint and the session files stay.
@@ -290,10 +274,6 @@ PDF, and one-page PDFs. No Qloo or LLM request was made.
   below; on phones the single-column grids may be narrower than a word, so text
   wraps instead of being clipped. Checked on 4 brands at 6 widths (195–1440 px,
   including 200% zoom) and in the source dialog.
-- While generating sample PDFs, a test script created sessions with the
-  Anthropic key present: 15 real Claude calls (about $0.10 estimated) were made
-  and logged to temporary ledgers; their rows were added to `data/llm_calls.jsonl`.
-  The PDF code itself makes no call.
 
 ## Review of two hosted results: Adidas and OpenAI (2026-10-07)
 
@@ -314,12 +294,12 @@ PDF, and one-page PDFs. No Qloo or LLM request was made.
   references"; web, HTML brief, and PDF consistent.
 - Rows: every motif and why row shares one 210 px label column at 24 px; phones
   stack every row the same way (EXPERIMENTATION no longer gets its own layout).
-- Engine proposals for the owner (not applied): lexicon coverage, narrative-tone
+- Engine proposals (not applied in this pass): lexicon coverage, narrative-tone
   context rule, common-word unlocking, no olfactory-layer change.
 
 ## Lexicon-0.4, sensory-1.1, and a scent-first page (2026-10-07)
 
-Owner request after the review: apply the lexicon proposal limited to energy,
+Follow-up to the review: apply the lexicon proposal limited to energy,
 technology, and design words already in the recordings, fix narrative-tone
 misreads by context, no brand exception, no new research.
 

@@ -13,9 +13,9 @@ services:
     startCommand: python -m motif.web --host 0.0.0.0 --port $PORT
     healthCheckPath: /healthz
     envVars:
-      - key: MOTIF_ACCESS_PROTECTION  # temporary review gate; set to "off" to open the demo to judges
+      - key: MOTIF_ACCESS_PROTECTION  # optional access gate: "on" or "off"
         value: "on"
-      - key: MOTIF_ACCESS_PASSWORD    # review password (secret); with protection on and no password, access stays closed
+      - key: MOTIF_ACCESS_PASSWORD    # access gate password (secret); with protection on and no password, access stays closed
         sync: false
       - key: QLOO_API_KEY          # Qloo hackathon key (secret)
         sync: false
@@ -25,15 +25,11 @@ services:
         value: claude-sonnet-5-5
       - key: MOTIF_LLM_MAX_CALLS     # LLM calls per UTC day; template prose after that
         value: "40"
-      - key: MOTIF_LLM_BUDGET_GUARD  # auto: Claude is paused while the call counter would reset on restart (free plan, no disk);
-        value: auto                  # provider: only after setting an Anthropic workspace spend limit; off: no LLM calls
+      - key: MOTIF_LLM_BUDGET_GUARD  # auto, provider, or off; see docs/DEPLOYMENT.md
+        value: auto
       - key: MOTIF_QLOO_MAX_CALLS_PER_DAY
         value: "200"
       - key: MOTIF_WEB_SESSIONS_PER_DAY
         value: "60"
       - key: MOTIF_WEB_SESSIONS_PER_IP_HOUR
         value: "8"
-# Paid persistence option (owner decision, NOT active; creating it costs money):
-#   plan: starter                     # a disk needs a paid instance type
-#   disk: {name: motif-data, mountPath: /var/data, sizeGB: 1}
-#   envVars: MOTIF_DATA_DIR=/var/data # counters and the LLM ledger then survive restarts and deploys

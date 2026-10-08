@@ -1,7 +1,6 @@
 # Collapse analysis: where distinct Qloo profiles become the same scent output
 
-Offline diagnostic, 2026-10-07, branch `claude/wizardly-carson-y19ryg` (product code
-at `620072b`). **No Qloo request, no LLM call, no change to engine behaviour,
+Offline diagnostic, 2026-10-07 (product code at `620072b`). **No Qloo request, no LLM call, no change to engine behaviour,
 rules, lexicon, palette, or parameters.** The 13 brands of `reports/trial_6b.md`
 are replayed from their stored live responses through the unchanged engine
 (`RecordedQloo`); `tools/collapse_analysis.py` only reads the engine's own
@@ -181,7 +180,7 @@ the same script before anything else changes. Retaining motif weights (D) is the
 natural second step, since only one collision (MUJI = Aesop) originates there.
 
 Not implemented. The mapping would be a new design rule set (version bump,
-written reason, owner approval), and these 13 brands would stop being
+written reason, an explicit project decision), and these 13 brands would stop being
 independent checks for it.
 
 ---
