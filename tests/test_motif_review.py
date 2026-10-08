@@ -236,5 +236,18 @@ class Retry(unittest.TestCase):
         self.assertEqual(srv.created, [])
 
 
+class BriefStep(unittest.TestCase):
+    def test_brief_step_names_claude_while_claude_writes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            hub = FakeHub(tmp)
+            s = web_server.WebSession("s1", ("live", "synthbrand", "brand"), {"reference": "Synthbrand", "type": "brand"},
+                                      "live", None)
+            s.phase, s.outcome = "brief", {"result": {}, "status": "completed"}
+            for configured, who in ((True, "Claude"), (False, "MOTIF")):
+                s.llm_configured = configured
+                step = next(x for x in hub._steps(s) if x["key"] == "brief")
+                self.assertEqual((step["status"], step["who"]), ("running", who))
+
+
 if __name__ == "__main__":
     unittest.main()

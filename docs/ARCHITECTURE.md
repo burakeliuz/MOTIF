@@ -92,8 +92,9 @@ application context and accepted readings apart from the evidence (categories
 
 **Prose** (`motif/llm.py`). With `MOTIF_ANTHROPIC_API_KEY`, one call writes the
 brief text from the result (`prose-c1.0`); the text is checked (no ingredient
-outside the architecture, no numbers, no audience or validation claims, every
-open dimension named). One controlled retry; otherwise the labelled template.
+outside the architecture, no numbers except the digits inside a material name
+the architecture gives, such as 3-octanol, no audience or validation claims,
+every open dimension named). One controlled retry; otherwise the labelled template.
 Every call is reserved in `data/llm_calls.jsonl` before it is sent.
 
 ## 3. Web app

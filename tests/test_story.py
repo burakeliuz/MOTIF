@@ -6,6 +6,7 @@ try:
 except ImportError:
     import _netguard  # noqa: F401
     from motif_fakes import AESTHETIC, STYLE, TONE, evidence_item as ev
+import copy
 import json
 import unittest
 
@@ -86,6 +87,26 @@ class Prose(unittest.TestCase):
         self.assertTrue(any("percentage" in p for p in story.validate_prose("Use 20% of it. " + opened, r)))
         self.assertTrue(any("claim" in p for p in story.validate_prose("Its audience loves calm. " + opened, r)))
         self.assertEqual(story.validate_prose("Synth24 stays quiet. " + opened, r, "Synth24"), [])
+
+    def test_digits_inside_named_materials_are_not_doses(self):
+        r = result(OWN_QUIET)  # its drydown names "3-octanol" and "methyl 2,4-dihydroxy-3,6-dimethylbenzoate"
+        self.assertIn("3-octanol", story._material_names(r))
+        opened = " ".join(story.DIM_NAMES[a] for a in story.open_dims(r)) + " are open to the perfumer."
+        text = "The drydown could draw on 3-octanol or methyl 2,4-dihydroxy-3,6-dimethylbenzoate. " + opened
+        self.assertEqual(story.validate_prose(text, r), [])
+        self.assertEqual(story.validate_prose("3\u2011Octanol could lead it. " + opened, r), [])  # case, typographic hyphen
+        bare = copy.deepcopy(r)  # the same words when the architecture does not name these materials
+        for s in bare["architecture"]["structure"].values():
+            if s:
+                s["materials"] = []
+        self.assertTrue(any("numbers" in p for p in story.validate_prose(text, bare)))
+        for dose in ("Use 2% 3-octanol.", "Add 5 drops of 3-octanol.", "Blend 3-octanol 1:3 with the core.",
+                     "Keep 3-octanol at 0.5 parts.", "Try 13-octanol."):
+            problems = story.validate_prose(dose + " " + opened, r)
+            self.assertTrue(any("numbers" in p or "percentage" in p for p in problems), dose)
+        self.assertTrue(any("percentage" in p for p in story.validate_prose("3-octanol at ten percent. " + opened, r)))
+        self.assertTrue(any("claim" in p for p in story.validate_prose("3-octanol is proven to please. " + opened, r)))
+        self.assertTrue(any("ingredient" in p for p in story.validate_prose("3-octanol and oud. " + opened, r)))
 
     def test_llm_text_is_used_only_when_it_passes(self):
         r = result(OWN_QUIET)

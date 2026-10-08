@@ -349,9 +349,28 @@ def _allowed_terms(result: Dict[str, Any]) -> set:
     return words
 
 
+_HYPHENS = "-\u2010\u2011\u2012\u2013"
+
+
+def _material_names(result: Dict[str, Any]) -> List[str]:
+    """The material references the scent architecture itself names: generic names and trade examples."""
+    names = []
+    for s in ((result.get("architecture") or {}).get("structure") or {}).values():
+        for m in (s or {}).get("materials", []):
+            names += [n for n in (m.get("generic"), m.get("example")) if n]
+    return names
+
+
+def _name_pattern(name: str) -> str:
+    """A material name as a whole-token pattern; any hyphen or run of spaces matches its typographic variants."""
+    parts = [f"[{_HYPHENS}]" if ch in _HYPHENS else r"\s+" if ch.isspace() else re.escape(ch) for ch in name]
+    return r"(?<!\w)" + "".join(parts) + r"(?!\w)"
+
+
 def validate_prose(text: str, result: Dict[str, Any], name: Optional[str] = None) -> List[str]:
     """Problems with an LLM text: ingredients the architecture does not name, numbers or percentages,
-    an open dimension left unsaid, a claim about preference or proof."""
+    an open dimension left unsaid, a claim about preference or proof. Digits inside a material name the
+    architecture gives (for example "3-octanol") are part of that name, not a dose."""
     problems: List[str] = []
     if name:
         text = re.sub(re.escape(name), " ", text, flags=re.IGNORECASE)
@@ -362,7 +381,10 @@ def validate_prose(text: str, result: Dict[str, Any], name: Optional[str] = None
             problems.append(f"names an ingredient the scent architecture does not name: {term!r}")
     if "%" in text or "percent" in low:
         problems.append("contains a percentage")
-    stray = re.findall(r"\d+(?:\.\d+)?", text)
+    counted = text
+    for material in sorted(_material_names(result), key=len, reverse=True):
+        counted = re.sub(_name_pattern(material), " ", counted, flags=re.IGNORECASE)
+    stray = re.findall(r"\d+(?:\.\d+)?", counted)
     if stray:
         problems.append(f"contains numbers (scores and doses do not belong in the brief): {sorted(set(stray))}")
     for a in open_dims(result):

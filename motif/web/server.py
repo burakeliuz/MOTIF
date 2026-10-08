@@ -428,9 +428,9 @@ class Hub:
             s.phase = "engine"
             s.outcome = outcome
             if outcome.get("result") is not None and outcome["status"] == "completed":
-                s.phase = "brief"
                 writer = self._writer()
-                s.llm_configured = writer is not None
+                s.llm_configured = writer is not None  # known before the step shows as running
+                s.phase = "brief"
                 name = (outcome.get("resolution") or {}).get("name") or p["reference"]
                 s.prose = write_prose(name, outcome["result"], writer, intent=p.get("intent"))
                 if writer is None and self._llm_paused():
@@ -491,6 +491,9 @@ class Hub:
                 status = {"skip": "skipped", "stop": "stopped", "ask_user": "waiting"}.get(row["decision"], "done")
                 cached = row.get("served_from") == "session_cache"
                 detail = row["reason"] if status in ("skipped", "stopped", "waiting") else ("reused from this session" if cached else None)
+            elif key == "brief" and s.phase == "brief" and not finished:
+                status, detail = "running", None
+                who = "Claude" if s.llm_configured else "MOTIF"
             elif s.phase == key and not finished:
                 status, detail = "running", None
             elif key == "engine" and s.outcome and s.outcome.get("result") is not None:
@@ -502,9 +505,6 @@ class Hub:
                     detail = "written by " + (s.prose.get("llm") or {}).get("model", "LLM") + ", checked against the engine result"
                 else:
                     detail = s.prose.get("note")
-            elif key == "brief" and s.phase == "brief" and not finished:
-                status, detail = "running", None
-                who = "Claude" if s.llm_configured else "MOTIF"
             else:
                 status, detail = ("not_run" if finished else "pending"), None
             if status in ("pending", "not_run", "skipped"):
