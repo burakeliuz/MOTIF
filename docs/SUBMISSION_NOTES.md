@@ -299,6 +299,18 @@ until the owner approves them; no engine or deployment change was made.
   closed method detail. 7 of 19 recorded brands change resolved dimensions;
   Adidas and OpenAI no longer share a structure; not independently validated.
 
+## 2i. Devpost package (2026-10-08)
+
+- Final texts in `docs/DEVPOST_SUBMISSION.md`: tagline, a 486-word story in
+  Devpost's sections, built with, judge test steps, gallery captions, and the
+  four judging criteria mapped to features.
+- Cover and four gallery images (1500 × 1000 PNG) and a sample PDF in
+  `docs/devpost/`, one story on MUJI: brand input and research steps, the scent
+  idea, a Qloo phrase → motif → scent decision, the one-page PDF. Real screens
+  from a local run of `main` with live Qloo data (four requests, 2026-10-07);
+  Claude not called. Covers kit items 1, 2, and 4 (problem, Qloo workflow,
+  screenshots without credentials or personal data).
+
 ## 3. Redacted request-to-result explanation
 
 Example from the full live run `live-20261006T103307Z-660d` (request `req 0011`; the credential is never stored):

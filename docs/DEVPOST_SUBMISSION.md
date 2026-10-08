@@ -1,247 +1,138 @@
-# Devpost submission texts (copy-ready drafts)
+# Devpost submission (final, copy-ready)
 
-Drafts for the owner to paste into Devpost. The project is already submitted;
-nothing here has been entered or changed on Devpost by the build agent. Every
-claim below matches the implemented product and the reports in this repository
-(`docs/VALIDATION.md`, `reports/final_validation.md`, `reports/trial_6b.md`).
+Texts and images for the owner to paste and upload on Devpost. The project is
+already submitted; nothing here has been entered or changed on Devpost by the
+build agent. Every claim matches the product on `main` and the screens in
+`docs/devpost/` (MUJI, real MOTIF output; capture note under "Image gallery").
 
-**Status of these texts: draft for after deployment.** They describe the
-continuous engine and the redesigned brief (engine refactor of 2026-10-07).
-They become true for judges only after this version is on `main` and the owner
-redeploys Render. If the hosted demo still runs an earlier version, use the
-"Earlier demo variant" at the end instead of the testing steps and gallery.
-
-Basic fields:
+## Basic fields
 
 - **Project name:** MOTIF
-- **Tagline (≈ 200 characters):** If a brand were a scent: MOTIF reads how culture describes a brand in Qloo and translates it, step by traceable step, into a scent direction, a scent architecture, and a one-page perfumer brief.
-- **Demo URL:** https://motif-pxh8.onrender.com (behind a reviewer password, see testing instructions)
-- **Repository:** https://github.com/burakeliuz/MOTIF (MIT license for the code)
+- **Tagline (elevator pitch):** If a brand were a scent: MOTIF reads a brand's cultural evidence in Qloo and turns it into a traceable scent direction and a one-page brief for a perfumer.
+- **Demo:** https://motif-pxh8.onrender.com
+- **Repository:** https://github.com/burakeliuz/MOTIF
 
 ## About the project
 
+*(Not part of the text: copy from "### Inspiration" down to the italic line about brands. Each paragraph is one line, so it pastes without stray line breaks; 486 words without the headings.)*
+
 ### Inspiration
 
-Brand and creative teams who commission a scent (a signature scent for stores, a
-first fragrance, a hotel or retail atmosphere) usually brief a perfumer with
-mood boards and adjectives. The brief decides a lot, yet it rarely says why a
-direction fits the brand. We asked a sharper question: if this brand were a
-scent, what would it be, and can every step from culture to scent be shown and
-checked? (The need is our working assumption; no brand team or perfumer has
-validated MOTIF yet.)
+If a brand were a scent, what would it be? Creative teams shaping a scent idea for a brand's stores, launch or first fragrance usually start from mood boards and adjectives; the perfumer who receives the brief rarely learns why a direction fits. MOTIF is for both: type a brand and get a reasoned scent direction, a scent idea in three parts (opening, core, drydown) and a one-page PDF brief whose every step traces back to its source.
 
 ### What it does
 
-You type a brand and, optionally, an application context ("a signature scent
-for the flagship stores"). MOTIF then shows, step by step:
+Take MUJI. Type the name and, optionally, what the scent is for ("a signature scent for the flagship stores"). MOTIF finds MUJI in Qloo, reads its own entry and the brands and films Qloo relates to it, and shows each research step as it runs. MUJI's own descriptors ("Unpretentious", "Clean Lines", "Natural Materials") and those references ("Muted" on the film Still Walking, "Earthy Color Palette" on the brand studio CLIP) support three motifs: restraint, precision and naturalness. MOTIF reads them as a light, natural-feeling, slightly smooth-finished direction and proposes a scent idea: aromatic herbs to open, a transparent floral core, an earthy, mossy drydown.
 
-1. **Qloo, the cultural evidence.** MOTIF finds the brand in Qloo (and asks you
-   when a name is ambiguous: "Le Labo" returns shops and the brand "Le Labo
-   Fragrances"). It reads the descriptors Qloo attaches to the brand itself and
-   to the brands and films Qloo relates to it.
-2. **MOTIF, the translation.** Descriptors become weighted motifs (restraint,
-   precision, provocation …), the brand's own entry weighing most. A versioned
-   model translates the motifs into six continuous sensory dimensions
-   (temperature, weight, texture, impression, projection, sweetness); a
-   dimension the evidence does not decide stays "open to the perfumer", and a
-   leaning that rests only on MOTIF's design reading is labelled tentative. The
-   dimensions select a scent architecture (opening, core, drydown) from 23
-   accord-type directions, with what to emphasize and avoid when the evidence
-   supports it. Material references are examples of each direction's class,
-   named as in the IFRA ingredient glossary, with a trade name only where we
-   read the supplier's page.
-3. **Claude, the brief.** Claude writes the brief in plain words from the
-   finished result; MOTIF checks it (no ingredient outside the architecture, no
-   numbers, no audience claims, every open dimension named) and falls back to a
-   labelled template otherwise. The application context frames the brief; it
-   does not change the evidence or the direction. The brief prints as one A4 page
-   with its sources, and every step is shown: Qloo → motif → scent.
-
-Examples (stored live Qloo responses of 2026-10-06/07, current engine):
-
-- **MUJI**: "Restraint, precision and naturalness: a light, natural-feeling and
-  slightly smooth-finished direction." Opening aromatic herbs, core transparent
-  floral, drydown earthy and mossy. Projection stays open to the perfumer.
-- **Gucci**: "Provocation: a slightly diffusive direction." Qloo's related brands
-  and films add dense weight and a smooth finish, and the page says they come
-  from those references. Core rich white floral, drydown resinous amber; the
-  opening stays open.
-- **Harley-Davidson**: "Heritage and provocation: a slightly dense and slightly
-  dry direction", labelled tentative: every leaning rests on MOTIF's design
-  reading, and the page says so. Fresh spice, smoke and incense, leather.
+Each phrase opens its source: "Natural Materials" comes from MUJI itself; "Earthy Color Palette" is labelled as a reference Qloo relates to MUJI, not proof of a shared aesthetic. Both read as naturalness, which makes the impression natural-feeling, and the opening and drydown are chosen to fit it. Projection stays open to the perfumer: nothing in the evidence decides it. One click saves the PDF brief.
 
 ### How we built it
 
-- **Qloo Hackathon API**: `/search`, `/entities` (the brand's own entry), and
-  `/v2/insights` for related brands and films; at most four requests per brand,
-  cached per brand so choosing an entity, changing the context, refreshing, or
-  printing repeats nothing.
-- **A research controller** (a deterministic state machine, not an LLM) resolves
-  the entity or asks you to choose, fetches the own entry, related brands, and
-  related films within a budget, stops on a failed request with what it has, and
-  offers one controlled retry.
-- **The engine** (Python standard library), every part versioned: a lexicon of
-  fourteen motifs; saturating motif scores; a motif-to-sensory model built from
-  open odor-descriptor datasets (Dravnieks, Keller & Vosshall, Leffingwell, the
-  IFRA glossary, via Pyrfume) and labelled design readings; continuous
-  aggregation that keeps every contributor; a 23-direction olfactory library.
-  The same evidence and versions always give the same result.
-- **Claude (`claude-sonnet-5-5`)** writes prose only; it chooses no motif,
-  dimension, direction, or material.
-- **Web**: a standard-library Python server and a vanilla JavaScript interface (no
-  HTML built from data), hosted on Render behind a review password. Keys stay
-  server-side; spending is reserved before every paid call.
+A deterministic research controller, not an LLM, makes four Qloo calls per brand (`/search`, `/entities`, and `/v2/insights` for related brands and films), asks you to choose when a name is ambiguous, and stops on a failed request instead of falling back. MOTIF's versioned engine, in plain Python, weighs descriptors into motifs (the brand's own entry counts most), maps motifs to six sensory dimensions with a model partly built on open odor-descriptor data, and picks the best-fitting opening, core and drydown from 23 accord types. Claude, when switched on, only writes the brief's prose, checked against the result; otherwise MOTIF's template writes it.
 
 ### Challenges we ran into
 
-- Qloo describes culture, not smell: the culture-to-scent step is our own model,
-  and it has to say what it cannot decide.
-- Our first engine (five yes/no rules, seven materials) gave 13 brands only 3
-  distinct material sets. We rebuilt it as a continuous model and kept the old
-  engine as a measured baseline.
-- Sensory claims need support: where open odor data exists (warm/cool,
-  light/heavy, sweet/dry ratings of odor families) the model cites it; elsewhere
-  a cell is a labelled design reading, and three motifs carry no claim at all.
-- Related entities are relations, not proof of a shared aesthetic: directions
-  drawn only from them are labelled and never lead the result.
+Qloo describes culture, not smell, so the culture-to-scent step had to be ours, and honest about what it cannot decide. Our first rule engine gave 13 brands only three distinct results, so we rebuilt it as a continuous model.
 
 ### Accomplishments that we're proud of
 
-- An auditable result: every Qloo phrase opens its entity, field, request, and
-  date; every dimension shows the motifs and phrases behind it.
-- Less collapse, measured: on 13 trial brands, 11 distinct scent architectures
-  instead of 3 material sets, deterministic and stable when one descriptor is
-  left out (the architecture changes in 4% of 523 such runs).
-- Unknowns stay unknown, and tentative leanings say so.
+Every claim is traceable: a Qloo phrase opens its source entity and fetch date, and every dimension names the motifs behind it.
 
 ### What we learned
 
-On five pre-registered brands MOTIF had never seen, it resolved four (Qloo's
-search returned only IKEA stores) with no structural failure, and misread 8% of
-the descriptors it relied on ("industrial design" read as an industrial look).
-About a third of the differences between architectures come from MOTIF's
-tentative design readings rather than data, and brands whose descriptors fall
-outside our lexicon (LEGO, Coca-Cola) get thin, similar results. A Claude-only
-brief commits to almost every dimension and agrees with our grounded engine on
-most poles where both commit, but nothing in it can be traced. No perfumer has
-rated the briefs, so we claim no winner.
+Related references are evidence, not proof, so MOTIF labels them and never lets them lead the headline. A useful brief also says what the data leaves open. MOTIF offers a creative starting brief, not a formula: nothing is smelled, dosed or predicted to please anyone.
 
-### What's next
+### What's next for MOTIF
 
-A perfumer's review of real briefs; wider lexicon coverage; context rules for
-the misreads; typed entity search; fresh held-out brands for every model change.
+A perfumer's review of real briefs, a wider vocabulary, and fresh test brands for every model change.
 
-## Current limits (short)
-
-- A creative direction, never a formula: nothing is smelled, balanced, dosed, or
-  tested for safety, and nothing predicts who will like a scent.
-- Much of the culture-to-scent model is design reading, labelled tentative; only
-  some relations rest on open odor data.
-- Related entities are relations, not audience overlap.
-- The demo is password-protected during judging and runs on a free host (first
-  load after a quiet period can take about a minute).
+*Brands appear as examples run on Qloo data; none is affiliated with MOTIF.*
 
 ## Built with
 
-`python` · `javascript` · `html5` · `css3` · `qloo-api` · `anthropic-claude` ·
-`render` · Google Fonts (Archivo, Newsreader)
+`python` · `javascript` · `html5` · `css3` · `qloo` · `claude` · `anthropic` ·
+`fpdf2` · `render` · `playwright` · `google-fonts` · `pyrfume`
 
-## Testing instructions (password placeholder)
+(Qloo hackathon API; Claude `claude-sonnet-5-5`, optional, prose only; fpdf2
+for the PDF; Render free web service; Playwright and Chromium for browser
+tests; Archivo and Newsreader fonts; open odor-descriptor data read through
+Pyrfume for the sensory model.)
 
-Paste only into a field the organizers confirm is visible to judges alone.
-Never put the password in the public description.
+## Try it out
+
+- Demo: https://motif-pxh8.onrender.com
+- Code: https://github.com/burakeliuz/MOTIF
+
+## Testing instructions for judges
+
+Paste into the judges-only field. Write the password there only, never in the
+public description.
 
 ```
-MOTIF is behind a reviewer password during judging.
-
-1. Open https://motif-pxh8.onrender.com
-   (free hosting: the first load after a quiet period can take about a minute).
-2. Sign in with the password: [PASSWORD PLACEHOLDER]
-3. Click "MUJI" (or type a brand), then "Explore a scent direction". Optionally
-   pick or type an application context (for example "Flagship store").
-   Research takes a few seconds and shows its real steps.
-4. On the result: the headline, the cultural profile (every phrase opens its
-   Qloo source), the olfactory direction, the scent architecture (opening,
-   core, drydown), and "Why": which Qloo phrases led to which motif and
-   dimension.
-5. "Download brief (PDF)" saves the one-page brief as a PDF file.
-
-Try also "Le Labo" (ambiguous name: you choose the brand) and
-"Harley-Davidson" (a tentative direction, labelled as such).
+1. Open https://motif-pxh8.onrender.com (free hosting: the first load after a
+   quiet period can take about a minute).
+2. If a sign-in page appears, use the password: [PASSWORD, judges-only field]
+3. Click "MUJI" under the brand field (or type any brand), optionally pick
+   "Flagship store", then "Explore a scent direction". The research steps run
+   for a few seconds.
+4. Read the title and the scent idea, then click a Qloo phrase such as
+   "Natural Materials" to see where it comes from.
+5. Scroll to "Why: Qloo → motif → scent" and click "Download brief (PDF)".
+6. Also try "Le Labo" (Qloo may ask which entity you mean) or a brand of your
+   own. If the brief shows no Claude badge, its prose came from MOTIF's
+   template: Claude is optional and paused on the free host.
 ```
 
-## Short summary in Turkish (for the owner, not for Devpost)
+## Image gallery (upload in this order)
 
-MOTIF, bir markanın Qloo'daki kültürel tanımlarını okur; bunları ağırlıklı
-motiflere, altı sürekli duyusal boyuta ve açılış, kalp ve dip notalarından
-oluşan bir koku mimarisine çevirir; sonunda tek sayfalık bir parfümör brief'i
-verir. Her adımın kaynağı açılabilir. Kanıtın karar vermediği boyutlar
-"parfümöre açık" kalır. Yalnızca MOTIF'in tasarım okumasına dayanan eğilimler
-"tentative" diye işaretlenir. Claude yalnızca metni yazar; araştırmayı belirli
-kurallarla çalışan bir denetleyici yönetir.
+All images are 1500 × 1000 PNG, under 0.4 MB each, in `docs/devpost/`.
 
-## Gallery
+| File | Title on the image | Devpost caption |
+|---|---|---|
+| `00-cover-1500x1000.png` (thumbnail) | If a brand were a scent. | MOTIF: from a brand's cultural evidence in Qloo to a scent idea. The strips are MUJI's proposed opening, core and drydown. |
+| `01-brand-to-direction.png` | From a brand name to a scent direction | Type a brand and, optionally, what the scent is for. MOTIF finds it in Qloo, reads its own entry and the brands and films Qloo relates to it, and shows each real research step before the result. |
+| `02-scent-idea.png` | MUJI as a scent: opening, core, drydown | MUJI reads as restraint, precision and naturalness: a light, natural-feeling, slightly smooth-finished direction. The scent idea and its opening, core and drydown are MOTIF's creative proposal, labelled as such; nothing has been smelled. |
+| `03-qloo-to-scent.png` | From a Qloo phrase to a scent decision | "Natural Materials" comes from MUJI's own Qloo entry; "Earthy Color Palette" from studio CLIP, a brand Qloo relates to MUJI. MOTIF reads both as naturalness, which makes the impression natural-feeling; the opening and drydown are chosen to fit it. Qloo supplies the evidence; MOTIF translates. |
+| `04-pdf-brief.png` | A one-page brief to hand to a perfumer | One click saves a real one-page PDF: the direction, the scent architecture with material references, what to emphasize and avoid, why, and the Qloo sources. A creative starting brief, not a formula. |
 
-Retake the images from a live session after this version is deployed (the
-previous gallery shows the earlier interface). Private image files: they show
-Qloo descriptors, so publishing them follows the same data-sharing decision as
-the repository excerpts. Suggested shots and captions:
+Sample PDF: `docs/devpost/MOTIF-Muji-Brief.pdf` (the file the download button
+saved). Everything is also in `docs/devpost/MOTIF-Devpost-Package.zip`.
 
-1. **Cover**: "If a brand were a scent. Type a brand; MOTIF shows how Qloo, MOTIF, and Claude each contribute."
-2. **Result**: "MUJI: the headline, the cultural profile, and the olfactory direction; projection stays open to the perfumer."
-3. **Scent architecture**: "Opening, core, drydown, each with the dimensions it fits and material references from the IFRA glossary."
-4. **Why**: "Qloo phrase → motif → dimension, for every resolved dimension."
-5. **One-page brief**: "The printable brief with its sources."
-6. **Mobile**: "The same result on a phone."
-7. Optional, **tentative result**: "Harley-Davidson: every leaning is MOTIF's design reading, and the page says so."
+**Capture note.** All screens are real MOTIF output for MUJI, captured on 7
+October 2026 from a local run of the code on `main` (commit 4975a42) with live
+Qloo data (four requests); the hosted demo itself is not reachable from the
+build environment. Claude was not called, so the brief text in the PDF comes
+from MOTIF's template. The images add titles, numbers, arrows, frames and a
+fade at the cut edge of the phone screens; no result was edited.
 
-## Optional demo narration (about 75 seconds; a video is not required)
+## Judging criteria → where MOTIF shows it
 
-"If a brand were a scent, what would it be? MOTIF answers with evidence. I type
-MUJI. MOTIF asks Qloo how culture describes MUJI, and which brands and films Qloo
-relates to it: four requests, shown as real steps. The cultural profile leads
-with MUJI's own motifs: restraint, precision, naturalness. MOTIF translates them
-into a light, natural-feeling, slightly smooth-finished direction; projection
-stays open, because the evidence does not decide it. The scent architecture
-follows: aromatic herbs to open, a transparent floral core, an earthy, mossy
-drydown. 'Why' shows each step from a Qloo phrase to a motif to a dimension.
-Harley-Davidson shows the other side: its leanings rest on MOTIF's design
-reading, and the page labels them tentative. Claude writes the brief, checked
-against the result, and it prints as one page. A direction, not a formula."
-
-## Judging criteria → product evidence
-
-| Criterion (equal weight) | What to show |
+| Criterion | Feature or example |
 |---|---|
-| Technological implementation / Qloo use | Own entry vs. related references weighed and labelled separately; deterministic, versioned engine; legacy vs continuous measured on 13 brands and a pre-registered holdout; entity choice from Qloo search; one controlled retry |
-| Design | Headline and direction first, evidence one tap away; scent architecture drawn as strips; phone layout; one-page brief |
-| Potential impact | A brief a brand team can hand to a perfumer: direction, structure, what to emphasize and avoid, evidence, honest limits |
-| Quality of the idea | Culture → motif → sensory dimension → scent architecture, with unknowns open and tentative leanings labelled |
+| Technological Implementation | Four Qloo calls per brand (`/search`, `/entities`, `/v2/insights` for related brands and films); the brand's own entry and its references weighed and labelled separately; a deterministic controller with entity choice, a request budget and no fallback; a versioned, tested engine; every phrase opens its Qloo source (image 3). |
+| Design | Scent idea first, evidence one click away; scent strips for opening, core and drydown; labels that separate Qloo evidence, MOTIF's translation and MOTIF's creative proposal; phone layout (image 1); one-page PDF (image 4). |
+| Potential Impact | A creative team goes from a brand name to a reasoned direction and a brief it can hand to a perfumer: MUJI from name to PDF (images 1 to 4). |
+| Quality of the Idea | Qloo's cultural descriptors used as evidence for a sensory translation (culture → motif → dimension → accords), with unknowns left open and references never treated as proof (image 3). |
 
-## Earlier demo variant (only if this version is not deployed)
+## Current limits (short)
 
-If Render still runs the earlier rule-engine interface, describe it instead:
-the result shows the cultural profile, MOTIF's proposed direction from five
-draft rules, and Top/Heart/Base starting materials drawn as scent strips (only
-materials verified on the supplier's page), with the printable brief. Remove
-the "Scent architecture" and "Why" gallery shots and testing step 4's wording
-about them.
+- A creative direction, never a formula: nothing is smelled, balanced, dosed or
+  tested for safety, and nothing predicts who will like a scent.
+- Much of the culture-to-scent model is MOTIF's design reading, labelled
+  tentative; only some relations rest on open odor data.
+- Related brands and films are references Qloo relates to a brand, not proof of
+  a shared aesthetic or audience.
+- Free hosting: the first load after a quiet period can take about a minute.
 
-## Before the deadline (suggested check on October 27–28; nothing is scheduled)
+## Before the deadline (owner checklist)
 
-- Deadline: October 30, 2026, 11:45 pm EDT = October 31, 06:45 Türkiye. Judging:
+- Deadline: October 30, 2026, 11:45 pm EDT (October 31, 06:45 Türkiye). Judging:
   November 2–16 (US Eastern); keep the demo working until at least November 17.
-- Re-read the official rules; confirm with the organizers (Discord
-  `#qloo-hackathon`) whether a password-protected demo is accepted and where
-  judges see testing instructions.
-- Check Render: service live, `/healthz` OK, `main` deployed, environment
-  variables present (names only: `QLOO_API_KEY`, `MOTIF_ANTHROPIC_API_KEY`,
-  `MOTIF_ACCESS_PROTECTION`, `MOTIF_ACCESS_PASSWORD`, `MOTIF_LLM_MAX_CALLS`,
-  `MOTIF_LLM_BUDGET_GUARD`, `MOTIF_QLOO_MAX_CALLS_PER_DAY`,
-  `MOTIF_WEB_SESSIONS_PER_DAY`, `MOTIF_WEB_SESSIONS_PER_IP_HOUR`).
-- Budgets for the judging weeks: decide between the options in
-  `docs/STAGE_6A_DECISIONS.md` §0.4 so a judge can always complete MUJI (about four
-  Qloo requests and one Claude call).
-- Repository: public, MIT license present, README setup steps work from a clean
-  clone. The MIT license covers the code, not Qloo data; recorded Qloo data stays
-  out of the public demo.
+- Judge access: the demo is behind the review password. Before judging, either
+  give judges the password in a field the organizers confirm is judges-only, or
+  open the demo (`MOTIF_ACCESS_PROTECTION=off` on Render).
+- Claude on the free host stays paused unless the provider-side spending cap of
+  `docs/STAGE_6A_DECISIONS.md` §0.4 is set; the demo works either way.
+- Check Render on October 27–28: service live, `/healthz` OK, latest `main`
+  deployed.
+- The demo video is planned for a separate session.
